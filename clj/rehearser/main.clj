@@ -10,8 +10,13 @@
   (require 'rehearser.cmd.db-check)
   ((resolve 'rehearser.cmd.db-check/run) opts))
 
+(defn db-reset [opts]
+  (require 'rehearser.cmd.db-reset)
+  ((resolve 'rehearser.cmd.db-reset/run) opts))
+
 (def subcommands
-  {:db-check [db-check "Check database connectivity"]})
+  {:db-check [db-check "Check database connectivity"]
+   :db-reset [db-reset "Reset database contents"]})
 
 (defn usage [summary]
   (str/join \newline
