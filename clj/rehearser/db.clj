@@ -10,3 +10,6 @@
     (str "jdbc:postgresql://"
          hostname ":" port "/" dbname
          "?user=" username "&password=" password)))
+
+(defn db-url->db [database-url]
+  {:connection-uri (libpq->jdbc database-url)})

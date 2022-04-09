@@ -6,6 +6,18 @@
   [["-h" "--help" "Display help and exit"]
    [nil "--database DATABASE Database URL"]])
 
+(defn account-add [opts]
+  (require 'rehearser.cmd.account)
+  ((resolve 'rehearser.cmd.account/add) opts))
+
+(defn account-list [opts]
+  (require 'rehearser.cmd.account)
+  ((resolve 'rehearser.cmd.account/-list) opts))
+
+(defn account-passwd [opts]
+  (require 'rehearser.cmd.account)
+  ((resolve 'rehearser.cmd.account/passwd) opts))
+
 (defn db-check [opts]
   (require 'rehearser.cmd.db-check)
   ((resolve 'rehearser.cmd.db-check/run) opts))
@@ -15,7 +27,10 @@
   ((resolve 'rehearser.cmd.db-reset/run) opts))
 
 (def subcommands
-  {:db-check [db-check "Check database connectivity"]
+  {:account-add [account-add "Add an account"]
+   :account-list [account-list "List accounts"]
+   :account-passwd [account-passwd "Reset password of account"]
+   :db-check [db-check "Check database connectivity"]
    :db-reset [db-reset "Reset database contents"]})
 
 (defn usage [summary]
