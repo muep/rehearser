@@ -1,8 +1,26 @@
-{:paths ["clj" "classes" "sql"]
- :deps {org.clojure/clojure {:mvn/version "1.11.0"}
+{:paths ["clj" "classes" "resources" "sql"]
+ :deps {;; General org.clojure bits
+        org.clojure/clojure {:mvn/version "1.11.0"}
+        org.clojure/core.async {:mvn/version "1.5.648"} ;: [1]
         org.clojure/tools.cli {:mvn/version "1.0.206"}
+
+        ;; Logging
+        org.clojure/tools.logging {:mvn/version "1.2.4"}
+        ch.qos.logback/logback-classic {:mvn/version "1.2.11"}
+
+        ;; HTTP
+        http-kit/http-kit {:mvn/version "2.5.3"}
+        metosin/reitit-core {:mvn/version "0.5.18"}
+        metosin/reitit-ring {:mvn/version "0.5.18"}
+        metosin/muuntaja {:mvn/version "0.6.8"}
+
+        ;; Database
         org.clojure/java.jdbc {:mvn/version "0.7.12"}
         org.postgresql/postgresql {:mvn/version "42.3.3"}
-        org.springframework.security/spring-security-crypto {:mvn/version "5.6.2"}
+        hikari-cp/hikari-cp {:mvn/version "2.13.0"}
         webjure/jeesql {:mvn/version "0.4.7"}
-        org.clojure/core.async {:mvn/version "1.5.648"}}}
+
+        ;; Misc
+        org.springframework.security/spring-security-crypto {:mvn/version "5.6.2"}}}
+
+;; [1] jeesql requires a rather old version

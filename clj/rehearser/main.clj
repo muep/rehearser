@@ -26,12 +26,17 @@
   (require 'rehearser.cmd.db-reset)
   ((resolve 'rehearser.cmd.db-reset/run) opts))
 
+(defn serve [opts]
+  (require 'rehearser.cmd.serve)
+  ((resolve 'rehearser.cmd.serve/serve) opts))
+
 (def subcommands
   {:account-add [account-add "Add an account"]
    :account-list [account-list "List accounts"]
    :account-passwd [account-passwd "Reset password of account"]
    :db-check [db-check "Check database connectivity"]
-   :db-reset [db-reset "Reset database contents"]})
+   :db-reset [db-reset "Reset database contents"]
+   :serve [serve "Run the http service"]})
 
 (defn usage [summary]
   (str/join \newline
