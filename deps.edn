@@ -1,6 +1,7 @@
 {:paths ["clj" "classes" "resources" "sql"]
  :deps {;; General org.clojure bits
         org.clojure/clojure {:mvn/version "1.11.0"}
+        org.clojure/tools.namespace {:mvn/version "1.2.0"}
         org.clojure/core.async {:mvn/version "1.5.648"} ;: [1]
         org.clojure/tools.cli {:mvn/version "1.0.206"}
 
