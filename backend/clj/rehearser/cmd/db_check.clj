@@ -3,6 +3,7 @@
             [rehearser.db :as db]))
 
 (defn run [{{:keys [database-url]} :options :keys [subcmd-args] }]
+  (println "Checking database at" database-url)
   (let [db {:connection-uri (db/libpq->jdbc database-url)}
         schema-ver (-> (jdbc/query db "select max(version) as version from rehearser_schema;")
                        first
