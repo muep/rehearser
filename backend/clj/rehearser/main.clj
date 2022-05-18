@@ -1,6 +1,7 @@
 (ns rehearser.main
   (:require [clojure.string :as str]
-            [clojure.tools.cli :as cli]))
+            [clojure.tools.cli :as cli])
+  (:gen-class))
 
 (def toplevel-options
   [["-h" "--help" "Display help and exit"]
