@@ -20,3 +20,9 @@ select
   name
 from account
 order by id;
+
+-- name: select-account-by-name
+select
+  id, name, pwhash
+from account
+where name = :name;

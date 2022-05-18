@@ -1,29 +1,19 @@
 (ns user
   (:require
-   [clojure.tools.namespace.repl :refer [disable-unload! refresh]]
-   [rehearser.db :refer [libpq->jdbc]]
+   [clojure.tools.namespace.repl :refer [refresh]]
+   [rehearser.db :as db]
    [rehearser.http-service :as service]
-   [sysinfo :refer [sys-summary sys-stat]]))
-
-(disable-unload!)
-
-(defonce server (atom nil))
-
-(defonce database-url "postgres://rehearser:rehearser@localhost:5432/rehearser")
-(defonce port 8080)
+   [sysinfo :refer [sys-summary sys-stat]]
+   [user.state :as state]))
 
 (defn run []
-  (refresh)
-  (swap! server (fn [old-server]
-                  (when old-server
-                    (println "Shutting down" old-server)
-                    (old-server))
-                  (service/run {:jdbc-url (libpq->jdbc database-url)
-                                :port port}))))
+  (state/set-server! (service/run {:jdbc-url (db/libpq->jdbc state/database-url)
+                                   :port state/port})))
 
 (defn stop []
-  (swap! server (fn [old-server]
-                  (when old-server
-                    (println "Shutting down" old-server)
-                    (old-server))
-                  nil)))
+  (state/set-server! nil))
+
+(defn restart []
+  (stop)
+  (refresh)
+  (run))
