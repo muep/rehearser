@@ -6,6 +6,9 @@
    [sysinfo :refer [sys-summary sys-stat]]
    [user.state :as state]))
 
+(defn db []
+  {:connection-uri (db/libpq->jdbc state/database-url)})
+
 (defn run []
   (state/set-server! (service/run {:jdbc-url (db/libpq->jdbc state/database-url)
                                    :port state/port})))
@@ -17,3 +20,6 @@
   (stop)
   (refresh)
   (run))
+
+(defn reset-db []
+  (db/reset (db)))
