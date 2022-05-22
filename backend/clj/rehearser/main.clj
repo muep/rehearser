@@ -55,9 +55,17 @@
                             subcommands))]))
 
 (defn env->jdbc-url []
-  (if-let [db-url (System/getenv "DATABASE_URL")]
-    {:jdbc-url (libpq->jdbc db-url)}
-    {}))
+  (let [database-url (System/getenv "DATABASE_URL")
+        jdbc-url (System/getenv "JDBC_URL")]
+    (cond
+      (not (nil? jdbc-url))
+      {:jdbc-url jdbc-url}
+
+      (not (nil? database-url))
+      {:jdbc-url (libpq->jdbc database-url)}
+
+      :else
+      {})))
 
 (def env->options env->jdbc-url)
 
