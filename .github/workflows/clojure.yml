@@ -15,9 +15,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Run tests
+      working-directory: ./backend
+      run: clojure -M:test
+
     - name: Build Jar archive
       working-directory: ./backend
       run: ./package.sh
+
     - name: Archive the jar archive
       uses: actions/upload-artifact@v2
       with:

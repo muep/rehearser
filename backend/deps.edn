@@ -27,7 +27,9 @@
         org.springframework.security/spring-security-crypto {:mvn/version "5.6.2"}}
  :aliases {:uberdeps {:replace-deps {uberdeps/uberdeps {:mvn/version "1.1.2"}}
                       :replace-paths []
-                      :main-opts ["-m" "uberdeps.uberjar"]}}}
+                      :main-opts ["-m" "uberdeps.uberjar"]}
+           :test {:extra-paths ["test"]
+                  :main-opts ["-m" "rehearser.testsuite"]}}}
 
 ;; [1] jeesql requires a rather old version, so this file requests a
 ;; more up-to-date version
