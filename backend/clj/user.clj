@@ -7,10 +7,10 @@
    [user.state :as state]))
 
 (defn db []
-  {:connection-uri (db/libpq->jdbc state/database-url)})
+  {:connection-uri state/jdbc-url})
 
 (defn run []
-  (state/set-server! (service/run {:jdbc-url (db/libpq->jdbc state/database-url)
+  (state/set-server! (service/run {:jdbc-url state/jdbc-url
                                    :port state/port})))
 
 (defn stop []

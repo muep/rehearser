@@ -7,23 +7,23 @@
 
 (defqueries "rehearser/account.sql")
 
-(defn add [{{:keys [database-url]} :options :keys [subcmd-args]}]
+(defn add [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
   (when-not (= 2 (count subcmd-args))
     (usage-error! "usage: account-add <name> <password>" subcmd-args))
-  (let [db (db-url->db database-url)
+  (let [db {:connection-uri jdbc-url}
         [username pw] subcmd-args]
     (account-create! db {:name username
                          :pwhash (BCrypt/hashpw pw (BCrypt/gensalt 12))})))
 
-(defn -list [{{:keys [database-url]} :options :keys [subcmd-args]}]
-  (let [db (db-url->db database-url)]
+(defn -list [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
+  (let [db {:connection-uri jdbc-url}]
     (doseq [{:keys [id name]} (select-accounts db)]
       (println id name))))
 
-(defn passwd [{{:keys [database-url]} :options :keys [subcmd-args]}]
+(defn passwd [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
   (when-not (= 2 (count subcmd-args))
     (usage-error! "usage: account-add <name> <password>" subcmd-args))
-  (let [db (db-url->db database-url)
+  (let [db {:connection-uri jdbc-url}
         [username pw] subcmd-args
         change-cnt (account-force-passwd! db {:name username
                                               :pwhash (BCrypt/hashpw pw (BCrypt/gensalt 12))})]

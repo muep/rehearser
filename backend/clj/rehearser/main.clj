@@ -1,6 +1,7 @@
 (ns rehearser.main
   (:require [clojure.string :as str]
-            [clojure.tools.cli :as cli])
+            [clojure.tools.cli :as cli]
+            [rehearser.db-url :refer [libpq->jdbc]])
   (:gen-class))
 
 (def toplevel-options
@@ -53,12 +54,12 @@
                               (str "    " (name nom) ": " desc))
                             subcommands))]))
 
-(defn env->database-url []
+(defn env->jdbc-url []
   (if-let [db-url (System/getenv "DATABASE_URL")]
-    {:database-url db-url}
+    {:jdbc-url (libpq->jdbc db-url)}
     {}))
 
-(def env->options env->database-url)
+(def env->options env->jdbc-url)
 
 (defn parse-args [args]
   (let [{:keys [arguments errors options summary] :as opts}

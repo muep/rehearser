@@ -5,7 +5,7 @@
 (disable-unload!)
 
 (defonce server (atom nil))
-(defonce database-url "postgres://rehearser:rehearser@localhost:5432/rehearser")
+(defonce jdbc-url "jdbc:postgresql://localhost:5432/rehearser?user=rehearser&password=rehearser")
 (defonce port 8080)
 
 (defn set-server! [new-server]
