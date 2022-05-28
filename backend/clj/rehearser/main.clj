@@ -91,16 +91,26 @@
       (if-let [subcmd (-> subcommands  (get (keyword subcmd-name)) first)]
         {:options options
          :subcmd subcmd
-         :subcmd-args subcmd-args}
+         :subcmd-args subcmd-args
+         :subcmd-name subcmd-name}
         {:exit-with-message (str/join \newline
                                       [(str "Unexpected subcommand " subcmd-name)
                                        (usage summary)])
          :status 1}))))
 
 (defn -main [& args]
-  (let [{:keys [exit-with-message status options subcmd subcmd-args]} (parse-args args)]
+  (let [{:keys [exit-with-message status options subcmd subcmd-args subcmd-name]} (parse-args args)]
     (when exit-with-message
       (println exit-with-message)
       (System/exit status))
-    (subcmd {:options (merge (env->options) options)
-             :subcmd-args subcmd-args})))
+    (try
+      (subcmd {:options (merge (env->options) options)
+               :subcmd-args subcmd-args})
+      (catch clojure.lang.ExceptionInfo e
+        (case (-> e ex-data :type)
+          :usage (do
+                   (println (-> e ex-data :errors first))
+                   (println "usage: rehearser" subcmd-name "[options]")
+                   (println "options:")
+                   (println (-> e ex-data :summary)))
+          (throw e))))))
