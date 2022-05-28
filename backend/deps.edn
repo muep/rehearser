@@ -7,6 +7,7 @@
 
         ;; Logging
         org.clojure/tools.logging {:mvn/version "1.2.4"}
+        org.slf4j/slf4j-api {:mvn/version "1.7.32"}
         ch.qos.logback/logback-classic {:mvn/version "1.2.11"}
 
         ;; HTTP
