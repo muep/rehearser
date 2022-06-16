@@ -98,6 +98,15 @@
                                        (usage summary)])
          :status 1}))))
 
+
+
+(defn subcmd-usage-msg [subcmd-name errors summary]
+  (str
+   (if (empty? errors) "" (str (first errors) "\n"))
+   (str/join "\n" [(str "usage: rehearser " subcmd-name " [options]")
+                   "options:"
+                   summary])))
+
 (defn -main [& args]
   (let [{:keys [exit-with-message status options subcmd subcmd-args subcmd-name]} (parse-args args)]
     (when exit-with-message
@@ -109,8 +118,11 @@
       (catch clojure.lang.ExceptionInfo e
         (case (-> e ex-data :type)
           :usage (do
-                   (println (-> e ex-data :errors first))
-                   (println "usage: rehearser" subcmd-name "[options]")
-                   (println "options:")
-                   (println (-> e ex-data :summary)))
+                   (println (subcmd-usage-msg subcmd-name
+                                              (-> e ex-data :errors)
+                                              (-> e ex-data :summary)))
+                   (System/exit 2))
+          :help (println (subcmd-usage-msg subcmd-name
+                                           []
+                                           (-> e ex-data :summary)))
           (throw e))))))
