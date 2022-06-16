@@ -1,7 +1,7 @@
 (ns rehearser.cmd.serve
   (:require
    [clojure.tools.cli :as cli]
-   [rehearser.cmd.common :refer [usage-error!]]
+   [rehearser.cmd.common :refer [check-parse-result!]]
    [rehearser.http-service :as http]))
 
 (def serve-options
@@ -17,8 +17,6 @@
          :keys [arguments errors options summary]
          :as opts}
         (cli/parse-opts subcmd-args serve-options)]
-    (when (not (empty? errors))
-      (usage-error! "Bad arguments" {:summary summary
-                                     :errors errors}))
+    (check-parse-result! opts)
     (http/run {:jdbc-url jdbc-url
                :port port})))
