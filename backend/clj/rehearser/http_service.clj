@@ -29,7 +29,7 @@
       (println "after:" session)
       resp)))
 
-(defn make-app [db session-key]
+(defn make-app [db session-key static-file-dir]
   (reitit-ring/ring-handler
    (reitit-ring/router
     [["/health" {:get health/get-health}]
@@ -41,17 +41,24 @@
                          wrap-print-session
                          ]}})
    (reitit-ring/routes
-    (reitit-ring/create-file-handler {:path "/"
-                                      :root "web/"})
+    (if (empty? static-file-dir)
+      (reitit-ring/create-resource-handler {:path "/"})
+      (reitit-ring/create-file-handler {:path "/"
+                                        :root static-file-dir}))
     (reitit-ring/create-default-handler))))
 
-(defn run [{:keys [session-key jdbc-url port]
+(defn run [{:keys [session-key jdbc-url port static-file-dir]
             :or {port 8080}}]
   (log/info "should listen on port" port "and use database at" jdbc-url)
+
+  (if (empty? static-file-dir)
+    (log/info "Should serve static content from resources")
+    (log/info "Should serve static content from" static-file-dir))
+
   (let [ds (hikari/make-datasource {:jdbc-url jdbc-url})
         db {:datasource ds}
         key (or session-key (random/bytes 16))
-        app (make-app db key)
+        app (make-app db key static-file-dir)
         close-server (http-server/run-server app {:port port})]
     (fn []
       (close-server)
