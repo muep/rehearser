@@ -65,7 +65,7 @@
       {:jdbc-url (libpq->jdbc database-url)}
 
       :else
-      {})))
+      {:jdbc-url "jdbc:postgresql://localhost:5432/rehearser?user=rehearser&password=rehearser"})))
 
 (def env->options env->jdbc-url)
 
