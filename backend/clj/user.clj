@@ -19,6 +19,7 @@
 (defn restart []
   (stop)
   (refresh)
+  (require 'user)
   (run))
 
 (defn reset-db []
