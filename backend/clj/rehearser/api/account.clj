@@ -18,17 +18,24 @@
                                 (select-account-by-name db
                                                         {:name username}))]
     (if (BCrypt/checkpw password pwhash)
-      {:status 200
+      {:status 303
        :session (assoc session
                        :account-id id
                        :account-name username)
+       :headers {"Location" "../index.html"}
        :body "Did log in"}
-      {:status 401
+      {:status 303
+       :headers {"Location" "../login.html"}
        :body "Password check failed"})
-    {:status 404
-     :body "Did not find the user"}))
+    {:status 303
+     :headers {"Location" "../login.html"}
+     :body "Password check failed"}))
 
-(def logout login)
+(defn logout [req]
+  {:status 303
+   :headers {"Location" "../login.html"}
+   :session {}
+   :body "Successfully logged out"})
 
 (def passwd login)
 
