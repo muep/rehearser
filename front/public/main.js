@@ -1,5 +1,13 @@
 import { noteAdd, tuneAdd, tuneRm, tunes, tuneById } from "./db.js";
 
+const whoami = await fetch("api/whoami").then(r => r.json());
+if (whoami["account-id"] === null) {
+  window.location.href = "login.html";
+} else {
+  const userNameSpan = document.getElementById("user-name");
+  userNameSpan.textContent = whoami["account-name"];
+}
+
 const contentsAfter = (sep, txt) => {
   const idx = txt.indexOf(sep);
   if (idx === -1) {
