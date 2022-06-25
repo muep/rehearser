@@ -1,6 +1,6 @@
 import { noteAdd, tuneAdd, tuneRm, tunes, tuneById } from "./db.js";
 
-const whoami = await fetch("api/whoami").then(r => r.json());
+const whoami = await fetch("api/whoami").then((r) => r.json());
 if (whoami["account-id"] === null) {
   window.location.href = "login.html";
 } else {
