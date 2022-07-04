@@ -1,7 +1,8 @@
--- name: account-create!
+-- name: account-create<!
 insert into account (name, pwhash)
   values (:name, :pwhash)
-  returning id;
+on conflict (name) do nothing
+returning id;
 
 -- name: account-force-passwd!
 update account

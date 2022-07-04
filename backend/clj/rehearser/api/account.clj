@@ -1,8 +1,22 @@
 (ns rehearser.api.account
-  (:require [jeesql.core :refer [defqueries]])
+  (:require [rehearser.service.account :as service]
+            [jeesql.core :refer [defqueries]])
   (:import (org.springframework.security.crypto.bcrypt BCrypt)))
 
 (defqueries "rehearser/account.sql")
+
+(def account-exceptions
+  {:account-name-format {:status 400
+                         :body "Invalid format for user name"}})
+
+(defn handler-with-exceptions [handler ex-map]
+  (fn [req]
+    (try
+      (handler req)
+      (catch clojure.lang.ExceptionInfo e
+        (if-let [handler (get ex-map (-> e ex-data :type))]
+          (if (fn? handler) (handler (ex-data e)) handler)
+          (throw e))))))
 
 (defn whoami [{:keys [session]}]
   {:status 200
@@ -12,11 +26,11 @@
            {:account-id nil
             :account-name "anonymous"})})
 
-(defn login [{:keys [db session]
-              {:strs [username password]} :params}]
+(defn- login- [{:keys [db session]
+                {:strs [username password]} :params}]
   (if-let [{:keys [id pwhash]} (first
                                 (select-account-by-name db
-                                                        {:name username}))]
+                                                        {:name (service/normalized-name username)}))]
     (if (BCrypt/checkpw password pwhash)
       {:status 303
        :session (assoc session
@@ -31,6 +45,8 @@
      :headers {"Location" "../login.html"}
      :body "Password check failed"}))
 
+(def login (handler-with-exceptions login- account-exceptions))
+
 (defn logout [req]
   {:status 303
    :headers {"Location" "../login.html"}
@@ -39,4 +55,17 @@
 
 (def passwd login)
 
-(def signup login)
+
+(defn- signup- [{:keys [db session]
+                 {:strs [username password]} :params}]
+  (if-let [account (service/create-account! db
+                                            (service/normalized-name username)
+                                            password)]
+    {:status 303
+     :headers {"Location" "../login.html"}
+     :body "Account created"}
+    {:status 303
+     :headers {"Location" "../signup.html#name-conflict=true"}
+     :body "Requested name was already taken"}))
+
+(def signup (handler-with-exceptions signup- account-exceptions))
