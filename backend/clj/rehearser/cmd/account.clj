@@ -1,7 +1,8 @@
 (ns rehearser.cmd.account
   (:require [clojure.java.jdbc :as jdbc]
             [jeesql.core :refer [defqueries]]
-            [rehearser.cmd.common :refer [usage-error!]])
+            [rehearser.cmd.common :refer [usage-error!]]
+            [rehearser.service.account :as service])
   (:import (org.springframework.security.crypto.bcrypt BCrypt)))
 
 (defqueries "rehearser/account.sql")
@@ -11,8 +12,12 @@
     (usage-error! "usage: account-add <name> <password>" {:args subcmd-args}))
   (let [db {:connection-uri jdbc-url}
         [username pw] subcmd-args]
-    (account-create! db {:name username
-                         :pwhash (BCrypt/hashpw pw (BCrypt/gensalt 12))})))
+    (if-let [account-id (-> (service/create-account! db
+                                                     (service/normalized-name username)
+                                                     pw)
+                            :id)]
+      (println "Account" username "created with id:" account-id)
+      (println "Account named" username "already existed, nothing was changed"))))
 
 (defn -list [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
   (let [db {:connection-uri jdbc-url}]
