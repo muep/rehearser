@@ -18,8 +18,3 @@
 (defn create-account! [db username password]
   (account-create<! db {:name username
                         :pwhash (BCrypt/hashpw password (BCrypt/gensalt 12))}))
-
-(defn valid-username? [name]
-  (cond
-    (<= 4 (count name)) false
-    ))
