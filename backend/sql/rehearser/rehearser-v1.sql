@@ -1,7 +1,8 @@
+drop table if exists entry;
+drop index if exists rehearsal_single_null_idx;
 drop table if exists rehearsal;
-drop index if exists sesn_single_null_idx;
-drop table if exists sesn;
-drop table if exists task;
+drop table if exists variant;
+drop table if exists exercise;
 drop table if exists account;
 drop table if exists rehearser_schema;
 
@@ -13,7 +14,7 @@ create table account (
     pwhash text not null
 );
 
-create table task (
+create table exercise (
     id serial unique not null,
     account_id integer not null references account(id),
     title text not null,
@@ -21,7 +22,17 @@ create table task (
     unique (account_id, title)
 );
 
-create table sesn (
+create table variant (
+    id serial unique not null,
+    account_id integer not null references account(id),
+    title text not null,
+    description text not null,
+    unique (account_id, title)
+);
+
+-- This is kind of a collection of rehearsal entries that
+-- occurred together
+create table rehearsal (
     id serial unique not null,
     account_id integer not null references account(id),
     start_time timestamptz not null,
@@ -30,15 +41,16 @@ create table sesn (
     description text not null
 );
 
-create unique index sesn_single_null_idx
-    on sesn (account_id, (duration is null))
+create unique index rehearsal_single_null_idx
+    on rehearsal (account_id, (duration is null))
     where duration is null;
 
-create table rehearsal (
+create table entry (
     id serial unique not null,
-    sesn_id integer not null references sesn(id),
-    task_id integer not null references task(id),
-    rehearse_time timestamptz not null,
+    rehearsal_id integer not null references rehearsal(id),
+    exercise_id integer not null references exercise(id),
+    variant_id integer not null references variant(id),
+    entry_time timestamptz not null,
     remarks text not null
 );
 
