@@ -1,6 +1,7 @@
 (ns rehearser.main
   (:require [clojure.string :as str]
             [clojure.tools.cli :as cli]
+            [rehearser.cmd.common :as common-cmd]
             [rehearser.db-url :refer [libpq->jdbc]])
   (:gen-class))
 
@@ -40,19 +41,14 @@
    :db-reset [db-reset "Reset database contents"]
    :serve [serve "Run the http service"]})
 
-(defn usage [summary]
+
+(defn subcmd-description []
   (str/join \newline
-            ["Usage:"
-             "    rehearser [options]"
-             "    rehearser <subcommand> --help"
-             "    rehearser [options]  <subcommand> [subcommand-options]"
-             "Options:"
-             summary
-             "Subcommands:"
-             (str/join \newline
-                       (map (fn [[nom [_ desc]]]
+            (concat
+             ["subcommands:"]
+             (map (fn [[nom [_ desc]]]
                               (str "    " (name nom) ": " desc))
-                            subcommands))]))
+                            subcommands))))
 
 (defn env->jdbc-url []
   (let [database-url (System/getenv "DATABASE_URL")
@@ -73,56 +69,38 @@
   (let [{:keys [arguments errors options summary] :as opts}
         (cli/parse-opts args toplevel-options :in-order true)
         [subcmd-name & subcmd-args] arguments]
-    (cond
-      (:help options)
-      {:exit-with-message (usage summary)
-       :status 0}
+    (common-cmd/check-parse-result! ["rehearser"] opts
+                                    [(subcmd-description)])
 
-      errors
-      {:exit-with-message (str/join \newline errors)
-       :status 1}
+    (when (nil? subcmd-name)
+      (common-cmd/usage-error! "Subcommand is required"
+                               (common-cmd/usage-msg ["rehearser"]
+                                                     summary
+                                                     [(subcmd-description)])))
 
-      (nil? subcmd-name)
-      {:exit-with-message (str/join \newline
-                                    ["Expected a subcommand" (usage summary)])
-       :status 1}
-
-      :else
-      (if-let [subcmd (-> subcommands  (get (keyword subcmd-name)) first)]
-        {:options options
-         :subcmd subcmd
-         :subcmd-args subcmd-args
-         :subcmd-name subcmd-name}
-        {:exit-with-message (str/join \newline
-                                      [(str "Unexpected subcommand " subcmd-name)
-                                       (usage summary)])
-         :status 1}))))
-
-
-
-(defn subcmd-usage-msg [subcmd-name errors summary]
-  (str
-   (if (empty? errors) "" (str (first errors) "\n"))
-   (str/join "\n" [(str "usage: rehearser " subcmd-name " [options]")
-                   "options:"
-                   summary])))
+    (if-let [subcmd (-> subcommands  (get (keyword subcmd-name)) first)]
+      {:options options
+       :subcmd subcmd
+       :subcmd-args subcmd-args
+       :subcmd-name subcmd-name}
+      (common-cmd/usage-error! (str "Unexpected subcommand " subcmd-name)
+                               (common-cmd/usage-msg ["rehearser"]
+                                                     summary
+                                                     [(subcmd-description)])))))
 
 (defn -main [& args]
-  (let [{:keys [exit-with-message status options subcmd subcmd-args subcmd-name]} (parse-args args)]
-    (when exit-with-message
-      (println exit-with-message)
-      (System/exit status))
-    (try
+  (try
+    ;; Only the top-level arguments are parsed here. Further parsing
+    ;; will be done when the subcommand has been selected and its
+    ;; namespace has been loaded as well.
+    (let [{:keys [help status options subcmd subcmd-args subcmd-name]} (parse-args args)]
       (subcmd {:options (merge (env->options) options)
-               :subcmd-args subcmd-args})
-      (catch clojure.lang.ExceptionInfo e
-        (case (-> e ex-data :type)
-          :usage (do
-                   (println (subcmd-usage-msg subcmd-name
-                                              (-> e ex-data :errors)
-                                              (-> e ex-data :summary)))
-                   (System/exit 2))
-          :help (println (subcmd-usage-msg subcmd-name
-                                           []
-                                           (-> e ex-data :summary)))
-          (throw e))))))
+               :subcmd-args subcmd-args}))
+    (catch clojure.lang.ExceptionInfo e
+          (case (-> e ex-data :type)
+            :usage (do
+                     (println (.getMessage e))
+                     (println (-> e ex-data :usage))
+                     (System/exit 2))
+            :help (println (-> e ex-data :usage))
+            (throw e)))))
