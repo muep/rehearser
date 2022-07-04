@@ -4,6 +4,10 @@ insert into account (name, pwhash)
 on conflict (name) do nothing
 returning id;
 
+--name: account-default-variant!
+insert into variant (account_id, title, description)
+values (:account-id,  'default', '');
+
 -- name: account-force-passwd!
 update account
   set pwhash = :pwhash

@@ -16,5 +16,9 @@
                     {:type :account-name-format}))))
 
 (defn create-account! [db username password]
-  (account-create<! db {:name username
-                        :pwhash (BCrypt/hashpw password (BCrypt/gensalt 12))}))
+  (let [account
+        (account-create<! db {:name username
+                              :pwhash (BCrypt/hashpw password (BCrypt/gensalt 12))})]
+    (when (not (nil? account))
+      (account-default-variant! db {:account-id (:id account)}))
+    account))
