@@ -9,7 +9,8 @@
 
 (defn add [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
   (when-not (= 2 (count subcmd-args))
-    (usage-error! "usage: account-add <name> <password>" {:args subcmd-args}))
+    (usage-error! "Expected exactly two arguments"
+                  "usage: rehearser account-add <name> <password>"))
   (let [db {:connection-uri jdbc-url}
         [username pw] subcmd-args]
     (if-let [account-id (-> (service/create-account! db
@@ -26,7 +27,8 @@
 
 (defn passwd [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
   (when-not (= 2 (count subcmd-args))
-    (usage-error! "usage: account-add <name> <password>" {:args subcmd-args}))
+    (usage-error! "Expected exactly two arguments"
+                  "usage: rehearser account-passwd <name> <password>"))
   (let [db {:connection-uri jdbc-url}
         [username pw] subcmd-args
         change-cnt (account-force-passwd! db {:name username

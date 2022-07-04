@@ -1,17 +1,25 @@
-(ns rehearser.cmd.common)
+(ns rehearser.cmd.common
+  (:require [clojure.string :as str]))
 
-(defn usage-error! [message data]
-  (throw (ex-info message (assoc data :type :usage))))
+(defn usage-msg [cmd-path summary extra-messages]
+  (str/join "\n"
+            (concat
+             [(str"usage: " (str/join " " cmd-path) " [options]")
+              "options:"
+              summary]
+             extra-messages)))
 
-(defn help! [data]
-  (throw (ex-info "Help printout requested" (assoc data :type :help))))
+(defn usage-error! [message usage-text]
+  (throw (ex-info message {:type :usage
+                           :usage usage-text})))
 
-(defn check-parse-result! [{:keys [errors summary] {:keys [help]}:options}]
+(defn help! [usage-text]
+  (throw (ex-info "Help printout requested" {:type :help
+                                             :usage usage-text})))
+
+(defn check-parse-result! [cmd-path {:keys [errors summary] {:keys [help]}:options} extra-messages]
   (when help
-    (help! {:errors errors
-            :summary summary}))
+    (help! (usage-msg cmd-path summary extra-messages)))
   (when (not (empty? errors))
-    (usage-error! "Bad command line arguments"
-                  {:errors errors
-                   :summary summary})))
-
+    (usage-error! (first errors)
+                  (usage-msg cmd-path summary extra-messages))))

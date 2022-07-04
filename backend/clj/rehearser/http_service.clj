@@ -24,9 +24,12 @@
 
 (defn wrap-print-session [handler]
   (fn [{:keys [session] :as req}]
-    (println "before:" session)
-    (let [{:keys [session] :as resp} (handler req)]
-      (println "after:" session)
+    (let [session-before session
+          resp (handler req)
+          session-after (:session resp)]
+      (when (and (not (nil? session-after))
+                 (not (= session-before session-after)))
+        (log/info session-before "->" session-after))
       resp)))
 
 (defn make-app [db session-key static-file-dir]

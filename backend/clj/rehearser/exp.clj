@@ -6,3 +6,6 @@
    :body params})
 
 (def params-post params-get)
+
+(defn fail [req]
+  (throw (ex-info "Intentional failure in request processing" {})))

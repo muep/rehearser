@@ -8,4 +8,6 @@
              ["/logout" {:post account/logout}]
              ["/whoami" {:get account/whoami}]
              ["/params" {:get exp/params-get
-                         :post exp/params-post}]])
+                         :post exp/params-post}]
+             ["/fail" {:get exp/fail
+                       :post exp/fail}]])

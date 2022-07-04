@@ -29,7 +29,7 @@
          :as opts}
         (cli/parse-opts subcmd-args serve-options)
         session-key (env->session-key)]
-    (check-parse-result! opts)
+    (check-parse-result! ["rehearser" "serve"] opts nil)
     (http/run {:jdbc-url jdbc-url
                :port port
                :session-key session-key
