@@ -5,7 +5,7 @@ on conflict (name) do nothing
 returning id;
 
 --name: account-default-variant!
-insert into variant (account_id, title, description)
+insert into variant ("account-id", title, description)
 values (:account-id,  'default', '');
 
 -- name: account-force-passwd!

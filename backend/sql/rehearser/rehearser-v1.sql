@@ -14,43 +14,48 @@ create table account (
     pwhash text not null
 );
 
+-- Something that can be practiced
 create table exercise (
     id serial unique not null,
-    account_id integer not null references account(id),
+    "account-id" integer not null references account(id),
     title text not null,
     description text not null,
-    unique (account_id, title)
+    unique ("account-id", title)
 );
 
+-- Different ways of performing an exercise - e.g. different
+-- instruments.
 create table variant (
     id serial unique not null,
-    account_id integer not null references account(id),
+    "account-id" integer not null references account(id),
     title text not null,
     description text not null,
-    unique (account_id, title)
+    unique ("account-id", title)
 );
 
 -- This is kind of a collection of rehearsal entries that
 -- occurred together
 create table rehearsal (
     id serial unique not null,
-    account_id integer not null references account(id),
-    start_time timestamptz not null,
+    "account-id" integer not null references account(id),
+    "start-time" timestamptz not null,
     duration interval,
     title text not null,
     description text not null
 );
 
 create unique index rehearsal_single_null_idx
-    on rehearsal (account_id, (duration is null))
+    on rehearsal ("account-id", (duration is null))
     where duration is null;
 
+-- Entry for marking that some variant of some exercise was performed
+-- exactly then and then as part of some rehearsal.
 create table entry (
     id serial unique not null,
-    rehearsal_id integer not null references rehearsal(id),
-    exercise_id integer not null references exercise(id),
-    variant_id integer not null references variant(id),
-    entry_time timestamptz not null,
+    "rehearsal-id" integer not null references rehearsal(id),
+    "exercise-id" integer not null references exercise(id),
+    "variant-id" integer not null references variant(id),
+    "entry-time" timestamptz not null,
     remarks text not null
 );
 
