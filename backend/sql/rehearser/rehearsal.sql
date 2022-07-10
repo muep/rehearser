@@ -10,7 +10,7 @@ insert into rehearsal (
     :title,
     :description
 )
-returning id as id, title, description, extract(epoch from  "start-time") as "start-time";
+returning id, title, description, extract(epoch from  "start-time") as "start-time";
 
 -- name: rehearsal-end!
 update rehearsal
