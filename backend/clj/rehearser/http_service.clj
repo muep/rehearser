@@ -23,14 +23,25 @@
                                      {:store (cookie-session/cookie-store {:key key})})))
 
 (defn wrap-print-session [handler]
-  (fn [{:keys [session] :as req}]
+  (fn [{:keys [remote-addr session] :as req}]
     (let [session-before session
           resp (handler req)
           session-after (:session resp)]
       (when (and (not (nil? session-after))
                  (not (= session-before session-after)))
-        (log/info session-before "->" session-after))
+        (log/info remote-addr session-before "->" session-after))
       resp)))
+
+(defn session->whoami [{:keys [account-id account-name] :as session}]
+  (when (and (int? account-id)
+             (string? account-name)
+             (not (empty? account-name)))
+    {:account-id account-id
+     :account-name account-name}))
+
+(defn whoami-middleware [handler]
+  (fn [{:keys [session] :as req}]
+    (handler (assoc req :whoami (session->whoami session)))))
 
 (defn make-app [db session-key static-file-dir]
   (reitit-ring/ring-handler
@@ -41,6 +52,7 @@
                          muuntaja/wrap-format-response
                          (wrap-db db)
                          (wrap-session session-key)
+                         whoami-middleware
                          wrap-print-session
                          ]}})
    (reitit-ring/routes

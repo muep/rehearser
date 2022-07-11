@@ -1,0 +1,11 @@
+The resolution for addressing
+[#26](https://github.com/muep/rehearser/issues/26) seems to
+be that the database can be this somewhat abstract thing,
+even if the initial product might focus on learning tunes.
+
+The terminology should map so that [reharsal, exercise,
+variant] respectively become [rehearsal, tune, instrument].
+
+The rationale is that this seems easy enough to work with
+and the mapping is clear enough. This will hopefully avoid
+having to rename everything even if some spinoff arises.
