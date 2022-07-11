@@ -1,9 +1,10 @@
 ;; Functions for experimenting with middlewares
 (ns rehearser.exp)
 
-(defn params-get [{:keys [params]}]
+(defn params-get [{:keys [params whoami]}]
   {:status 200
-   :body params})
+   :body {:params params
+          :whoami whoami}})
 
 (def params-post params-get)
 
