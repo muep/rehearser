@@ -12,7 +12,8 @@
 (defn run []
   (state/set-server! (service/run {:jdbc-url state/jdbc-url
                                    :port state/port
-                                   :static-file-dir "../front/public"})))
+                                   :static-file-dir "../front/public"
+                                   :session-key state/session-key})))
 
 (defn stop []
   (state/set-server! nil))
