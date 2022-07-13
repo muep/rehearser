@@ -13,6 +13,13 @@
     {:status 404
      :body "Resource was not found"}))
 
+(defn response-modify-one [result]
+  (if (<= 1 result)
+    {:status 200
+     :body "Deleted"}
+    {:status 404
+     :body "Not found, not deleted"}))
+
 (defn get-exercises [{:keys [db whoami]}]
   {:status 200
    :body (service/find-all db whoami)})
@@ -22,12 +29,16 @@
   {:body (service/add! db whoami body-params)
    :status 200})
 
-(def get-exercise_ (not-implemented "Getting a single exercise"))
-
 (defn get-exercise [{{:keys [id]} :path-params
                      :keys [db whoami]
                      :as req}]
   (response-get-one (service/find-by-id db whoami (Integer/parseInt id))))
+
+(defn delete-exercise! [{{:keys [id]} :path-params
+                         :keys [db whoami]
+                         :as req}]
+  (response-modify-one (service/delete-by-id! db whoami (Integer/parseInt id))))
+
 
 (def put-exercise (not-implemented "Making changes to exercises"))
 
@@ -35,4 +46,5 @@
   [["" {:get get-exercises
         :post post-exercise}]
    ["/:id" {:get get-exercise
+            :delete delete-exercise!
             :put put-exercise}]])

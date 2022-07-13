@@ -20,3 +20,8 @@ select id, "account-id", title, description
 from exercise
 where "account-id" = :account-id and
       id = :id;
+
+--name: exercise-delete!
+delete from exercise
+where "account-id" = :account-id and
+      id = :id;
