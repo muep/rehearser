@@ -17,7 +17,7 @@
   (exercise-select-all db (select-keys whoami [:account-id])))
 
 (defn update-by-id! [db whoami id exercise]
-  (jdbc/update! db :exercise exercise ["\"account-id\" = ? and id = ?" (:account-id whoami )id]))
+  (jdbc/update! db :exercise exercise ["\"account-id\" = ? and id = ?" (:account-id whoami) id]))
 
 (defn delete-by-id! [db whoami id]
   (exercise-delete! db {:id id
