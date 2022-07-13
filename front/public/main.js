@@ -42,6 +42,7 @@ const start = () => {
 
 const button = (text, onclick) => {
   const b = document.createElement("button");
+  b.setAttribute("type", "button");
   b.textContent = text;
   b.onclick = onclick;
   return b;
@@ -157,9 +158,9 @@ const tune_new = () => {
   const nameInput = document.createElement("input");
   form.appendChild(nameInput);
 
-  const addButton = button("Add", () => {
-    tuneAdd(nameInput.value);
-    location.hash = "#tune";
+  const addButton = button("Add", async () => {
+    await tuneAdd(nameInput.value);
+    location.hash = "tune";
   });
   form.appendChild(addButton);
 
