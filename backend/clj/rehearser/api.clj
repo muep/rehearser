@@ -15,7 +15,6 @@
 
 (def routes [["/login" {:post account/login}]
              ["/signup" {:post account/signup}]
-             ["/"]
              ["/logout" {:post account/logout}]
              ["/whoami" {:get account/whoami}]
              ["/exercise" api-metadata exercise/routes]
