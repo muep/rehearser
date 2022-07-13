@@ -32,6 +32,11 @@
         (log/info remote-addr session-before "->" session-after))
       resp)))
 
+(defn wrap-disable-cache [handler]
+  (fn [req]
+    (-> (handler req)
+        (assoc-in [:headers "Cache-Control"] "no-store"))))
+
 (defn session->whoami [{:keys [account-id account-name] :as session}]
   (when (and (int? account-id)
              (string? account-name)
@@ -43,11 +48,14 @@
   (fn [{:keys [session] :as req}]
     (handler (assoc req :whoami (session->whoami session)))))
 
+(def api-metadata
+  {:middleware [[wrap-disable-cache]]})
+
 (defn make-app [db session-key static-file-dir]
   (reitit-ring/ring-handler
    (reitit-ring/router
     [["/health" {:get health/get-health}]
-     ["/api" api/routes]]
+     ["/api" api-metadata api/routes]]
     {:data {:middleware [parameters-middleware
                          muuntaja/wrap-format
                          (wrap-db db)
