@@ -11,7 +11,11 @@
   {:status 200
    :body (service/find-all db whoami)})
 
-(def post-exercise (not-implemented "Posting new exercises"))
+(defn post-exercise [{:keys [db whoami body-params]
+                      :as req}]
+  {:body (service/add! db whoami body-params)
+   :status 200})
+
 (def get-exercise (not-implemented "Getting a single exercise"))
 (def put-exercise (not-implemented "Making changes to exercises"))
 

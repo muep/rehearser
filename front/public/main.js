@@ -1,4 +1,6 @@
-import { noteAdd, tuneAdd, tuneRm, tunes, tuneById } from "./db.js";
+import { noteAdd } from "./db.js";
+
+import { tuneAdd, tuneRm, tunes, tuneById } from "./tune-api.js";
 
 const whoami = await fetch("api/whoami").then((r) => r.json());
 if (whoami["account-id"] === null) {
@@ -64,7 +66,7 @@ const link = (text, dest) => {
   return a;
 };
 
-const tuneIndex = () => {
+const tuneIndex = async () => {
   const page = document.createElement("section");
 
   const heading = h2("Tunes");
@@ -72,9 +74,9 @@ const tuneIndex = () => {
 
   const tuneList = document.createElement("ul");
 
-  for (const tune of tunes()) {
+  for (const tune of await tunes()) {
     const tuneItem = document.createElement("li");
-    tuneItem.appendChild(link(tune.name, `#tune/${tune.id}`));
+    tuneItem.appendChild(link(tune.title, `#tune/${tune.id}`));
     tuneList.appendChild(tuneItem);
   }
 

@@ -49,7 +49,7 @@
     [["/health" {:get health/get-health}]
      ["/api" api/routes]]
     {:data {:middleware [parameters-middleware
-                         muuntaja/wrap-format-response
+                         muuntaja/wrap-format
                          (wrap-db db)
                          (wrap-session session-key)
                          whoami-middleware
