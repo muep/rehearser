@@ -9,6 +9,10 @@
   (exercise-insert<! db (merge (select-keys whoami [:account-id])
                                (select-keys exercise [:title :description]))))
 
+(defn find-by-id [db whoami id]
+  (exercise-by-id db {:id id
+                      :account-id (:account-id whoami)}))
+
 (defn find-all [db whoami]
   (exercise-select-all db (select-keys whoami [:account-id])))
 

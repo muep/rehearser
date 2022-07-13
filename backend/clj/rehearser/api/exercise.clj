@@ -6,6 +6,12 @@
   (fn [req]
     (throw (ex-info (str what " not yet implemented") {}))))
 
+(defn response-get-one [result]
+  (if-let [body (first result)]
+    {:status 200
+     :body body}
+    {:status 404
+     :body "Resource was not found"}))
 
 (defn get-exercises [{:keys [db whoami]}]
   {:status 200
@@ -16,7 +22,13 @@
   {:body (service/add! db whoami body-params)
    :status 200})
 
-(def get-exercise (not-implemented "Getting a single exercise"))
+(def get-exercise_ (not-implemented "Getting a single exercise"))
+
+(defn get-exercise [{{:keys [id]} :path-params
+                     :keys [db whoami]
+                     :as req}]
+  (response-get-one (service/find-by-id db whoami (Integer/parseInt id))))
+
 (def put-exercise (not-implemented "Making changes to exercises"))
 
 (def routes

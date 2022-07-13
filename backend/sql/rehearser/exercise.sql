@@ -14,3 +14,9 @@ returning id, "account-id", title, description;
 select id, "account-id", title, description
 from exercise
 where "account-id" = :account-id;
+
+--name: exercise-by-id
+select id, "account-id", title, description
+from exercise
+where "account-id" = :account-id and
+      id = :id;
