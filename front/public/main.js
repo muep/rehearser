@@ -105,8 +105,8 @@ const tuneHeading = (title) => {
   return heading;
 };
 
-const tunePage = (id) => {
-  const tune = tuneById(id);
+const tunePage = async (id) => {
+  const tune = await tuneById(id);
   if (tune === undefined) {
     notfound();
     return;
@@ -114,34 +114,18 @@ const tunePage = (id) => {
 
   const page = document.createElement("section");
 
-  page.appendChild(tuneHeading(tune.name));
+  page.appendChild(tuneHeading(tune.title));
 
-  page.appendChild(h3("Notes"));
+  page.appendChild(h3("Description"));
 
-  for (const note of tune.notes) {
-    const noteP = document.createElement("p");
-    noteP.textContent = note.text;
-    page.appendChild(noteP);
-  }
-
-  const noteForm = document.createElement("form");
-
-  const noteField = document.createElement("textarea");
-  noteForm.appendChild(noteField);
-
-  noteForm.appendChild(
-    button("Add note", () => {
-      noteAdd(id, noteField.value);
-      tunePage(id);
-    })
-  );
-
-  page.appendChild(noteForm);
+  const description = document.createElement("p");
+  description.textContent = tune.description;
+  page.appendChild(description);
 
   page.appendChild(h3("Actions"));
-  const rmButton = button("Remove tune", () => {
-    tuneRm(id);
-    location.hash = "#tune";
+  const rmButton = button("Remove tune", async () => {
+    await tuneRm(id);
+    location.hash = "tune";
   });
 
   page.appendChild(rmButton);
