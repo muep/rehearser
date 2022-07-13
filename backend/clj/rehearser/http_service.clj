@@ -10,7 +10,8 @@
    [org.httpkit.server :as http-server]
    [hikari-cp.core :as hikari]
    [rehearser.api :as api]
-   [rehearser.health :as health]))
+   [rehearser.health :as health]
+   [rehearser.reqstat :as reqstat]))
 
 (defn wrap-db [db]
   (fn [handler]
@@ -52,23 +53,26 @@
   {:middleware [[wrap-disable-cache]]})
 
 (defn make-app [db session-key static-file-dir]
-  (reitit-ring/ring-handler
-   (reitit-ring/router
-    [["/health" {:get health/get-health}]
-     ["/api" api-metadata api/routes]]
-    {:data {:middleware [parameters-middleware
-                         muuntaja/wrap-format
-                         (wrap-db db)
-                         (wrap-session session-key)
-                         whoami-middleware
-                         wrap-print-session
-                         ]}})
-   (reitit-ring/routes
-    (if (empty? static-file-dir)
-      (reitit-ring/create-resource-handler {:path "/"})
-      (reitit-ring/create-file-handler {:path "/"
-                                        :root static-file-dir}))
-    (reitit-ring/create-default-handler))))
+  (let [reqstat (reqstat/reqstat-middleware+handler)]
+    (reitit-ring/ring-handler
+     (reitit-ring/router
+      [["/health" {:get health/get-health}]
+       ["/api" api-metadata (concat api/routes
+                       [["/reqstat" (:get-handler reqstat)]])]]
+      {:data {:middleware [(:middleware reqstat)
+                           parameters-middleware
+                           muuntaja/wrap-format
+                           (wrap-db db)
+                           (wrap-session session-key)
+                           whoami-middleware
+                           wrap-print-session
+                           ]}})
+     (reitit-ring/routes
+      (if (empty? static-file-dir)
+        (reitit-ring/create-resource-handler {:path "/"})
+        (reitit-ring/create-file-handler {:path "/"
+                                          :root static-file-dir}))
+      (reitit-ring/create-default-handler)))))
 
 (defn run [{:keys [session-key jdbc-url port static-file-dir]
             :or {port 8080}}]
