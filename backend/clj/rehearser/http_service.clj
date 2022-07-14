@@ -69,9 +69,14 @@
                            ]}})
      (reitit-ring/routes
       (if (empty? static-file-dir)
-        (reitit-ring/create-resource-handler {:path "/"})
-        (reitit-ring/create-file-handler {:path "/"
-                                          :root static-file-dir}))
+        (do
+          (log/info "Serving static content from resources")
+          (reitit-ring/create-resource-handler {:path "/"
+                                                :root "public"}))
+        (do
+          (log/info "Service static content from" static-file-dir)
+          (reitit-ring/create-file-handler {:path "/"
+                                            :root static-file-dir})))
       (reitit-ring/create-default-handler)))))
 
 (defn run [{:keys [session-key jdbc-url port static-file-dir]
