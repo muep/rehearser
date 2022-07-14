@@ -29,6 +29,14 @@
   (require 'rehearser.cmd.db-reset)
   ((resolve 'rehearser.cmd.db-reset/run) opts))
 
+(defn pw-check [opts]
+  (require 'rehearser.cmd.pw)
+  ((resolve 'rehearser.cmd.pw/check) opts))
+
+(defn pw-hash [opts]
+  (require 'rehearser.cmd.pw)
+  ((resolve 'rehearser.cmd.pw/hashpw) opts))
+
 (defn serve [opts]
   (require 'rehearser.cmd.serve)
   ((resolve 'rehearser.cmd.serve/serve) opts))
@@ -39,6 +47,8 @@
    :account-passwd [account-passwd "Reset password of account"]
    :db-check [db-check "Check database connectivity"]
    :db-reset [db-reset "Reset database contents"]
+   :pw-check [pw-check "Check a password hash"]
+   :pw-hash [pw-hash "Produce a password hash"]
    :serve [serve "Run the http service"]})
 
 
