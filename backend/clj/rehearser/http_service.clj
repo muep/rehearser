@@ -69,7 +69,8 @@
                            ]}})
      (reitit-ring/routes
       (if (empty? static-file-dir)
-        (reitit-ring/create-resource-handler {:path "/"})
+        (reitit-ring/create-resource-handler {:path "/"
+                                              :root "public"})
         (reitit-ring/create-file-handler {:path "/"
                                           :root static-file-dir}))
       (reitit-ring/create-default-handler)))))
