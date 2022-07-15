@@ -1,3 +1,3 @@
 (ns rehearser.api.admin)
 
-(def routes [])
+(def routes ["/status" {:get (fn [_] {:status 200})}])
