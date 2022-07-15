@@ -38,12 +38,14 @@
     (-> (handler req)
         (assoc-in [:headers "Cache-Control"] "no-store"))))
 
-(defn session->whoami [{:keys [account-id account-name] :as session}]
-  (when (and (int? account-id)
-             (string? account-name)
-             (not (empty? account-name)))
+(defn session->whoami [{:keys [account-id account-name account-admin?]}]
+  (when (or account-admin?
+            (and (int? account-id)
+                 (string? account-name)
+                 (not (empty? account-name))))
     {:account-id account-id
-     :account-name account-name}))
+     :account-name account-name
+     :account-admin? account-admin?}))
 
 (defn whoami-middleware [handler]
   (fn [{:keys [session] :as req}]
