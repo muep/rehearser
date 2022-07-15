@@ -15,6 +15,7 @@
 (def api-metadata {:middleware [[wrap-require-account]]})
 
 (def routes [["/login" {:post account/login}]
+             ["/admin-login" {:post account/admin-login}]
              ["/signup" {:post account/signup}]
              ["/logout" {:post account/logout}]
              ["/whoami" {:get account/whoami}]

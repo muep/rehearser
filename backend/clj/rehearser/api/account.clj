@@ -35,7 +35,8 @@
       {:status 303
        :session (assoc session
                        :account-id id
-                       :account-name username)
+                       :account-name username
+                       :account-admin? false)
        :headers {"Location" "../index.html"}
        :body "Did log in"}
       {:status 303
@@ -46,6 +47,18 @@
      :body "Password check failed"}))
 
 (def login (handler-with-exceptions login- account-exceptions))
+
+(defn admin-login [{:keys [db session]
+                      {:strs [password]} :params}]
+  (if-let [admin-pwhash (System/getenv "REHEARSER_ADMIN_PASSWORD")]
+    (if (BCrypt/checkpw password admin-pwhash)
+      {:status 200
+       :session (assoc session
+                       :account-id nil
+                       :account-name "admin"
+                       :account-admin? true)}
+      {:status 403})
+    {:status 404}))
 
 (defn logout [req]
   {:status 303
