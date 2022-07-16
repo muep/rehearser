@@ -48,17 +48,22 @@
 
 (def login (handler-with-exceptions login- account-exceptions))
 
-(defn admin-login [{:keys [db session]
-                      {:strs [password]} :params}]
-  (if-let [admin-pwhash (System/getenv "REHEARSER_ADMIN_PASSWORD")]
-    (if (BCrypt/checkpw password admin-pwhash)
-      {:status 200
-       :session (assoc session
-                       :account-id nil
-                       :account-name "admin"
-                       :account-admin? true)}
+(defn admin-login [admin-pwhash]
+  (if (empty? admin-pwhash)
+    ;; No acceptable password hash -> admin login never possible
+    (fn [_]
       {:status 403})
-    {:status 404}))
+    ;; Actual implementation, installed only if it seems that a
+    ;; useful password hash is available.
+    (fn [{:keys [db session]
+          {:strs [password]} :params}]
+      (if (BCrypt/checkpw password admin-pwhash)
+        {:status 200
+         :session (assoc session
+                         :account-id nil
+                         :account-name "admin"
+                         :account-admin? true)}
+        {:status 403}))))
 
 (defn logout [req]
   {:status 303

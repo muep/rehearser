@@ -5,6 +5,7 @@
 
 (disable-unload!)
 
+(defonce admin-pwhash nil)
 (defonce server (atom nil))
 (defonce jdbc-url "jdbc:postgresql://localhost:5432/rehearser?user=rehearser&password=rehearser")
 (defonce port 8080)
