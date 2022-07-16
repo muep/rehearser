@@ -48,4 +48,4 @@
              :post exp/fail}]
    ["/sys-stat" {:get sysinfo/sys-stat}]
    ["/sys-summary" {:get sysinfo/sys-summary}]
-   ["/reqstat" (:get-handler get-reqstat)]])
+   ["/reqstat" {:get get-reqstat}]])
