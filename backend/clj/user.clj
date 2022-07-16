@@ -10,10 +10,11 @@
   {:connection-uri state/jdbc-url})
 
 (defn run []
-  (state/set-server! (service/run {:jdbc-url state/jdbc-url
+  (state/set-server! (service/run {:admin-pwhash state/admin-pwhash
+                                   :jdbc-url state/jdbc-url
                                    :port state/port
                                    :session-key state/session-key
-                                   :static-file-dir "../front/public"})))
+                                   :static-file-dir "front/public"})))
 
 (defn stop []
   (state/set-server! nil))

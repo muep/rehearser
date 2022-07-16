@@ -38,12 +38,14 @@
     (-> (handler req)
         (assoc-in [:headers "Cache-Control"] "no-store"))))
 
-(defn session->whoami [{:keys [account-id account-name] :as session}]
-  (when (and (int? account-id)
-             (string? account-name)
-             (not (empty? account-name)))
+(defn session->whoami [{:keys [account-id account-name account-admin?]}]
+  (when (or account-admin?
+            (and (int? account-id)
+                 (string? account-name)
+                 (not (empty? account-name))))
     {:account-id account-id
-     :account-name account-name}))
+     :account-name account-name
+     :account-admin? account-admin?}))
 
 (defn whoami-middleware [handler]
   (fn [{:keys [session] :as req}]
@@ -52,13 +54,12 @@
 (def api-metadata
   {:middleware [[wrap-disable-cache]]})
 
-(defn make-app [db session-key static-file-dir]
+(defn make-app [db session-key static-file-dir admin-pwhash]
   (let [reqstat (reqstat/reqstat-middleware+handler)]
     (reitit-ring/ring-handler
      (reitit-ring/router
       [["/health" {:get health/get-health}]
-       ["/api" api-metadata (concat api/routes
-                       [["/reqstat" (:get-handler reqstat)]])]]
+       ["/api" api-metadata (api/routes admin-pwhash (:get-handler reqstat))]]
       {:data {:middleware [(:middleware reqstat)
                            parameters-middleware
                            muuntaja/wrap-format
@@ -79,7 +80,7 @@
                                             :root static-file-dir})))
       (reitit-ring/create-default-handler)))))
 
-(defn run [{:keys [session-key jdbc-url port static-file-dir]
+(defn run [{:keys [admin-pwhash session-key jdbc-url port static-file-dir]
             :or {port 8080}}]
   (log/info "should listen on port" port "and use database at" jdbc-url)
 
@@ -90,7 +91,7 @@
   (let [ds (hikari/make-datasource {:jdbc-url jdbc-url})
         db {:datasource ds}
         key (or session-key (random/bytes 16))
-        app (make-app db key static-file-dir)
+        app (make-app db key static-file-dir admin-pwhash)
         close-server (http-server/run-server app {:port port})]
     (fn []
       (close-server)

@@ -35,7 +35,8 @@
       {:status 303
        :session (assoc session
                        :account-id id
-                       :account-name username)
+                       :account-name username
+                       :account-admin? false)
        :headers {"Location" "../index.html"}
        :body "Did log in"}
       {:status 303
@@ -46,6 +47,23 @@
      :body "Password check failed"}))
 
 (def login (handler-with-exceptions login- account-exceptions))
+
+(defn admin-login [admin-pwhash]
+  (if (empty? admin-pwhash)
+    ;; No acceptable password hash -> admin login never possible
+    (fn [_]
+      {:status 403})
+    ;; Actual implementation, installed only if it seems that a
+    ;; useful password hash is available.
+    (fn [{:keys [db session]
+          {:strs [password]} :params}]
+      (if (BCrypt/checkpw password admin-pwhash)
+        {:status 200
+         :session (assoc session
+                         :account-id nil
+                         :account-name "admin"
+                         :account-admin? true)}
+        {:status 403}))))
 
 (defn logout [req]
   {:status 303

@@ -23,14 +23,19 @@
               hex->bytes)]
     (if (= 16 (count k)) k nil)))
 
+(defn env->admin-pwhash []
+  (System/getenv "REHEARSER_ADMIN_PASSWORD"))
+
 (defn serve [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
   (let [{{:keys [port static-file-dir]} :options
          :keys [arguments errors options summary]
          :as opts}
         (cli/parse-opts subcmd-args serve-options)
-        session-key (env->session-key)]
+        session-key (env->session-key)
+        admin-pwhash (env->admin-pwhash)]
     (check-parse-result! ["rehearser" "serve"] opts nil)
-    (http/run {:jdbc-url jdbc-url
+    (http/run {:admin-pwhash admin-pwhash
+               :jdbc-url jdbc-url
                :port port
                :session-key session-key
                :static-file-dir static-file-dir})))
