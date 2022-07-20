@@ -1,5 +1,12 @@
 (ns rehearser.api.exercise
-  (:require [rehearser.service.exercise :as service]))
+  (:require [rehearser.service.exercise :as service]
+            [clojure.spec.alpha :as s]))
+
+(s/def ::title string?)
+(s/def ::description string?)
+(s/def ::exercise
+  (s/keys :req-un [::title
+                   ::description]))
 
 (defn response-get-one [result]
   (if-let [body (first result)]
