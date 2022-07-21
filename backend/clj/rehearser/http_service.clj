@@ -51,15 +51,13 @@
   (fn [{:keys [session] :as req}]
     (handler (assoc req :whoami (session->whoami session)))))
 
-(def api-metadata
-  {:middleware [[wrap-disable-cache]]})
-
 (defn make-router [db session-key admin-pwhash]
   (let [reqstat (reqstat/reqstat-middleware+handler)]
     (reitit-ring/router
      [["/health" {:get health/get-health}]
-      ["/api" api-metadata (api/routes admin-pwhash (:get-handler reqstat))]]
+      ["/api" (api/routes admin-pwhash (:get-handler reqstat))]]
      {:data {:middleware [(:middleware reqstat)
+                          wrap-disable-cache
                           parameters-middleware
                           muuntaja/wrap-format
                           (wrap-db db)
