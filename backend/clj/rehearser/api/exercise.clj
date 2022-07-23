@@ -45,8 +45,8 @@
                            (select-keys body-params [:title :description])))))
 
 (def routes
-  [["" {:get get-exercises
-        :post post-exercise}]
-   ["/:id" {:get get-exercise
-            :delete delete-exercise!
-            :put put-exercise!}]])
+  [["" {:get {:handler get-exercises}
+        :post {:handler post-exercise}}]
+   ["/:id" {:get {:handler get-exercise}
+            :delete {:handler delete-exercise!}
+            :put {:handler put-exercise!}}]])
