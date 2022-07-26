@@ -51,34 +51,34 @@
   (fn [{:keys [session] :as req}]
     (handler (assoc req :whoami (session->whoami session)))))
 
-(def api-metadata
-  {:middleware [[wrap-disable-cache]]})
+(defn make-router [db session-key admin-pwhash]
+  (let [reqstat (reqstat/reqstat-middleware+handler)]
+    (reitit-ring/router
+     [["/health" {:get health/get-health}]
+      ["/api" (api/routes admin-pwhash (:get-handler reqstat))]]
+     {:data {:middleware [(:middleware reqstat)
+                          wrap-disable-cache
+                          parameters-middleware
+                          muuntaja/wrap-format
+                          (wrap-db db)
+                          (wrap-session session-key)
+                          whoami-middleware
+                          wrap-print-session]}})))
 
 (defn make-app [db session-key static-file-dir admin-pwhash]
-  (let [reqstat (reqstat/reqstat-middleware+handler)]
-    (reitit-ring/ring-handler
-     (reitit-ring/router
-      [["/health" {:get health/get-health}]
-       ["/api" api-metadata (api/routes admin-pwhash (:get-handler reqstat))]]
-      {:data {:middleware [(:middleware reqstat)
-                           parameters-middleware
-                           muuntaja/wrap-format
-                           (wrap-db db)
-                           (wrap-session session-key)
-                           whoami-middleware
-                           wrap-print-session
-                           ]}})
-     (reitit-ring/routes
-      (if (empty? static-file-dir)
-        (do
-          (log/info "Serving static content from resources")
-          (reitit-ring/create-resource-handler {:path "/"
-                                                :root "public"}))
-        (do
-          (log/info "Service static content from" static-file-dir)
-          (reitit-ring/create-file-handler {:path "/"
-                                            :root static-file-dir})))
-      (reitit-ring/create-default-handler)))))
+  (reitit-ring/ring-handler
+   (make-router db session-key admin-pwhash)
+   (reitit-ring/routes
+    (if (empty? static-file-dir)
+      (do
+        (log/info "Serving static content from resources")
+        (reitit-ring/create-resource-handler {:path "/"
+                                              :root "public"}))
+      (do
+        (log/info "Service static content from" static-file-dir)
+        (reitit-ring/create-file-handler {:path "/"
+                                          :root static-file-dir})))
+    (reitit-ring/create-default-handler))))
 
 (defn run [{:keys [admin-pwhash session-key jdbc-url port static-file-dir]
             :or {port 8080}}]
