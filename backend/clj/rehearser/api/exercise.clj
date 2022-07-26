@@ -19,7 +19,7 @@
   {:status 200
    :body (service/find-all db whoami)})
 
-(defn post-exercise [{:keys [db whoami body-params]
+(defn post-exercise! [{:keys [db whoami body-params]
                       :as req}]
   {:body (service/add! db whoami body-params)
    :status 200})
@@ -46,7 +46,7 @@
 
 (def routes
   [["" {:get {:handler get-exercises}
-        :post {:handler post-exercise}}]
+        :post {:handler post-exercise!}}]
    ["/:id" {:get {:handler get-exercise}
             :delete {:handler delete-exercise!}
             :put {:handler put-exercise!}}]])
