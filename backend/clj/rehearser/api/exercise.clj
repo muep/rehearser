@@ -2,10 +2,18 @@
   (:require [rehearser.service.exercise :as service]
             [clojure.spec.alpha :as s]))
 
+(s/def ::id int?)
 (s/def ::title string?)
 (s/def ::description string?)
-(s/def ::exercise
+(s/def ::exercise-content
   (s/keys :req-un [::title
+                   ::description]))
+(s/def ::exercise
+  (s/merge ::exercise-content
+           (s/keys :req-un [::id])))
+
+(s/def ::exercise-update
+  (s/keys :opt-un [::title
                    ::description]))
 
 (defn response-get-one [result]
@@ -31,10 +39,10 @@
   {:body (service/add! db whoami body-params)
    :status 200})
 
-(defn get-exercise [{{:keys [id]} :path-params
-                     :keys [db whoami]
+(defn get-exercise [{{{:keys [id]} :path} :parameters
+                     :keys [db whoami parameters]
                      :as req}]
-  (response-get-one (service/find-by-id db whoami (Integer/parseInt id))))
+  (response-get-one (service/find-by-id db whoami id)))
 
 (defn delete-exercise! [{{:keys [id]} :path-params
                          :keys [db whoami]
@@ -54,6 +62,12 @@
 (def routes
   [["" {:get {:handler get-exercises}
         :post {:handler post-exercise!}}]
-   ["/:id" {:get {:handler get-exercise}
-            :delete {:handler delete-exercise!}
-            :put {:handler put-exercise!}}]])
+   ["/:id" {:get {:handler get-exercise
+                  :parameters {:path {:id ::id}}
+                  :responses {200 {:body ::exercise}}}
+            :delete {:handler delete-exercise!
+                     :parameters {:path {:id ::id}}}
+            :put {:handler put-exercise!
+                  :parameters {:path {:id ::id}
+                               :body {:title ::title
+                                      :description ::description}}}}]])
