@@ -40,6 +40,13 @@
     {:status 404
      :body "Not found, not changed"}))
 
+(defn response-update-one [result]
+  (if result
+    {:status 200
+     :body result}
+    {:status 404
+     :body "Not found, not changed"}))
+
 (defn get-exercises [{:keys [db whoami]}]
   {:status 200
    :body (service/find-all db whoami)})
@@ -64,14 +71,9 @@
 (defn put-exercise! [{{{:keys [id]} :path
                        {:keys [title description]} :body} :parameters
                       :keys [db whoami]}]
-  (let [updates (into {}
-                      (filter (fn [pair]
-                                (-> pair second some?))
-                              {:title title
-                               :description description}))]
-    (response-modify-one
-     (first
-      (service/update-by-id! db whoami id updates)))))
+  (response-update-one
+   (service/update-by-id! db whoami id {:title title
+                                        :description description})))
 
 (def routes
   [["" {:get {:handler get-exercises
