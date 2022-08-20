@@ -25,3 +25,12 @@ where "account-id" = :account-id and
 delete from exercise
 where "account-id" = :account-id and
       id = :id;
+
+--name: exercise-update<!
+update exercise
+set
+  title = coalesce(:title, title),
+  description = coalesce(:description, description)
+where "account-id" = :account-id and
+      id = :id
+returning id, "account-id", title, description;
