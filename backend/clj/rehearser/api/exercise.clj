@@ -52,19 +52,16 @@
    :body (service/find-all db whoami)})
 
 (defn post-exercise! [{{:keys [body]} :parameters
-                       :keys [db whoami]
-                       :as req}]
+                       :keys [db whoami]}]
   {:body (service/add! db whoami body)
    :status 200})
 
 (defn get-exercise [{{{:keys [id]} :path} :parameters
-                     :keys [db whoami parameters]
-                     :as req}]
+                     :keys [db whoami parameters]}]
   (response-get-one (service/find-by-id db whoami id)))
 
 (defn delete-exercise! [{{{:keys [id]} :path} :parameters
-                         :keys [db whoami]
-                         :as req}]
+                         :keys [db whoami]}]
   (response-modify-one (service/delete-by-id! db whoami id)))
 
 
