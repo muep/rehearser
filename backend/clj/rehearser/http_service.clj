@@ -2,8 +2,16 @@
   (:require
    [clojure.tools.logging :as log]
    [crypto.random :as random]
+
    [reitit.ring :as reitit-ring]
    [reitit.ring.middleware.parameters :refer [parameters-middleware]]
+
+   [reitit.coercion :refer [compile-request-coercers]]
+   [reitit.coercion.schema :refer [coercion]]
+   [reitit.ring.coercion :refer [coerce-exceptions-middleware
+                                 coerce-request-middleware
+                                 coerce-response-middleware]]
+
    [ring.middleware.session :as session-middleware]
    [ring.middleware.session.cookie :as cookie-session]
    [muuntaja.middleware :as muuntaja]
@@ -56,13 +64,18 @@
     (reitit-ring/router
      [["/health" {:get health/get-health}]
       ["/api" (api/routes admin-pwhash (:get-handler reqstat))]]
-     {:data {:middleware [(:middleware reqstat)
+     {:data {:coercion coercion
+             :compile compile-request-coercers
+             :middleware [(:middleware reqstat)
                           wrap-disable-cache
                           parameters-middleware
                           muuntaja/wrap-format
                           (wrap-db db)
                           (wrap-session session-key)
                           whoami-middleware
+                          coerce-exceptions-middleware
+                          coerce-request-middleware
+                          coerce-response-middleware
                           wrap-print-session]}})))
 
 (defn make-app [db session-key static-file-dir admin-pwhash]
