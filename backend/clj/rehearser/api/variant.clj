@@ -1,21 +1,21 @@
-(ns rehearser.api.exercise
-  (:require [rehearser.service.exercise :as service]
+(ns rehearser.api.variant
+  (:require [rehearser.service.variant :as service]
             [rehearser.malli :refer [Metadata save->update]]
             [malli.core :as m]
             [malli.util :as mu]
             [malli.error :as me]))
 
-(def ExerciseSave
+(def VariantSave
   (m/schema [:map {:closed true}
              [:description string?]
              [:title  (m/schema [:string {:min 1}])]]))
 
-(def Exercise
-  (mu/merge Metadata ExerciseSave))
+(def Variant
+  (mu/merge Metadata VariantSave))
 
-(def Exercises (m/schema [:sequential Exercise]))
+(def Variants (m/schema [:sequential Variant]))
 
-(def ExerciseUpdate (save->update ExerciseSave))
+(def VariantUpdate (save->update VariantSave))
 
 (defn response-get-one [result]
   (if-let [body (first result)]
@@ -38,24 +38,24 @@
     {:status 404
      :body "Not found, not changed"}))
 
-(defn get-exercises [{:keys [db whoami]}]
+(defn get-variants [{:keys [db whoami]}]
   {:status 200
    :body (service/find-all db whoami)})
 
-(defn post-exercise! [{{:keys [body]} :parameters
+(defn post-variant! [{{:keys [body]} :parameters
                        :keys [db whoami]}]
   {:body (service/add! db whoami body)
    :status 200})
 
-(defn get-exercise [{{{:keys [id]} :path} :parameters
+(defn get-variant [{{{:keys [id]} :path} :parameters
                      :keys [db whoami parameters]}]
   (response-get-one (service/find-by-id db whoami id)))
 
-(defn delete-exercise! [{{{:keys [id]} :path} :parameters
+(defn delete-variant! [{{{:keys [id]} :path} :parameters
                          :keys [db whoami]}]
   (response-modify-one (service/delete-by-id! db whoami id)))
 
-(defn put-exercise! [{{{:keys [id]} :path
+(defn put-variant! [{{{:keys [id]} :path
                        {:keys [title description]} :body} :parameters
                       :keys [db whoami]}]
   (response-update-one
@@ -63,17 +63,17 @@
                                         :description description})))
 
 (def routes
-  [["" {:get {:handler get-exercises
-              :responses {200 {:body Exercises}}}
-        :post {:handler post-exercise!
-               :parameters {:body ExerciseSave}
-               :responses {200 {:body Exercise}}}}]
-   ["/:id" {:get {:handler get-exercise
+  [["" {:get {:handler get-variants
+              :responses {200 {:body Variants}}}
+        :post {:handler post-variant!
+               :parameters {:body VariantSave}
+               :responses {200 {:body Variant}}}}]
+   ["/:id" {:get {:handler get-variant
                   :parameters {:path {:id int?}}
-                  :responses {200 {:body Exercise}}}
-            :delete {:handler delete-exercise!
+                  :responses {200 {:body Variant}}}
+            :delete {:handler delete-variant!
                      :parameters {:path {:id int?}}}
-            :put {:handler put-exercise!
+            :put {:handler put-variant!
                   :parameters {:path {:id int?}
-                               :body ExerciseUpdate}
-                  :responses {200 {:body Exercise}}}}]])
+                               :body VariantUpdate}
+                  :responses {200 {:body Variant}}}}]])
