@@ -3,6 +3,7 @@
             [rehearser.api.admin :as admin]
             [rehearser.api.exercise :as exercise]
             [rehearser.api.sysinfo :as sysinfo]
+            [rehearser.api.variant :as variant]
             [rehearser.exp :as exp]))
 
 (defn wrap-require-account [handler]
@@ -42,6 +43,7 @@
    ["/logout" {:post account/logout}]
    ["/whoami" {:get account/whoami}]
    ["/exercise" api-metadata exercise/routes]
+   ["/variant" api-metadata variant/routes]
    ["/params" {:get exp/params-get
                :post exp/params-post}]
    ["/fail" {:get exp/fail
