@@ -1,7 +1,8 @@
 (ns rehearser.service.exercise
   (:require
    [clojure.java.jdbc :as jdbc]
-   [jeesql.core :refer [defqueries]]))
+   [jeesql.core :refer [defqueries]]
+   [rehearser.misc :refer [select-or-nil-keys]]))
 
 (defqueries "rehearser/exercise.sql")
 
@@ -20,7 +21,7 @@
   (exercise-update<! db (merge
                          {:id id}
                          (select-keys whoami [:account-id])
-                         (select-keys exercise [:title :description]))))
+                         (select-or-nil-keys exercise [:title :description]))))
 
 (defn delete-by-id! [db whoami id]
   (exercise-delete! db {:id id
