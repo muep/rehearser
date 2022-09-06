@@ -20,7 +20,8 @@ create table exercise (
     "account-id" integer not null references account(id),
     title text not null,
     description text not null,
-    unique ("account-id", title)
+    unique ("account-id", title),
+    unique (id, "account-id")
 );
 
 -- Different ways of performing an exercise - e.g. different
@@ -30,7 +31,8 @@ create table variant (
     "account-id" integer not null references account(id),
     title text not null,
     description text not null,
-    unique ("account-id", title)
+    unique ("account-id", title),
+    unique (id, "account-id")
 );
 
 -- This is kind of a collection of rehearsal entries that
@@ -41,7 +43,8 @@ create table rehearsal (
     "start-time" timestamptz not null,
     duration interval,
     title text not null,
-    description text not null
+    description text not null,
+    unique (id, "account-id")
 );
 
 create unique index rehearsal_single_null_idx
@@ -52,11 +55,15 @@ create unique index rehearsal_single_null_idx
 -- exactly then and then as part of some rehearsal.
 create table entry (
     id serial unique not null,
-    "rehearsal-id" integer not null references rehearsal(id),
-    "exercise-id" integer not null references exercise(id),
-    "variant-id" integer not null references variant(id),
+    "account-id" integer not null,
+    "rehearsal-id" integer not null,
+    "exercise-id" integer not null,
+    "variant-id" integer not null,
     "entry-time" timestamptz not null,
-    remarks text not null
+    remarks text not null,
+    foreign key ("rehearsal-id", "account-id") references rehearsal(id, "account-id"),
+    foreign key ("exercise-id", "account-id") references exercise(id, "account-id"),
+    foreign key ("variant-id", "account-id") references variant(id, "account-id")
 );
 
 insert into rehearser_schema(version) values (1);
