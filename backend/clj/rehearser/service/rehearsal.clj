@@ -22,6 +22,32 @@
 (defn find-open [db whoami]
   (first (rehearsal-select-open db whoami)))
 
+(defn find-by-id [db whoami id]
+  (let [tbl (rehearsal-select-by-id db {:account-id (:account-id whoami)
+                                        :id id})
+        {:keys [account-id
+                rehearsal-id
+                rehearsal-start-time
+                rehearsal-end-time
+                rehearsal-duration
+                rehearsal-title
+                rehearsal-description]} (first tbl)]
+    (-> {:id rehearsal-id
+         :account-id account-id
+         :start-time rehearsal-start-time
+         :end-time rehearsal-end-time
+         :duration rehearsal-duration
+         :title rehearsal-title
+         :description rehearsal-description}
+        (assoc :entries (map #(select-keys % [:id
+                                              :account-id
+                                              :rehearsal-id
+                                              :exercise-id
+                                              :variant-id
+                                              :entry-time
+                                              :remarks])
+                             tbl)))))
+
 (defn entry-add! [db whoami entry]
   (let [rehearsal-id (-> (find-open db whoami) :id)]
     (when (nil? rehearsal-id)
@@ -31,3 +57,21 @@
       (throw (ex-info (str "Must make entries in the open rehearsal (" rehearsal-id ")")
                       {:type :data-model-violation}))))
   (entry-insert<! db (assoc entry :account-id (:account-id whoami))))
+
+(defn entry-find-by-id [db whoami entry-id]
+  (-> (entry-select db {:account-id (:account-id whoami)
+                        :id entry-id})
+      first))
+
+(defn entry-delete-by-id! [db whoami entry-id]
+  (let [rehearsal-id (-> (find-open db whoami) :id)]
+    (when (nil? rehearsal-id)
+      (throw (ex-info "Only possible to remove from an open rehearsal"
+                      {:type :data-model-violation})))
+    (let [result (entry-delete! db {:account-id (:account-id whoami)
+                                    :rehearsal-id rehearsal-id
+                                    :id entry-id})]
+      (when (= 0 result)
+        (throw (ex-info
+                (str "No entry " entry-id " in the open rehearsal " rehearsal-id)
+                {:type :not-found}))))))

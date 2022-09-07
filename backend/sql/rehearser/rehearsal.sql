@@ -61,6 +61,28 @@ from
 where
     "account-id" = :account-id and duration is null;
 
+--name: rehearsal-select-by-id
+select
+    entry.id,
+    entry."account-id",
+    "rehearsal-id",
+    "exercise-id",
+    "variant-id",
+    extract(epoch from entry."entry-time") as "entry-time",
+    remarks,
+
+    extract(epoch from rehearsal."start-time") as "rehearsal-start-time",
+    extract(epoch from rehearsal."start-time" + rehearsal.duration) as "rehearsal-end-time",
+    extract(epoch from coalesce(rehearsal.duration, now() - rehearsal."start-time")) as "rehearsal-duration",
+    rehearsal.title as "rehearsal-title",
+    rehearsal.description as "rehearsal-description"
+from
+    rehearsal join entry
+        on rehearsal.id = entry."rehearsal-id"
+where
+    rehearsal."account-id" = :account-id and
+    rehearsal.id = :id;
+
 --name: rehearsal-delete-by-id!
 delete from rehearsal
 where
@@ -93,8 +115,29 @@ returning
     extract(epoch from  "entry-time") as "entry-time",
     remarks;
 
+--name: entry-select
+select
+    id,
+    "account-id",
+    "rehearsal-id",
+    "exercise-id",
+    "variant-id",
+    extract(epoch from  "entry-time") as "entry-time",
+    remarks
+from entry
+where
+    "account-id" = :account-id and
+    id = :id;
+
 --name: entry-delete-by-rehearsal-id!
 delete from entry
 where
     "account-id" = :account-id and
     "rehearsal-id" = :id;
+
+--name: entry-delete!
+delete from entry
+where
+    "account-id" = :account-id and
+    "rehearsal-id" = :rehearsal-id and
+    id = :id;
