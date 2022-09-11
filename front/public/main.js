@@ -30,45 +30,12 @@ const setMainContent = (element) => {
   main.appendChild(element);
 };
 
-const paragraph = (text) => {
-  const p = document.createElement("p");
-  p.textContent = text;
-  return p;
-};
-
 const start = () => {
   setMainContent(paragraph("Start"));
 };
 
-const button = (text, onclick) => {
-  const b = document.createElement("button");
-  b.setAttribute("type", "button");
-  b.textContent = text;
-  b.onclick = onclick;
-  return b;
-};
-
-const h2 = (text) => {
-  const h = document.createElement("h2");
-  h.textContent = text;
-  return h;
-};
-
-const h3 = (text) => {
-  const h = document.createElement("h3");
-  h.textContent = text;
-  return h;
-};
-
-const link = (text, dest) => {
-  const a = document.createElement("a");
-  a.setAttribute("href", dest);
-  a.textContent = text;
-  return a;
-};
-
 const tuneIndex = async () => {
-  const page = document.createElement("section");
+  const page = section();
 
   const heading = h2("Tunes");
   page.appendChild(heading);
@@ -112,7 +79,7 @@ const tunePage = async (id) => {
     return;
   }
 
-  const page = document.createElement("section");
+  const page = section();
 
   page.appendChild(tuneHeading(tune.title));
 
@@ -134,7 +101,7 @@ const tunePage = async (id) => {
 };
 
 const tune_new = () => {
-  const page = document.createElement("section");
+  const page = section();
 
   page.appendChild(tuneHeading("New"));
 
