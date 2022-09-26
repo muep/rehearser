@@ -2,3 +2,5 @@ classes
 target
 .cpcache
 .nrepl-port
+rehearser.jar
+/tmp
