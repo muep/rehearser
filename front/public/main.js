@@ -1,6 +1,9 @@
 import { noteAdd } from "./db.js";
 
 import { tuneAdd, tuneRm, tunes, tuneById } from "./tune-api.js";
+import { instrumentPage } from "./instrument-page.js";
+import { instrumentsPage } from "./instruments-page.js";
+import { section, link, button, paragraph, h2, h3 } from "./elements.js";
 
 const whoami = await fetch("api/whoami").then((r) => r.json());
 if (whoami["account-id"] === null) {
@@ -135,6 +138,17 @@ const navigate = (path) => {
       } else {
         notfound();
       }
+    } else {
+      notfound();
+    }
+  } else if (path[0] === "instrument") {
+    if (path.length === 1) {
+      instrumentsPage(setMainContent);
+    } else if (path.length === 2 && path[1] === "new") {
+      notfound();
+    } else if (path.length === 2) {
+      const id = Number.parseInt(path[1]);
+      instrumentPage(setMainContent, id);
     } else {
       notfound();
     }

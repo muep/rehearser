@@ -25,6 +25,19 @@ export const link = (text, dest) => {
   return a;
 };
 
+export const objectHeading = (groupName, groupDest, title) => {
+  const parentLink = link(groupName, groupDest);
+
+  const nameSpan = span();
+  nameSpan.textContent = " / " + title;
+
+  const heading = document.createElement("h2");
+  heading.appendChild(parentLink);
+  heading.appendChild(nameSpan);
+
+  return heading;
+};
+
 export const paragraph = (text) => {
   const p = document.createElement("p");
   p.textContent = text;
@@ -32,3 +45,4 @@ export const paragraph = (text) => {
 };
 
 export const section = () => document.createElement("section");
+export const span = () => document.createElement("span");
