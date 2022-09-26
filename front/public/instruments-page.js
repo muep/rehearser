@@ -16,5 +16,7 @@ export const instrumentsPage = async (setMainContent) => {
 
   page.appendChild(instList);
 
+  page.appendChild(link("New instrument", "#instrument/new"));
+
   setMainContent(page);
 };
