@@ -1,11 +1,6 @@
-import {
-  instrumentAdd,
-  instrumentRm,
-  instruments,
-  instrumentById,
-} from "./instrument-api.js";
+import { instruments } from "./instrument-api.js";
 
-import { h2, link, objectHeading, section, span } from "./elements.js";
+import { h2, link, section } from "./elements.js";
 
 export const instrumentsPage = async (setMainContent) => {
   const page = section();

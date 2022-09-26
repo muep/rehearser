@@ -1,11 +1,6 @@
-import {
-  instrumentAdd,
-  instrumentRm,
-  instruments,
-  instrumentById,
-} from "./instrument-api.js";
+import { instrumentById } from "./instrument-api.js";
 
-import { link, objectHeading, section, span } from "./elements.js";
+import { objectHeading, section } from "./elements.js";
 
 const instrumentHeading = (title) =>
   objectHeading("Instrument", "#instrument", title);
