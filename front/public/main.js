@@ -1,6 +1,10 @@
 import { noteAdd } from "./db.js";
 
 import { tuneAdd, tuneRm, tunes, tuneById } from "./tune-api.js";
+import { instrumentPage } from "./instrument-page.js";
+import { instrumentsPage } from "./instruments-page.js";
+import { instrumentNewPage } from "./instrument-new-page.js";
+import { section, link, button, paragraph, h2, h3 } from "./elements.js";
 
 const whoami = await fetch("api/whoami").then((r) => r.json());
 if (whoami["account-id"] === null) {
@@ -30,45 +34,12 @@ const setMainContent = (element) => {
   main.appendChild(element);
 };
 
-const paragraph = (text) => {
-  const p = document.createElement("p");
-  p.textContent = text;
-  return p;
-};
-
 const start = () => {
   setMainContent(paragraph("Start"));
 };
 
-const button = (text, onclick) => {
-  const b = document.createElement("button");
-  b.setAttribute("type", "button");
-  b.textContent = text;
-  b.onclick = onclick;
-  return b;
-};
-
-const h2 = (text) => {
-  const h = document.createElement("h2");
-  h.textContent = text;
-  return h;
-};
-
-const h3 = (text) => {
-  const h = document.createElement("h3");
-  h.textContent = text;
-  return h;
-};
-
-const link = (text, dest) => {
-  const a = document.createElement("a");
-  a.setAttribute("href", dest);
-  a.textContent = text;
-  return a;
-};
-
 const tuneIndex = async () => {
-  const page = document.createElement("section");
+  const page = section();
 
   const heading = h2("Tunes");
   page.appendChild(heading);
@@ -112,7 +83,7 @@ const tunePage = async (id) => {
     return;
   }
 
-  const page = document.createElement("section");
+  const page = section();
 
   page.appendChild(tuneHeading(tune.title));
 
@@ -134,7 +105,7 @@ const tunePage = async (id) => {
 };
 
 const tune_new = () => {
-  const page = document.createElement("section");
+  const page = section();
 
   page.appendChild(tuneHeading("New"));
 
@@ -168,6 +139,17 @@ const navigate = (path) => {
       } else {
         notfound();
       }
+    } else {
+      notfound();
+    }
+  } else if (path[0] === "instrument") {
+    if (path.length === 1) {
+      instrumentsPage(setMainContent);
+    } else if (path.length === 2 && path[1] === "new") {
+      instrumentNewPage(setMainContent);
+    } else if (path.length === 2) {
+      const id = Number.parseInt(path[1]);
+      instrumentPage(setMainContent, id);
     } else {
       notfound();
     }
