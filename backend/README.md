@@ -7,11 +7,11 @@ How to accomplish routine tasks
 
 Run this:
 
-    clojure -M test
+    clojure -M:test
 
 Or to limit what tests are to be run, additionally pass in a filter string
 
-    clojure -M test foo
+    clojure -M:test db-url
 
 ## Build self-container JAR archive
 
