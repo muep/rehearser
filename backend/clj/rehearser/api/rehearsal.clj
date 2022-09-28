@@ -19,9 +19,7 @@
              [:exercise-id int?]
              [:variant-id int?]
              [:entry-time int?]
-             [:remarks string?]
-             ]))
-
+             [:remarks string?]]))
 
 (def EntryUpdate (save->update EntrySave))
 
