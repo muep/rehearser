@@ -20,38 +20,6 @@ returning
     title,
     description;
 
--- name: rehearsal-start<!
-insert into rehearsal (
-    "account-id",
-    "start-time",
-    title,
-    description
-) values (
-    :account-id,
-    now(),
-    :title,
-    :description
-)
-returning
-    id,
-    title,
-    description,
-    extract(epoch from  "start-time") as "start-time",
-    extract(seconds from duration) as duration;
-
--- name: rehearsal-end<!
-update rehearsal
-set duration = now() - "start-time"
-where
-    duration is null and
-    "account-id" = :account-id
-returning
-    id,
-    title,
-    description,
-    extract(epoch from  "start-time") as "start-time",
-    extract(seconds from duration) as duration;
-
 --name: rehearsal-select
 select
     id,

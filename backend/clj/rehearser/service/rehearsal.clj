@@ -12,13 +12,6 @@
                                   :title
                                   :description]))))
 
-(defn start! [db whoami rehearsal]
-  (rehearsal-start<! db (merge (select-keys whoami [:account-id])
-                               (select-keys rehearsal [:title :description]))))
-
-(defn end! [db whoami]
-  (rehearsal-end<! db whoami))
-
 (defn delete-by-id! [db whoami rehearsal-id]
   (let [params (merge (select-keys whoami [:account-id])
                       {:id rehearsal-id})]
