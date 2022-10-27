@@ -16,7 +16,9 @@ returning
     id,
     "account-id",
     extract(epoch from  "start-time")::bigint as "start-time",
+    extract(epoch from "start-time" + duration)::bigint as "end-time",
     extract(seconds from duration)::bigint as duration,
+    duration is null as "is-open",
     title,
     description;
 

@@ -1,5 +1,6 @@
 (ns rehearser.api.rehearsal
-  (:require [rehearser.service.rehearsal :as service]
+  (:require [rehearser.response :as response]
+            [rehearser.service.rehearsal :as service]
             [rehearser.malli :refer [Metadata save->update]]
             [malli.core :as m]
             [malli.util :as mu]))
@@ -58,8 +59,10 @@
   {:status 200
    :body (service/find-by-id db whoami rehearsal-id)})
 
-(defn delete-rehearsal! [req]
-  (throw (ex-info "not implemented" {})))
+(defn delete-rehearsal! [{:keys [db whoami]
+                          {{:keys [rehearsal-id]} :path} :parameters}]
+  (response/modify-one
+   (service/delete-by-id! db whoami rehearsal-id)))
 
 (defn put-rehearsal! [req]
   (throw (ex-info "not implemented" {})))
