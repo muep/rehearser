@@ -31,7 +31,10 @@
 
 (def Rehearsal
   (-> Metadata
-      (mu/merge RehearsalSave)))
+      (mu/merge RehearsalSave)
+      (mu/merge [:map {:closed true}
+                 [:is-open boolean?]
+                 [:end-time [:maybe int?]]])))
 
 (def Rehearsals (m/schema [:sequential Rehearsal]))
 
@@ -41,14 +44,19 @@
                            [:entries Entries]]))))
 
 
-(defn get-rehearsals [req]
-  (throw (ex-info "not implemented" {})))
+(defn get-rehearsals [{:keys [db whoami]}]
+  {:status 200
+   :body (service/find-all db whoami)})
 
-(defn post-rehearsal! [req]
-  (throw (ex-info "not implemented" {})))
+(defn post-rehearsal! [{{:keys [body]} :parameters
+                        :keys [db whoami]}]
+  {:status 200
+   :body (service/add! db whoami body)})
 
-(defn get-rehearsal [req]
-  (throw (ex-info "not implemented" {})))
+(defn get-rehearsal [{:keys [db whoami]
+                      {{:keys [rehearsal-id]} :path} :parameters}]
+  {:status 200
+   :body (service/find-by-id db whoami rehearsal-id)})
 
 (defn delete-rehearsal! [req]
   (throw (ex-info "not implemented" {})))
@@ -81,7 +89,7 @@
    ["/:rehearsal-id"
     {:get {:handler get-rehearsal
            :parameters {:path {:rehearsal-id int?}}
-           :responses {200 {:body Rehearsal}}}
+           :responses {200 {:body RehearsalDeep}}}
      :put {:handler put-rehearsal!
            :parameters {:path {:rehearsal-id int?}
                         :body RehearsalUpdate}

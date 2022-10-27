@@ -3,6 +3,15 @@
 
 (defqueries "rehearser/rehearsal.sql")
 
+(defn add! [db whoami rehearsal]
+  (rehearsal-insert<!
+   db
+   (merge (select-keys whoami [:account-id])
+          (select-keys rehearsal [:start-time
+                                  :duration
+                                  :title
+                                  :description]))))
+
 (defn start! [db whoami rehearsal]
   (rehearsal-start<! db (merge (select-keys whoami [:account-id])
                                (select-keys rehearsal [:title :description]))))
@@ -26,6 +35,7 @@
   (let [tbl (rehearsal-select-by-id db {:account-id (:account-id whoami)
                                         :id id})
         {:keys [account-id
+                is-open
                 rehearsal-id
                 rehearsal-start-time
                 rehearsal-end-time
@@ -37,16 +47,18 @@
          :start-time rehearsal-start-time
          :end-time rehearsal-end-time
          :duration rehearsal-duration
+         :is-open is-open
          :title rehearsal-title
          :description rehearsal-description}
-        (assoc :entries (map #(select-keys % [:id
-                                              :account-id
-                                              :rehearsal-id
-                                              :exercise-id
-                                              :variant-id
-                                              :entry-time
-                                              :remarks])
-                             tbl)))))
+        (assoc :entries (->> tbl
+                             (filter (comp not nil? :id))
+                             (map #(select-keys % [:id
+                                                   :account-id
+                                                   :rehearsal-id
+                                                   :exercise-id
+                                                   :variant-id
+                                                   :entry-time
+                                                   :remarks])))))))
 
 (defn entry-add! [db whoami entry]
   (let [rehearsal-id (-> (find-open db whoami) :id)]
