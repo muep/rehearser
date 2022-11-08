@@ -64,8 +64,11 @@
   (response/modify-one
    (service/delete-by-id! db whoami rehearsal-id)))
 
-(defn put-rehearsal! [req]
-  (throw (ex-info "not implemented" {})))
+(defn put-rehearsal! [{:keys [db whoami]
+                       {{:keys [rehearsal-id]} :path
+                        :keys [body]} :parameters}]
+  (response/modify-one
+   (service/update! db whoami rehearsal-id body)))
 
 (defn get-entries [req]
   (throw (ex-info "not implemented" {})))
@@ -95,8 +98,7 @@
            :responses {200 {:body RehearsalDeep}}}
      :put {:handler put-rehearsal!
            :parameters {:path {:rehearsal-id int?}
-                        :body RehearsalUpdate}
-           :responses {200 {:body Rehearsal}}}
+                        :body RehearsalSave}}
      :delete {:handler delete-rehearsal!
               :parameters {:path {:rehearsal-id int?}}}}]
    ["/:rehearsal-id/entry"

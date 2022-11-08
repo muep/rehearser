@@ -1,5 +1,6 @@
 (ns rehearser.service.rehearsal
-  (:require [jeesql.core :refer [defqueries]]))
+  (:require [jeesql.core :refer [defqueries]]
+            [clojure.java.jdbc :as jdbc]))
 
 (defqueries "rehearser/rehearsal.sql")
 
@@ -52,6 +53,11 @@
                                                    :variant-id
                                                    :entry-time
                                                    :remarks])))))))
+
+(defn update! [db whoami id rehearsal]
+  (let [{:keys [account-id]} whoami]
+    (rehearsal-update!
+     db (merge rehearsal {:id id :account-id account-id}))))
 
 (defn entry-add! [db whoami entry]
   (let [rehearsal-id (-> (find-open db whoami) :id)]

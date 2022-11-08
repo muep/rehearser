@@ -8,7 +8,7 @@ insert into rehearsal (
 ) values (
     :account-id,
     to_timestamp(:start-time),
-    :duration,
+    :duration * interval '1 second',
     :title,
     :description
 )
@@ -21,6 +21,15 @@ returning
     duration is null as "is-open",
     title,
     description;
+
+-- name: rehearsal-update!
+update rehearsal
+set
+    "start-time" = to_timestamp(:start-time),
+    "duration" = :duration * interval '1 second',
+    title = :title,
+    description = :description
+where id = :id and "account-id" = :account-id;
 
 --name: rehearsal-select
 select
