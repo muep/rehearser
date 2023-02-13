@@ -7,37 +7,28 @@ insert into rehearsal (
     description
 ) values (
     :account-id,
-    to_timestamp(:start-time),
-    :duration * interval '1 second',
+    :start-time,
+    :duration,
     :title,
     :description
 )
 returning
     id,
     "account-id",
-    extract(epoch from  "start-time")::bigint as "start-time",
-    extract(epoch from "start-time" + duration)::bigint as "end-time",
-    extract(seconds from duration)::bigint as duration,
+    "start-time",
+    "start-time" + duration * interval '1 second' as "end-time",
+    duration,
     duration is null as "is-open",
     title,
     description;
-
--- name: rehearsal-update!
-update rehearsal
-set
-    "start-time" = to_timestamp(:start-time),
-    "duration" = :duration * interval '1 second',
-    title = :title,
-    description = :description
-where id = :id and "account-id" = :account-id;
 
 --name: rehearsal-select
 select
     id,
     "account-id",
-    extract(epoch from "start-time")::bigint as "start-time",
-    extract(epoch from "start-time" + duration)::bigint as "end-time",
-    extract(epoch from coalesce(duration, now() - "start-time"))::bigint as duration,
+    "start-time",
+    "start-time" + duration * interval '1 second' as "end-time",
+    duration,
     duration is null as "is-open",
     title,
     description
@@ -51,9 +42,9 @@ order by "start-time" asc;
 select
     id,
     "account-id",
-    extract(epoch from "start-time")::bigint as "start-time",
-    extract(epoch from "start-time" + duration)::bigint as "end-time",
-    extract(epoch from coalesce(duration, now() - "start-time")) as duration,
+    "start-time",
+    "start-time" + duration * interval '1 second' as "end-time",
+    duration,
     duration is null as "is-open",
     title,
     description
@@ -69,12 +60,12 @@ select
     rehearsal.id as "rehearsal-id",
     "exercise-id",
     "variant-id",
-    extract(epoch from entry."entry-time") as "entry-time",
+    "entry-time",
     remarks,
 
-    extract(epoch from rehearsal."start-time")::bigint as "rehearsal-start-time",
-    extract(epoch from rehearsal."start-time" + rehearsal.duration)::bigint as "rehearsal-end-time",
-    extract(epoch from coalesce(rehearsal.duration, now() - rehearsal."start-time"))::bigint as "rehearsal-duration",
+    rehearsal."start-time" as "rehearsal-start-time",
+    rehearsal."start-time" + rehearsal.duration * interval '1 second' as "rehearsal-end-time",
+    rehearsal.duration as "rehearsal-duration",
     duration is null as "is-open",
     rehearsal.title as "rehearsal-title",
     rehearsal.description as "rehearsal-description"

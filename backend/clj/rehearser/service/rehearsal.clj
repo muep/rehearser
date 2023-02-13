@@ -1,6 +1,7 @@
 (ns rehearser.service.rehearsal
   (:require [jeesql.core :refer [defqueries]]
-            [clojure.java.jdbc :as jdbc]))
+            [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]))
 
 (defqueries "rehearser/rehearsal.sql")
 
@@ -56,8 +57,8 @@
 
 (defn update! [db whoami id rehearsal]
   (let [{:keys [account-id]} whoami]
-    (rehearsal-update!
-     db (merge rehearsal {:id id :account-id account-id}))))
+    (-> (jdbc/update! db "rehearsal" rehearsal ["id = ? and \"account-id\" = ?" id account-id])
+        first)))
 
 (defn entry-add! [db whoami entry]
   (let [rehearsal-id (-> (find-open db whoami) :id)]
@@ -86,3 +87,6 @@
         (throw (ex-info
                 (str "No entry " entry-id " in the open rehearsal " rehearsal-id)
                 {:type :not-found}))))))
+
+#_(-> (find-open (user/db) {:account-id 1}))
+#_(-> (find-by-id (user/db) {:account-id 1} 22))

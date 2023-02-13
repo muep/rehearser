@@ -3,7 +3,13 @@
             [rehearser.service.rehearsal :as service]
             [rehearser.malli :refer [Metadata save->update]]
             [malli.core :as m]
-            [malli.util :as mu]))
+            [malli.util :as mu])
+  (:import (java.time Instant)))
+
+(defn update-if-present [m k f]
+  (if (not (nil? (k m)))
+    (update m k f)
+    m))
 
 (def RehearsalSave
   (m/schema [:map {:closed true}
@@ -44,15 +50,24 @@
       (mu/merge (m/schema [:map {:closed true}
                            [:entries Entries]]))))
 
+(defn api-rehearsal->service-rehearsal [r]
+  (update r :start-time #(Instant/ofEpochSecond %)))
+
+(defn service-rehearsal->api-rehearsal [r]
+  (-> r
+      (update-if-present :start-time #(.getEpochSecond %))
+      (update-if-present :end-time #(.getEpochSecond %))))
 
 (defn get-rehearsals [{:keys [db whoami]}]
   {:status 200
-   :body (service/find-all db whoami)})
+   :body (->> (service/find-all db whoami)
+              (map service-rehearsal->api-rehearsal))})
 
 (defn post-rehearsal! [{{:keys [body]} :parameters
                         :keys [db whoami]}]
   {:status 200
-   :body (service/add! db whoami body)})
+   :body (-> (service/add! db whoami (api-rehearsal->service-rehearsal body))
+             service-rehearsal->api-rehearsal)})
 
 (defn get-rehearsal [{:keys [db whoami]
                       {{:keys [rehearsal-id]} :path} :parameters}]
@@ -98,7 +113,7 @@
            :responses {200 {:body RehearsalDeep}}}
      :put {:handler put-rehearsal!
            :parameters {:path {:rehearsal-id int?}
-                        :body RehearsalSave}}
+                        :body RehearsalUpdate}}
      :delete {:handler delete-rehearsal!
               :parameters {:path {:rehearsal-id int?}}}}]
    ["/:rehearsal-id/entry"
