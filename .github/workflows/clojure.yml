@@ -21,6 +21,9 @@ jobs:
 
     - name: Build Jar archive
       run: ./package.sh
+    
+    - name: Check that the jar can at least run the main entry point
+      run: java -jar target/rehearser.jar --help
 
     - name: Archive the jar archive
       uses: actions/upload-artifact@v2
