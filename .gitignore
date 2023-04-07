@@ -1,6 +1,9 @@
 classes
 target
+.calva
+.clj-kondo
 .cpcache
+.lsp
 .nrepl-port
 rehearser.jar
 /tmp
