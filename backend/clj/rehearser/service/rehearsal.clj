@@ -57,7 +57,7 @@
 
 (defn update! [db whoami id rehearsal]
   (let [{:keys [account-id]} whoami]
-    (-> (jdbc/update! db "rehearsal" rehearsal ["id = ? and \"account-id\" = ?" id account-id])
+    (-> (jdbc/update! db "rehearsal" rehearsal ["id = ? and \"account-id\" = ?" id account-id] {:entities (jdbc/quoted :ansi)})
         first)))
 
 (defn entry-add! [db whoami entry]
