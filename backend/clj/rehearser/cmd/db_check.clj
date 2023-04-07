@@ -1,18 +1,13 @@
 (ns rehearser.cmd.db-check
-  (:require [clojure.java.jdbc :as jdbc])
-  (:import (java.net ConnectException)
-           (org.postgresql.util PSQLException)))
+  (:require [rehearser.db :as db]))
 
-(defn run [{{:keys [jdbc-url]} :options :keys [subcmd-args] }]
+#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
+(defn  run [{{:keys [jdbc-url]} :options}]
   (println "Checking database at" jdbc-url)
   (try
     (let [db {:connection-uri jdbc-url}
-          schema-ver (-> (jdbc/query db "select max(version) as version from rehearser_schema;")
-                         first
-                         :version)]
+          schema-ver (db/schema-version db)]
       (println "Detecting schema version" schema-ver))
-    (catch PSQLException e
-      (if (= ConnectException (-> e .getCause .getClass))
-        (println "Failed to connect:" (-> e .getCause .getMessage))
-        (println "PSQL error:" e))
+    (catch Exception e
+      (println e)
       (System/exit 1))))
