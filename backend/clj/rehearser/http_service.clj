@@ -4,17 +4,19 @@
    [crypto.random :as random]
 
    [reitit.ring :as reitit-ring]
+   [reitit.ring.middleware.exception :as exception-middleware]
    [reitit.ring.middleware.parameters :refer [parameters-middleware]]
 
    [reitit.coercion :refer [compile-request-coercers]]
    [reitit.coercion.malli :refer [coercion]]
-   [reitit.ring.coercion :refer [coerce-exceptions-middleware
-                                 coerce-request-middleware
+   [reitit.ring.coercion :refer [coerce-request-middleware
                                  coerce-response-middleware]]
 
    [ring.middleware.session :as session-middleware]
    [ring.middleware.session.cookie :as cookie-session]
-   [muuntaja.middleware :as muuntaja]
+   [muuntaja.middleware :refer [wrap-format-negotiate
+                                wrap-format-response
+                                wrap-format-request]]
    [org.httpkit.server :as http-server]
    [hikari-cp.core :as hikari]
    [rehearser.api :as api]
@@ -59,6 +61,16 @@
   (fn [{:keys [session] :as req}]
     (handler (assoc req :whoami (session->whoami session)))))
 
+(def api-adapter-middlewares
+  [wrap-disable-cache
+   wrap-format-negotiate
+   wrap-format-response
+   exception-middleware/exception-middleware
+   wrap-format-request
+   parameters-middleware
+   coerce-request-middleware
+   coerce-response-middleware])
+
 (defn make-router [db session-key admin-pwhash]
   (let [reqstat (reqstat/reqstat-middleware+handler)]
     (reitit-ring/router
@@ -66,17 +78,13 @@
       ["/api" (api/routes admin-pwhash (:get-handler reqstat))]]
      {:data {:coercion coercion
              :compile compile-request-coercers
-             :middleware [(:middleware reqstat)
-                          wrap-disable-cache
-                          parameters-middleware
-                          muuntaja/wrap-format
-                          (wrap-db db)
-                          (wrap-session session-key)
-                          whoami-middleware
-                          coerce-exceptions-middleware
-                          coerce-request-middleware
-                          coerce-response-middleware
-                          wrap-print-session]}})))
+             :middleware (-> (concat  [(:middleware reqstat)]
+                                      api-adapter-middlewares
+                                      [(wrap-db db)
+                                       (wrap-session session-key)
+                                       whoami-middleware
+                                       wrap-print-session])
+                             vec)}})))
 
 (defn make-app [db session-key static-file-dir admin-pwhash]
   (reitit-ring/ring-handler

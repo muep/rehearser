@@ -221,8 +221,6 @@
                                   :encode {:json instant->number}}])
 
 
-
-
 (def advanced-request-body
   [:map
    [:id :int]
