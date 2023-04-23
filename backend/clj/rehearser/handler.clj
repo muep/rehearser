@@ -12,26 +12,10 @@
    [muuntaja.middleware :refer [wrap-format-negotiate
                                 wrap-format-response
                                 wrap-format-request]]
-   [malli.core :as m]
-   [malli.registry :as mr])
-  (:import (java.time Instant)))
+   [rehearser.malli :as rehearser-malli]))
 
-(defn number->instant [num]
-  (-> num Instant/ofEpochSecond))
-
-(defn instant->number [i]
-  (-> i .toEpochSecond))
-
-(def schema-registry
-  (-> m/default-registry
-      (mr/composite-registry {:timestamp [(m/-simple-schema {:type :int
-                                                             :pred #(instance? Instant %)})
-                                          {:decode {:json number->instant}
-                                           :encode {:json instant->number}}]})))
-
-(def coercion (malli-coercion/create (assoc-in malli-coercion/default-options
-                                               [:options :registry]
-                                               schema-registry)))
+(def coercion (malli-coercion/create (merge malli-coercion/default-options
+                                            {:options rehearser-malli/malli-options})))
 
 (defn wrap-disable-cache [handler]
   (fn [req]

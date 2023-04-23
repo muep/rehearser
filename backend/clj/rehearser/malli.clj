@@ -1,7 +1,23 @@
 (ns rehearser.malli
   (:require [malli.core :as m]
             [malli.util :as mu]
-            [malli.error :as me]))
+            [malli.registry :as mr])
+  (:import (java.time Instant)))
+
+(defn number->instant [num]
+  (-> num Instant/ofEpochSecond))
+
+(defn instant->number [i]
+  (-> i .toEpochSecond))
+
+(def schema-registry
+  (-> m/default-registry
+      (mr/composite-registry {:timestamp [(m/-simple-schema {:type :int
+                                                             :pred #(instance? Instant %)})
+                                          {:decode {:json number->instant}
+                                           :encode {:json instant->number}}]})))
+
+(def malli-options {:registry schema-registry})
 
 (def Metadata
   (m/schema [:map {:closed true}
