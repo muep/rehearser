@@ -2,7 +2,6 @@
   (:require [clojure.test :as test]
             [rehearser.db-url-test]
             [rehearser.handler-test]
-            [rehearser.router-test]
             [rehearser.handler-progressive-test]))
 
 (defn- test-pattern [kw]
