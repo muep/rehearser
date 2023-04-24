@@ -10,8 +10,7 @@
 (defn instant->number [i]
   (-> i .toEpochSecond))
 
-(def Timestamp [(m/-simple-schema {:type :int
-                                   :pred #(instance? Instant %)})
+(def Timestamp [(m/-simple-schema {:pred #(instance? Instant %)})
                 {:decode {:json number->instant}
                  :encode {:json instant->number}}])
 

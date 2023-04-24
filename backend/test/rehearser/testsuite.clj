@@ -1,6 +1,7 @@
 (ns rehearser.testsuite
   (:require [clojure.test :as test]
             [rehearser.db-url-test]
+            [rehearser.malli-test]
             [rehearser.handler-test]
             [rehearser.handler-progressive-test]))
 
