@@ -10,12 +10,14 @@
 (defn instant->number [i]
   (-> i .toEpochSecond))
 
+(def Timestamp [(m/-simple-schema {:type :int
+                                   :pred #(instance? Instant %)})
+                {:decode {:json number->instant}
+                 :encode {:json instant->number}}])
+
 (def schema-registry
   (-> m/default-registry
-      (mr/composite-registry {:timestamp [(m/-simple-schema {:type :int
-                                                             :pred #(instance? Instant %)})
-                                          {:decode {:json number->instant}
-                                           :encode {:json instant->number}}]})))
+      (mr/composite-registry {:timestamp Timestamp})))
 
 (def malli-options {:registry schema-registry})
 
