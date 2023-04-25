@@ -16,12 +16,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Check if dependencies have changed
+      run: ./check-deps.sh
+
     - name: Run tests
       run: clojure -M:test
 
     - name: Build Jar archive
       run: ./package.sh
-    
+
     - name: Check that the jar can at least run the main entry point
       run: java -jar target/rehearser.jar --help
 
