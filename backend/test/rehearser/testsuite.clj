@@ -1,7 +1,9 @@
 (ns rehearser.testsuite
   (:require [clojure.test :as test]
             [rehearser.db-url-test]
-            [rehearser.router-test]))
+            [rehearser.malli-test]
+            [rehearser.handler-test]
+            [rehearser.handler-progressive-test]))
 
 (defn- test-pattern [kw]
   (re-pattern (str "rehearser\\..*" kw ".*-test")))
