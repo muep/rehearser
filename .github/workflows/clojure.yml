@@ -31,6 +31,8 @@ jobs:
 
     - name: Run tests
       run: clojure -M:test
+      env:
+        POSTGRES_HOST: postgres
 
     - name: Build Jar archive
       run: ./package.sh
