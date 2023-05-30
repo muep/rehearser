@@ -7,3 +7,5 @@ target
 .nrepl-port
 rehearser.jar
 /tmp
+rehearser.iml
+.idea
