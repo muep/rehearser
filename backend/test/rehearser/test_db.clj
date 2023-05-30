@@ -42,4 +42,4 @@
                          "template = rehearser_template;"))
     {:cleanup (fn []
                 (admin-execute! (str "drop database " db-name)))
-     :jdbc-url (str "jdbc:postgresql://localhost:5432/" db-name "?user=rehearser_test&password=rehearser_test")}))
+     :jdbc-url (str "jdbc:postgresql://" postgres-host ":5432/" db-name "?user=rehearser_test&password=rehearser_test")}))
