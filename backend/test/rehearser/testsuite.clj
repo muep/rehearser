@@ -1,6 +1,8 @@
 (ns rehearser.testsuite
   (:require [clojure.test :as test]
             [rehearser.test-db :as test-db]
+
+            [rehearser.account-test]
             [rehearser.db-url-test]
             [rehearser.fixture-test]
             [rehearser.malli-test]

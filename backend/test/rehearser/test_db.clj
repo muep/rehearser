@@ -36,6 +36,7 @@
 
 (defn make-disposable-test-db! []
   (let [db-name (str "rehearser_test_" (swap! db-ctr inc))]
+    (admin-execute! (str "drop database if exists " db-name ";"))
     (admin-execute! (str "create database " db-name " with "
                          "owner = rehearser_test "
                          "template = rehearser_template;"))

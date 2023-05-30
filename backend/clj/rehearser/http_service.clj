@@ -60,7 +60,7 @@
                      (reitit-ring/routes
                       (if (empty? static-file-dir)
                         (do
-                          (log/info "Serving static content from resources")
+                          (log/debug "Serving static content from resources")
                           (reitit-ring/create-resource-handler {:path "/"
                                                                 :root "public"}))
                         (do
