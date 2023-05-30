@@ -3,6 +3,15 @@ Rehearser backend
 # Development tasks
 How to accomplish routine tasks
 
+## Development database
+
+Via docker:
+
+    docker run -e POSTGRES_PASSWORD=postgres \
+        -d \
+        --name rehearser-db \
+        -p 5432:5432 postgres
+
 ## Run tests
 
 Run this:
