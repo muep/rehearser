@@ -4,9 +4,10 @@
 
     [rehearser.db :as db]))
 
+(def postgres-host (or (System/getenv "POSTGRES_HOST") "localhost"))
 
-(def admin-db "jdbc:postgresql://localhost:5432/postgres?user=postgres&password=postgres")
-(def template-db-as-tester "jdbc:postgresql://localhost:5432/rehearser_template?user=rehearser_test&password=rehearser_test")
+(def admin-db (str "jdbc:postgresql://" postgres-host ":5432/postgres?user=postgres&password=postgres"))
+(def template-db-as-tester (str "jdbc:postgresql://" postgres-host ":5432/rehearser_template?user=rehearser_test&password=rehearser_test"))
 
 (def ^:dynamic test-db nil)
 
