@@ -4,7 +4,19 @@
             [clojure.string :as str])
   (:import
    (java.net ConnectException)
+   (java.time Instant)
+   (java.sql Timestamp PreparedStatement)
    (org.postgresql.util PSQLException)))
+
+(extend-protocol jdbc/IResultSetReadColumn
+  Timestamp
+  (result-set-read-column [x _ _]
+    (.toInstant x)))
+
+(extend-protocol jdbc/ISQLParameter
+  Instant
+  (set-parameter [^Instant instant ^PreparedStatement stmt ^long i]
+    (.setObject stmt i (Timestamp/from instant))))
 
 (defn schema-version [db]
   (try
