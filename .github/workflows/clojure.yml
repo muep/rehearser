@@ -41,7 +41,7 @@ jobs:
       run: java -jar target/rehearser.jar --help
 
     - name: Archive the jar archive
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: rehearser.jar
         path: target/rehearser.jar
