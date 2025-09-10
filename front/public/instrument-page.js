@@ -20,7 +20,7 @@ export const instrumentPage = async (setMainContent, id) => {
     button("Remove instrument", async () => {
       await instrumentRm(id);
       location.hash = "instrument";
-    })
+    }),
   );
 
   setMainContent(page);
