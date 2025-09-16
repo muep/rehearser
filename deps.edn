@@ -1,6 +1,6 @@
 {:paths ["classes" "backend/clj" "backend/resources" "backend/sql" "front"]
  :deps {;; General org.clojure bits
-        org.clojure/clojure {:mvn/version "1.11.1"}
+        org.clojure/clojure {:mvn/version "1.12.2"}
         org.clojure/tools.namespace {:mvn/version "1.4.4"}
         org.clojure/core.async {:mvn/version "1.6.673"} ;: [1]
         org.clojure/tools.cli {:mvn/version "1.0.214"}
