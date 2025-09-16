@@ -44,7 +44,7 @@ application as a standalone JAR or using containerization (e.g.,
 Docker) and deploying on a low-cost VM in an EU-based data center,
 aligning with GDPR and budget constraints.
 
-## Alternatives Considered
+## Candidate comparison
 
 1. **Clojure**:
    - **Pros**:
