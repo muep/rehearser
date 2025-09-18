@@ -12,9 +12,9 @@ metosin/reitit-middleware 0.6.0
   X metosin/muuntaja 0.6.8 :use-top
   . metosin/spec-tools 0.10.5
     X org.clojure/spec.alpha 0.2.187 :older-version
-org.clojure/clojure 1.11.1
-  . org.clojure/spec.alpha 0.3.218
-  . org.clojure/core.specs.alpha 0.2.62
+org.clojure/clojure 1.12.2
+  . org.clojure/spec.alpha 0.5.238
+  . org.clojure/core.specs.alpha 0.4.74
 org.clojure/tools.logging 1.2.4
 metosin/muuntaja 0.6.8
   . metosin/jsonista 0.3.1
