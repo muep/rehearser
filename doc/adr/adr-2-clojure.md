@@ -17,8 +17,8 @@ due to its concise syntax and functional programming model. The
 dynamic nature and good support for interactive programming in the
 REPL is expected to help here as well.
 
-**Maintainbility**: The emphasis on immutability and pure functions may
-simplify testing and debugging processes.
+**Maintainability**: The emphasis on immutability and pure functions
+may simplify testing and debugging processes.
 
 **Performance**: The volumes of data and users are
 expected to be low enough, that almost any platform will generally
