@@ -41,6 +41,7 @@ other setups.
      - Meets budget constraints.
      - Simpler ops (no orchestration, fewer moving parts).
      - Faster to develop with limited resources.
+     - High flexibility with regards to where to host the app
    - **Cons**:
      - Scaling requires manual intervention.
 
