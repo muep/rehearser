@@ -36,7 +36,7 @@ metosin/muuntaja 0.6.8
         . org.javassist/javassist 3.18.1-GA
       X commons-codec/commons-codec 1.10 :older-version
       . javax.xml.bind/jaxb-api 2.3.0
-org.clojure/tools.cli 1.0.214
+org.clojure/tools.cli 1.1.230
 webjure/jeesql 0.4.7
   X org.clojure/java.jdbc 0.6.2-alpha3 :use-top
   X org.clojure/core.async 0.3.443 :use-top
