@@ -41,8 +41,8 @@ webjure/jeesql 0.4.7
   X org.clojure/java.jdbc 0.6.2-alpha3 :use-top
   X org.clojure/core.async 0.3.443 :use-top
 org.springframework.security/spring-security-crypto 5.8.2
-org.postgresql/postgresql 42.6.0
-  . org.checkerframework/checker-qual 3.31.0
+org.postgresql/postgresql 42.7.8
+  . org.checkerframework/checker-qual 3.49.5
 metosin/reitit-ring 0.6.0
   X metosin/reitit-core 0.6.0 :use-top
   . ring/ring-core 1.9.6
