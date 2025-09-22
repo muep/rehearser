@@ -59,6 +59,8 @@ aligning with GDPR and budget constraints.
        solutions.
      - Learning curve for developers unfamiliar with functional
        programming or the JVM ecosystem.
+     - Absence of static typing, which might help with avoiding some
+       classes of defects.
 2. **Anything else**:
    - **Pros**:
      - (Not really checked)
