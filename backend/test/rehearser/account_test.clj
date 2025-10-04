@@ -5,31 +5,15 @@
     [rehearser.test-db :refer [test-db]]
 
     [crypto.random :as random]
-    [jsonista.core :as json]
     [ring.mock.request :as mock]
 
-    [rehearser.http-service :as http-service])
+    [rehearser.http-service :as http-service]
+    [rehearser.test-util :refer [handler-with-local-cookies
+                                 read-json-value]])
   (:import (java.io ByteArrayInputStream)))
 
 (t/use-fixtures :each fixture)
 
-(def object-mapper (json/object-mapper {:decode-key-fn true}))
-
-(defn read-json-value [v]
-  (json/read-value v object-mapper))
-
-(defn handler-with-local-cookies [handler]
-  (let [cookies (atom {})]
-    (fn [req]
-      (let [req-with-cookies (reduce (fn [req [cookie-name cookie-value]]
-                                       (mock/cookie req cookie-name cookie-value))
-                                     req
-                                     @cookies)
-            response (handler req-with-cookies)]
-        (when-let [set-cookie (first (get-in response [:headers "Set-Cookie"]))]
-          (let [[cookie-name cookie-val] (clojure.string/split set-cookie #"=" 2)]
-            (swap! cookies assoc cookie-name (first (clojure.string/split cookie-val #";")))))
-        response))))
 
 (defn post-json-text-request [uri body-text]
   {:request-method :post
@@ -103,4 +87,18 @@
                                 :uri            "/api/whoami"
                                 :body ""})]
       (t/is (= (:status whoami-response) 200))
-      (t/is (integer? (-> whoami-response :body read-json-value :account-id))))))
+      (t/is (integer? (-> whoami-response :body read-json-value :account-id))))
+
+    ;; Try logging out
+    (let [logout-response (app {:request-method :post
+                                :uri            "/api/logout"
+                                :body ""})]
+      (t/is (= (:status logout-response) 303))
+      (t/is (= (-> logout-response :headers (get "Location")) "../login.html")))
+
+    ;; Now it should not have an id any more
+    (let [whoami-response (app {:request-method :get
+                                :uri            "/api/whoami"
+                                :body ""})]
+      (t/is (= (:status whoami-response) 200))
+      (t/is (nil? (-> whoami-response :body read-json-value :account-id))))))

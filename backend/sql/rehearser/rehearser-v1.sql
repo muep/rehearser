@@ -39,6 +39,7 @@ create table rehearsal (
     id serial unique not null,
     "account-id" integer not null references account(id),
     "start-time" timestamptz not null,
+    -- Null means "ongoing"
     duration interval,
     title text not null,
     description text not null
