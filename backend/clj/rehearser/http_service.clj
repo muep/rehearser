@@ -82,7 +82,7 @@
                                 (.setJdbcUrl jdbc-url)))
         db {:datasource ds}
         key (or session-key (random/bytes 16))
-        app (make-app db key static-file-dir admin-pwhash)
+        app (:handler (make-app db key static-file-dir admin-pwhash))
         close-server (http-server/run-server app {:port port})]
     (fn []
       (close-server)

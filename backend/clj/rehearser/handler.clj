@@ -33,13 +33,16 @@
    coerce-response-middleware])
 
 (defn handler [before-middlewares after-middlewares routes default-handler]
-  (reitit-ring/ring-handler
-   (reitit-ring/router routes
-                       {:data {:coercion coercion
-                               :compile compile-request-coercers
-                               :middleware (vec (concat before-middlewares
-                                                        api-adapter-middlewares
-                                                        after-middlewares))}})
-   (if (fn? default-handler)
-     (reitit-ring/routes default-handler (reitit-ring/create-default-handler))
-     (reitit-ring/create-default-handler))))
+  (let [router (reitit-ring/router routes
+                                   {:data {:coercion coercion
+                                           :compile compile-request-coercers
+                                           :middleware (vec (concat before-middlewares
+                                                                    api-adapter-middlewares
+                                                                    after-middlewares))}})
+        handler (reitit-ring/ring-handler
+                 router
+                 (if (fn? default-handler)
+                   (reitit-ring/routes default-handler (reitit-ring/create-default-handler))
+                   (reitit-ring/create-default-handler)))]
+    {:router router
+     :handler handler}))
