@@ -12,7 +12,7 @@ metosin/reitit-middleware 0.6.0
   X metosin/muuntaja 0.6.8 :use-top
   . metosin/spec-tools 0.10.5
     X org.clojure/spec.alpha 0.2.187 :older-version
-org.clojure/clojure 1.12.2
+org.clojure/clojure 1.12.3
   . org.clojure/spec.alpha 0.5.238
   . org.clojure/core.specs.alpha 0.4.74
 com.zaxxer/HikariCP 7.0.2
