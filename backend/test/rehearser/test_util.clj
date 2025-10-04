@@ -48,3 +48,24 @@
                       "content-type" "application/json"
                       "content-length" (-> body-text .length str)}
      :body (-> body-text .getBytes ByteArrayInputStream.)}))
+
+(defn var-name [v]
+  (let [m (meta v)]
+    (str (ns-name (:ns m)) "/" (:name m))))
+
+(defn test-time-reporter [reporter]
+  (let [timings (atom {})
+        reporter (fn [{:keys [type var] :as m}]
+                   (case type
+                     :begin-test-var
+                     (swap! timings assoc (var-name var) (System/nanoTime))
+
+                     :end-test-var
+                     (let [start (get @timings (var-name var))
+                           elapsed (/ (- (System/nanoTime) start) 1e6)]
+                       (swap! timings assoc (var-name var) elapsed))
+
+                     nil)
+                   (reporter m))]
+    {:reporter reporter
+     :timings timings}))
