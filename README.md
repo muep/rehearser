@@ -8,13 +8,13 @@ managing keeping track of things to practice regularly.
 To run the program based on this source code, these dependencies are
 needed:
 
-- Java Development Kit (development is mainly done on OpenJDK 11)
+- Java 21
 - [Clojure](https://clojure.org/index)
 
 The build process will additionally fetch dependencies listed in
 [deps.edn](deps.edn), as well as their transitive dependencies.
 
-just run the program in this source directory, one can invoke
+To just run the program in this source directory, one can invoke
 `clojure` like this:
 
 ```

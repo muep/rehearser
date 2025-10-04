@@ -10,6 +10,7 @@
   {:connection-uri state/jdbc-url})
 
 (defn run []
+  (state/set-server! nil)
   (state/set-server! (service/run {:admin-pwhash state/admin-pwhash
                                    :jdbc-url state/jdbc-url
                                    :port state/port

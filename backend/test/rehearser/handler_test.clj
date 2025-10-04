@@ -32,7 +32,7 @@
                                                   :body basic-body}
                                      :responses {200 basic-body}}}])
 
-(def app (rehearser.handler/handler [] [] routes nil))
+(def app (:handler (rehearser.handler/handler [] [] routes nil)))
 
 (t/deftest basics
   (let [response (app (post-json-text-request

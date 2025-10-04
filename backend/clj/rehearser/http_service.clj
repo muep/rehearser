@@ -8,11 +8,12 @@
    [ring.middleware.session.cookie :as cookie-session]
 
    [org.httpkit.server :as http-server]
-   [hikari-cp.core :as hikari]
    [rehearser.api :as api]
    [rehearser.handler :as handler]
    [rehearser.health :as health]
-   [rehearser.reqstat :as reqstat]))
+   [rehearser.reqstat :as reqstat])
+  (:import
+   (com.zaxxer.hikari HikariConfig HikariDataSource)))
 
 (defn wrap-db [db]
   (fn [handler]
@@ -77,10 +78,11 @@
     (log/info "Should serve static content from resources")
     (log/info "Should serve static content from" static-file-dir))
 
-  (let [ds (hikari/make-datasource {:jdbc-url jdbc-url})
+  (let [ds (HikariDataSource. (doto (HikariConfig.)
+                                (.setJdbcUrl jdbc-url)))
         db {:datasource ds}
         key (or session-key (random/bytes 16))
-        app (make-app db key static-file-dir admin-pwhash)
+        app (:handler (make-app db key static-file-dir admin-pwhash))
         close-server (http-server/run-server app {:port port})]
     (fn []
       (close-server)
