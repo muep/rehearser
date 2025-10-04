@@ -3,6 +3,7 @@
             [rehearser.test-db :as test-db]
 
             [rehearser.account-test]
+            [rehearser.exercise-test]
             [rehearser.db-url-test]
             [rehearser.fixture-test]
             [rehearser.malli-test]
