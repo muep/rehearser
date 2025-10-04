@@ -32,9 +32,11 @@
                       :main-opts ["-m" "uberdeps.uberjar"]}
            :dev {:extra-paths ["backend/test" "backend/dev"]
                  :extra-deps {org.clojure/tools.namespace {:mvn/version "1.4.4"}
+                              eftest/eftest  {:mvn/version "0.6.0"}
                               ring/ring-mock {:mvn/version "0.6.2"}}}
            :test {:extra-paths ["backend/test"]
-                  :extra-deps {ring/ring-mock {:mvn/version "0.6.2"}}
+                  :extra-deps {eftest/eftest  {:mvn/version "0.6.0"}
+                               ring/ring-mock {:mvn/version "0.6.2"}}
                   :main-opts ["-m" "rehearser.testsuite"]}}}
 
 ;; [1] jeesql requires a rather old version, so this file requests a
