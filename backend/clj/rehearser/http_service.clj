@@ -48,7 +48,22 @@
   (fn [{:keys [session] :as req}]
     (handler (assoc req :whoami (session->whoami session)))))
 
-(defn make-app [db session-key static-file-dir admin-pwhash]
+(defn make-app
+  "Constructs the backend Ring application with routes and middleware.
+
+  Parameters:
+  - db: A database spec accepted by JDBC libraries. Either a map containing
+        {:datasource <javax.sql.DataSource>} (normally a HikariCP pool) or
+        a plain JDBC URL string. The database access libraries are expected to be
+        able to handle both transparently.
+  - session-key: array of bytes - a secret key for signing cookie-based sessions.
+  - static-file-dir: Directory to serve static files from, or empty string
+        to serve from classpath resources
+  - admin-pwhash: Password hash used for admin authentication
+
+  Returns a map with :handler (the Ring handler) and any auxiliary values
+  needed by the application."
+  [db session-key static-file-dir admin-pwhash]
   (let [reqstat (reqstat/reqstat-middleware+handler)
         before-middlewares [(:middleware reqstat)]
         after-middlewares [(wrap-db db)
