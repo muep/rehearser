@@ -1,5 +1,6 @@
 (ns rehearser.handler
   (:require
+   [clojure.tools.logging :as log]
    [reitit.ring :as reitit-ring]
    [reitit.ring.middleware.exception :refer [exception-middleware]]
    [reitit.ring.middleware.parameters :refer [parameters-middleware]]
@@ -22,11 +23,20 @@
     (-> (handler req)
         (assoc-in [:headers "Cache-Control"] "no-store"))))
 
+(defn log-exceptions-middleware [handler]
+  (fn [req]
+    (try
+      (handler req)
+      (catch java.lang.Exception e
+        (log/error e "Unhandled exception")
+        (throw e)))))
+
 (def api-adapter-middlewares
   [wrap-disable-cache
    wrap-format-negotiate
    wrap-format-response
    exception-middleware
+   log-exceptions-middleware
    wrap-format-request
    parameters-middleware
    coerce-request-middleware
