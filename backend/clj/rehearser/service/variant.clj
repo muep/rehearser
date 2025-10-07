@@ -1,6 +1,5 @@
 (ns rehearser.service.variant
   (:require
-   [clojure.java.jdbc :as jdbc]
    [jeesql.core :refer [defqueries]]
    [rehearser.misc :refer [select-or-nil-keys]]))
 
