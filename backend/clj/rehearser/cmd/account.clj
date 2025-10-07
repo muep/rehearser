@@ -1,6 +1,5 @@
 (ns rehearser.cmd.account
-  (:require [clojure.java.jdbc :as jdbc]
-            [jeesql.core :refer [defqueries]]
+  (:require [jeesql.core :refer [defqueries]]
             [rehearser.cmd.common :refer [usage-error!]]
             [rehearser.service.account :as service])
   (:import (org.springframework.security.crypto.bcrypt BCrypt)))
