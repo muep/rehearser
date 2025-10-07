@@ -1,7 +1,7 @@
 (ns rehearser.fixture-test
   (:require
     [clojure.test :as t]
-    [clojure.java.jdbc :as jdbc]
+    [next.jdbc.sql :as jdbc-sql]
     [rehearser.test-db :as test-db]
     [rehearser.fixture :as fixture]))
 
@@ -13,5 +13,5 @@
 
 (t/deftest expected-content
   (t/testing "The test database has at least some known database objects"
-    (let [rows (jdbc/query test-db/test-db "select * from account;")]
+    (let [rows (jdbc-sql/query test-db/test-db ["select * from account;"])]
       (t/is (= rows [])))))
