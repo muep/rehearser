@@ -1,4 +1,4 @@
--- name: variant-insert<!
+-- :name variant-insert! :<! :1
 insert into variant (
     "account-id",
     title,
@@ -10,23 +10,23 @@ insert into variant (
 )
 returning id, "account-id", title, description;
 
--- name: variant-select-all
+-- :name variant-select-all :? :*
 select id, "account-id", title, description
 from variant
 where "account-id" = :account-id;
 
---name: variant-by-id
+-- :name variant-by-id :? :*
 select id, "account-id", title, description
 from variant
 where "account-id" = :account-id and
       id = :id;
 
---name: variant-delete!
+-- :name variant-delete! :! :n
 delete from variant
 where "account-id" = :account-id and
       id = :id;
 
---name: variant-update<!
+-- :name variant-update! :<! :1
 update variant
 set
   title = coalesce(:title, title),
