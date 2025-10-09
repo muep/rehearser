@@ -1,9 +1,9 @@
 (ns rehearser.api.account
   (:require [rehearser.service.account :as service]
-            [jeesql.core :refer [defqueries]])
+            [hugsql.core :refer [def-db-fns]])
   (:import (org.springframework.security.crypto.bcrypt BCrypt)))
 
-(defqueries "rehearser/account.sql")
+(def-db-fns "rehearser/account.sql")
 
 (def account-exceptions
   {:account-name-format {:status 400

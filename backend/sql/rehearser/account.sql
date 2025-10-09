@@ -1,32 +1,32 @@
--- name: account-create<!
+-- :name account-create! :<! :1
 insert into account (name, pwhash)
   values (:name, :pwhash)
 on conflict (name) do nothing
 returning id;
 
---name: account-default-variant!
+-- :name account-default-variant! :! :n
 insert into variant ("account-id", title, description)
 values (:account-id,  'default', '');
 
--- name: account-force-passwd!
+-- :name account-force-passwd! :! :n
 update account
   set pwhash = :pwhash
   where name = :name;
 
--- name: account-login
+-- :name account-login :? :*
 select id
 from account
 where name = :name and
       pwhash = :pwhash;
 
--- name: select-accounts
+-- :name select-accounts :? :*
 select
   id,
   name
 from account
 order by id;
 
--- name: select-account-by-name
+-- :name select-account-by-name :? :*
 select
   id, name, pwhash
 from account
