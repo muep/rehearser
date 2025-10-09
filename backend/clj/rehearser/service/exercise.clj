@@ -1,13 +1,13 @@
 (ns rehearser.service.exercise
   (:require
-   [jeesql.core :refer [defqueries]]
+   [hugsql.core :refer [def-db-fns]]
    [rehearser.misc :refer [select-or-nil-keys]]))
 
-(defqueries "rehearser/exercise.sql")
+(def-db-fns "rehearser/exercise.sql")
 
 (defn add! [db whoami exercise]
-  (exercise-insert<! db (merge (select-keys whoami [:account-id])
-                               (select-keys exercise [:title :description]))))
+  (exercise-insert! db (merge (select-keys whoami [:account-id])
+                              (select-keys exercise [:title :description]))))
 
 (defn find-by-id [db whoami id]
   (exercise-by-id db {:id id
@@ -17,10 +17,10 @@
   (exercise-select-all db (select-keys whoami [:account-id])))
 
 (defn update-by-id! [db whoami id exercise]
-  (exercise-update<! db (merge
-                         {:id id}
-                         (select-keys whoami [:account-id])
-                         (select-or-nil-keys exercise [:title :description]))))
+  (exercise-update! db (merge
+                        {:id id}
+                        (select-keys whoami [:account-id])
+                        (select-or-nil-keys exercise [:title :description]))))
 
 (defn delete-by-id! [db whoami id]
   (exercise-delete! db {:id id

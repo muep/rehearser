@@ -1,4 +1,4 @@
--- name: exercise-insert<!
+-- :name exercise-insert! :<! :1
 insert into exercise (
     "account-id",
     title,
@@ -10,23 +10,23 @@ insert into exercise (
 )
 returning id, "account-id", title, description;
 
--- name: exercise-select-all
+-- :name exercise-select-all :? :*
 select id, "account-id", title, description
 from exercise
 where "account-id" = :account-id;
 
---name: exercise-by-id
+-- :name exercise-by-id :? :*
 select id, "account-id", title, description
 from exercise
 where "account-id" = :account-id and
       id = :id;
 
---name: exercise-delete!
+-- :name exercise-delete! :! :n
 delete from exercise
 where "account-id" = :account-id and
       id = :id;
 
---name: exercise-update<!
+-- :name exercise-update! :<! :1
 update exercise
 set
   title = coalesce(:title, title),
