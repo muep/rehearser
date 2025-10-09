@@ -1,6 +1,7 @@
 (ns rehearser.db
   (:require [clojure.java.io :as io]
-            [clojure.java.jdbc :as jdbc]
+            [next.jdbc :as jdbc]
+            [next.jdbc.sql :as jdbc-sql]
             [clojure.string :as str])
   (:import
    (java.net ConnectException)
@@ -8,7 +9,7 @@
 
 (defn schema-version [db]
   (try
-    (-> (jdbc/query db "select max(version) as version from rehearser_schema;")
+    (-> (jdbc-sql/query db ["select max(version) as version from rehearser_schema;"])
         first
         :version)
     (catch PSQLException e
@@ -24,4 +25,4 @@
 
 (defn reset [db]
   (let [reset-stmts (slurp (io/resource "rehearser/rehearser-v1.sql"))]
-    (jdbc/execute! db reset-stmts)))
+    (jdbc/execute! db [reset-stmts])))

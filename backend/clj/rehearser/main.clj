@@ -1,6 +1,8 @@
 (ns rehearser.main
   (:require [clojure.string :as str]
             [clojure.tools.cli :as cli]
+            [hugsql.core :as hugsql]
+            [hugsql.adapter.next-jdbc :as next-adapter]
             [rehearser.cmd.common :as common-cmd]
             [rehearser.db-url :refer [libpq->jdbc]])
   (:gen-class))
@@ -99,6 +101,7 @@
                                                      [(subcmd-description)])))))
 
 (defn -main [& args]
+  (hugsql/set-adapter! (next-adapter/hugsql-adapter-next-jdbc))
   (try
     ;; Only the top-level arguments are parsed here. Further parsing
     ;; will be done when the subcommand has been selected and its

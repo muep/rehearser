@@ -1,10 +1,10 @@
 (ns rehearser.health
-  (:require [clojure.java.jdbc :as jdbc])
+  (:require [next.jdbc.sql :as jdbc-sql])
   (:import (java.sql SQLException)))
 
 (defn- check-db [db]
   (try
-    (jdbc/query db "select 1;")
+    (jdbc-sql/query db ["select 1;"])
     nil
     (catch SQLException e
       (str e))

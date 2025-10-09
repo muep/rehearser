@@ -1,11 +1,10 @@
 (ns rehearser.cmd.account
-  (:require [clojure.java.jdbc :as jdbc]
-            [jeesql.core :refer [defqueries]]
+  (:require [hugsql.core :refer [def-db-fns]]
             [rehearser.cmd.common :refer [usage-error!]]
             [rehearser.service.account :as service])
   (:import (org.springframework.security.crypto.bcrypt BCrypt)))
 
-(defqueries "rehearser/account.sql")
+(def-db-fns "rehearser/account.sql")
 
 (defn add [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
   (when-not (= 2 (count subcmd-args))

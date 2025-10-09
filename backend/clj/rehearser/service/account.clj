@@ -1,10 +1,10 @@
 (ns rehearser.service.account
-  (:require [jeesql.core :refer [defqueries]])
+  (:require [hugsql.core :refer [def-db-fns]])
   (:import (org.springframework.security.crypto.bcrypt BCrypt)
            (java.sql SQLException)
            (org.postgresql.util PSQLException)))
 
-(defqueries "rehearser/account.sql")
+(def-db-fns "rehearser/account.sql")
 
 (def account-regex #"[a-zA-Z][a-zA-Z0-9]{3,29}")
 
@@ -17,8 +17,8 @@
 
 (defn create-account! [db username password]
   (let [account
-        (account-create<! db {:name username
-                              :pwhash (BCrypt/hashpw password (BCrypt/gensalt 12))})]
+        (account-create! db {:name username
+                             :pwhash (BCrypt/hashpw password (BCrypt/gensalt 12))})]
     (when (not (nil? account))
       (account-default-variant! db {:account-id (:id account)}))
     account))

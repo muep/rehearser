@@ -1,11 +1,11 @@
 (ns rehearser.service.rehearsal
-  (:require [jeesql.core :refer [defqueries]]))
+  (:require [hugsql.core :refer [def-db-fns]]))
 
-(defqueries "rehearser/rehearsal.sql")
+(def-db-fns "rehearser/rehearsal.sql")
 
 (defn start! [db whoami rehearsal]
-  (rehearsal-start<! db (merge (select-keys whoami [:account-id])
-                               (select-keys rehearsal [:title :description]))))
+  (rehearsal-start! db (merge (select-keys whoami [:account-id])
+                              (select-keys rehearsal [:title :description]))))
 
 (defn end! [db whoami]
   (rehearsal-end! db whoami))

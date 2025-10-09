@@ -1,6 +1,6 @@
 (ns rehearser.test-db
   (:require
-    [clojure.java.jdbc :as jdbc]
+    [next.jdbc :as jdbc]
 
     [rehearser.db :as db]))
 
@@ -11,8 +11,8 @@
 
 (def ^:dynamic test-db nil)
 
-(defn admin-execute! [cmd]
-  (jdbc/execute! admin-db cmd {:transaction? false}))
+(defn- admin-execute! [cmd]
+  (jdbc/execute! admin-db [cmd]))
 
 (defn prepare-template-db! []
   (admin-execute! "create role rehearser_test with login password 'rehearser_test'")
