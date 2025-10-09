@@ -1,4 +1,4 @@
--- name: rehearsal-start<!
+-- :name rehearsal-start! :<! :1
 insert into rehearsal (
     "account-id",
     "start-time",
@@ -12,14 +12,14 @@ insert into rehearsal (
 )
 returning id, title, description, extract(epoch from  "start-time") as "start-time";
 
--- name: rehearsal-end!
+-- :name rehearsal-end! :! :n
 update rehearsal
 set duration = now() - "start-time"
 where
     duration is null and
     "account-id" = :account-id;
 
---name: rehearsal-select
+-- :name rehearsal-select :? :*
 select
     "account-id",
     extract(epoch from "start-time") as "start-time",
