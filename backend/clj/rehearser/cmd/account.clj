@@ -1,8 +1,10 @@
 (ns rehearser.cmd.account
-  (:require [hugsql.core :refer [def-db-fns]]
-            [rehearser.cmd.common :refer [usage-error!]]
-            [rehearser.service.account :as service])
-  (:import (org.springframework.security.crypto.bcrypt BCrypt)))
+  (:require
+   [rehearser.cmd.common :refer [usage-error!]]
+   [rehearser.hugsql :refer [def-db-fns]]
+   [rehearser.service.account :as service])
+  (:import
+   (org.springframework.security.crypto.bcrypt BCrypt)))
 
 (def-db-fns "rehearser/account.sql")
 

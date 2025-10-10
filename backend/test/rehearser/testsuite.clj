@@ -1,9 +1,8 @@
 (ns rehearser.testsuite
-  (:require [eftest.runner :as eftest]
-            [hugsql.core :as hugsql]
-            [hugsql.adapter.next-jdbc :as next-adapter]
-            [rehearser.test-db :as test-db]
-            [rehearser.test-util :refer [test-time-reporter]]))
+  (:require
+   [eftest.runner :as eftest]
+   [rehearser.test-db :as test-db]
+   [rehearser.test-util :refer [test-time-reporter]]))
 
 (defn- test-pattern [kw]
   (re-pattern (str "rehearser\\..*" kw ".*-test")))
@@ -14,7 +13,6 @@
     (some #(re-find % name) patterns)))
 
 (defn -main [& args]
-  (hugsql/set-adapter! (next-adapter/hugsql-adapter-next-jdbc))
   (test-db/wrap-prepared-template-db!
     (fn []
       (let [patterns (if (seq args)
