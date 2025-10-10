@@ -1,7 +1,9 @@
 (ns rehearser.api.account
-  (:require [rehearser.service.account :as service]
-            [hugsql.core :refer [def-db-fns]])
-  (:import (org.springframework.security.crypto.bcrypt BCrypt)))
+  (:require
+   [rehearser.hugsql :refer [def-db-fns]]
+   [rehearser.service.account :as service])
+  (:import
+   (org.springframework.security.crypto.bcrypt BCrypt)))
 
 (def-db-fns "rehearser/account.sql")
 

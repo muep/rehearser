@@ -1,6 +1,6 @@
 (ns rehearser.service.variant
   (:require
-   [hugsql.core :refer [def-db-fns]]
+   [rehearser.hugsql :refer [def-db-fns]]
    [rehearser.misc :refer [select-or-nil-keys]]))
 
 (def-db-fns "rehearser/variant.sql")
