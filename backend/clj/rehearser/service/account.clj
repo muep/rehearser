@@ -1,6 +1,6 @@
 (ns rehearser.service.account
   (:require
-   [rehearser.hugsql :refer [def-db-fns]])
+   [rehearser.db :refer [def-db-fns]])
   (:import
    (org.springframework.security.crypto.bcrypt BCrypt)
    (java.sql SQLException)
