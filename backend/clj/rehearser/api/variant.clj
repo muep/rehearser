@@ -9,7 +9,7 @@
 (def VariantSave
   (m/schema [:map {:closed true}
              [:description string?]
-             [:title  (m/schema [:string {:min 1}])]]))
+             [:title (m/schema [:string {:min 1}])]]))
 
 (def Variant
   (mu/merge Metadata VariantSave))
