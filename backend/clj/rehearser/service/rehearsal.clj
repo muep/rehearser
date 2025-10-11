@@ -1,5 +1,5 @@
 (ns rehearser.service.rehearsal
-  (:require [rehearser.hugsql :refer [def-db-fns]]))
+  (:require [rehearser.db :refer [def-db-fns]]))
 
 (def-db-fns "rehearser/rehearsal.sql")
 
