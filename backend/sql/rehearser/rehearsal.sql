@@ -103,6 +103,22 @@ returning
     "entry-time",
     remarks;
 
+-- :name entry-update! :<! :1
+update entry
+set
+    --~ (clojure.string/join ", " (map (fn [[k _]] (str "\"" (name k) "\" = " k )) (dissoc params :id :account-id)))
+where
+    "account-id" = :account-id and
+    id = :id
+returning
+    id,
+    "account-id",
+    "rehearsal-id",
+    "exercise-id",
+    "variant-id",
+    "entry-time",
+    remarks;
+
 -- :name entry-select :? :*
 select
     id,

@@ -45,6 +45,7 @@
    ["/whoami" {:get account/whoami}]
    ["/exercise" api-metadata exercise/routes]
    ["/rehearsal" api-metadata rehearsal/routes]
+   ["/entry" api-metadata rehearsal/entry-routes]
    ["/variant" api-metadata variant/routes]
    ["/params" {:get exp/params-get
                :post exp/params-post}]

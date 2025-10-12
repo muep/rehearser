@@ -31,6 +31,11 @@
                                                :entry-time
                                                :remarks]))))
 
+(defn update-entry! [db whoami id entry]
+  (entry-update! db (merge (select-keys entry [:entry-time :remarks :variant-id :exercise-id])
+                           {:id id}
+                           (select-keys whoami [:account-id]))))
+
 (defn find-entries-of-rehearsal [db {:keys [account-id]} rehearsal-id]
   (entry-select db {:account-id account-id
                     :rehearsal-id rehearsal-id}))

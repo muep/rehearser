@@ -79,6 +79,12 @@
    :body (service/insert-entry! db whoami (-> body
                                               (assoc :rehearsal-id rehearsal-id)))})
 
+(defn put-entry! [{{:keys [body]
+                    {:keys [id]} :path} :parameters
+                   :keys [db whoami]}]
+  {:status 200
+   :body (service/update-entry! db whoami id body)})
+
 (defn get-entries [{{{:keys [rehearsal-id]} :path} :parameters
                     :keys [db whoami]}]
   {:status 200
@@ -105,10 +111,17 @@
                :responses {200 {:body Rehearsal}}
                :handler put-rehearsal!}
          :delete {:handler not-implemented!}}]
-    ["/entry" {:post {:parameters {:body EntrySave
-                                   :path {:rehearsal-id int?}}
-                      :responses {200 {:body Entry}}
-                      :handler post-entry!}
-               :get {:parameters {:path {:rehearsal-id int?}}
-                     :responses {200 {:body Entries}}
-                     :handler get-entries}}]]])
+    ["/entry"
+     ["" {:post {:parameters {:body EntrySave
+                              :path {:rehearsal-id int?}}
+                 :responses {200 {:body Entry}}
+                 :handler post-entry!}
+          :get {:parameters {:path {:rehearsal-id int?}}
+                :responses {200 {:body Entries}}
+                :handler get-entries}}]]]])
+
+(def entry-routes
+  ["/:id" {:put {:parameters {:body (save->update EntrySave)
+                              :path {:id int?}}
+                 :responses {200 {:body Entry}}
+                 :handler put-entry!}}])

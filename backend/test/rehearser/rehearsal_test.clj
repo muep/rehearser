@@ -147,3 +147,82 @@
             ;; No other changes
             (t/is (= (dissoc rehearsal-after :duration :is-open)
                      (dissoc rehearsal :duration :is-open)))))))))
+
+(t/deftest rehearsal-three-entries-update-close-test
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) nil nil)
+                :handler
+                handler-with-local-cookies
+                handler-explaining-400)]
+
+    ;; sign up + login
+    (app (post-form-request "/api/signup" {:username "alice" :password "pw"}))
+    (app (post-form-request "/api/login" {:username "alice" :password "pw"}))
+
+    ;; add three exercises
+    (app (post-json-request "/api/exercise"
+                            {:title "Kerry Reel" :description "Some reel"}))
+    (app (post-json-request "/api/exercise"
+                            {:title "Kerry Polka" :description "Some polka"}))
+    (app (post-json-request "/api/exercise"
+                            {:title "Kerry Jig" :description "Some jig"}))
+
+    ;; fetch exercises and default variant id
+    (let [exercises (read-json-value (:body (app {:request-method :get :uri "/api/exercise"})))
+          variants (read-json-value (:body (app {:request-method :get :uri "/api/variant"})))
+          default-variant-id (:id (first variants))]
+
+      ;; create rehearsal
+      (let [resp (app (post-json-request "/api/rehearsal"
+                                         {:start-time 1760200000
+                                          :duration nil
+                                          :title "Afternoon session"
+                                          :description "Focusing"}))]
+        (assert-status! resp 200))
+
+      ;; locate the open rehearsal
+      (let [rehearsals (read-json-value (:body (app {:request-method :get :uri "/api/rehearsal"})))
+            rehearsal-id (->> rehearsals (filter :is-open) first :id)]
+
+        ;; add three entries (one per exercise)
+        (doseq [[ex idx] (map vector exercises (range 3))]
+          (let [resp (app (post-json-request (str "/api/rehearsal/" rehearsal-id "/entry")
+                                             {:exercise-id (:id ex)
+                                              :variant-id default-variant-id
+                                              :entry-time (+ 1760200000 (* 600 idx))
+                                              :remarks (str "Initial remark " (inc idx))}))]
+            (assert-status! resp 200)))
+
+        ;; verify three entries present
+        (let [entries (read-json-value
+                       (:body (app {:request-method :get
+                                    :uri (str "/api/rehearsal/" rehearsal-id "/entry")})))]
+          (t/is (= 3 (count entries)))
+
+          ;; pick the second entry and update its remarks
+          (let [second-entry-id (:id (second entries))
+                update-entry-resp (app (put-json-request
+                                        (str "/api/entry/" second-entry-id)
+                                        {:remarks "Much improved on this one"}))]
+            (t/is (= 200 (:status update-entry-resp))))
+
+          ;; update rehearsal title and close it (set duration)
+          (let [update-rehearsal-resp (app (put-json-request
+                                            (str "/api/rehearsal/" rehearsal-id)
+                                            {:title "Evening tune-up" :duration 2000}))]
+            (t/is (= 200 (:status update-rehearsal-resp))))
+
+          ;; fetch rehearsal and entries again and assert changes
+          (let [rehearsal-after (read-json-value
+                                 (:body (app {:request-method :get
+                                              :uri (str "/api/rehearsal/" rehearsal-id)})))
+                entries-after (read-json-value
+                               (:body (app {:request-method :get
+                                            :uri (str "/api/rehearsal/" rehearsal-id "/entry")})))
+                second-entry-after (some #(when (= (:id %) (-> entries second :id)) %) entries-after)]
+
+            ;; rehearsal title updated and rehearsal is closed
+            (t/is (= "Evening tune-up" (:title rehearsal-after)))
+            (t/is (not (:is-open rehearsal-after)))
+
+            ;; entry remarks updated
+            (t/is (= "Much improved on this one" (:remarks second-entry-after)))))))))
