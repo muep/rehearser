@@ -1,7 +1,7 @@
 (ns rehearser.api.rehearsal
   (:require
    [rehearser.service.rehearsal :as service]
-   [rehearser.malli :refer [Metadata Timestamp]]
+   [rehearser.malli :refer [Metadata Timestamp save->update]]
    [malli.core :as m]
    [malli.util :as mu]))
 
@@ -60,6 +60,18 @@
   {:status 200
    :body (service/find-all db whoami)})
 
+(defn get-rehearsal [{{{:keys [rehearsal-id]} :path} :parameters
+                      :keys [db whoami]}]
+  {:status 200
+   :body (service/find-rehearsal db whoami rehearsal-id)})
+
+(defn put-rehearsal! [{{:keys [body]
+                        {:keys [rehearsal-id]} :path} :parameters
+                       :keys [db whoami]}]
+  {:status 200
+   :body (service/update-rehearsal! db whoami rehearsal-id body)})
+
+
 (defn post-entry! [{{:keys [body]
                      {:keys [rehearsal-id]} :path} :parameters
                     :keys [db whoami]}]
@@ -73,10 +85,6 @@
    :body (service/find-entries-of-rehearsal db whoami rehearsal-id)})
 
 
-(defn get-rehearsal [{{{:keys [rehearsal-id]} :path} :parameters
-                      :keys [db whoami]}]
-  {:status 200
-   :body (service/find-rehearsal db whoami rehearsal-id)})
 
 (defn- not-implemented! [_req]
   {:status 500
@@ -92,9 +100,10 @@
     ["" {:get {:parameters {:path {:rehearsal-id int?}}
                :responses {200 {:body RehearsalWithEntries}}
                :handler get-rehearsal}
-         :put {:parameters {:body RehearsalSave}
+         :put {:parameters {:path {:rehearsal-id int?}
+                            :body (save->update RehearsalSave)}
                :responses {200 {:body Rehearsal}}
-               :handler not-implemented!}
+               :handler put-rehearsal!}
          :delete {:handler not-implemented!}}]
     ["/entry" {:post {:parameters {:body EntrySave
                                    :path {:rehearsal-id int?}}

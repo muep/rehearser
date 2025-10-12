@@ -26,6 +26,13 @@
                    (-> res :body read-json-value :humanized))))
       res)))
 
+(defn assert-status! [{:keys [status] :as response} expected-status]
+  (when (not (= expected-status status))
+    (t/is (= expected-status status)
+          (str "Expected status " expected-status ", got " status ":"
+               (-> response :body))))
+  response)
+
 (t/deftest rehearsal-and-entry-crud-test
   (let [app (-> (http-service/make-app test-db (random/bytes 16) nil nil)
                 :handler
@@ -108,6 +115,11 @@
           (t/is (= 2 (count entries-standalone)))
           (t/is (= (set (map :id entries-standalone)) (set (map :id entries))))
 
+          ;; Quite a few details in the rehearsal
+
+          ;; Check that it's still open
+          (t/is (:is-open rehearsal))
+
           (t/is (= 2 (count entries)))
           ;; Names against the earlier defined names
           (t/is (= #{"Tune A" "Tune B"}
@@ -121,4 +133,17 @@
           (t/is (= #{"Tune A" "Tune B"}
                    (->> entries
                         (map :exercise-title)
-                        set))))))))
+                        set)))
+          (-> (app (put-json-request (str "/api/rehearsal/" rehearsal-id)
+                                     {:duration 60}))
+              (assert-status! 200))
+
+          (let [rehearsal-after (read-json-value
+                                 (:body (app {:request-method :get
+                                              :uri (str "/api/rehearsal/" rehearsal-id)})))]
+            ;; Check that it's not open
+            (t/is (not (:is-open rehearsal-after)))
+
+            ;; No other changes
+            (t/is (= (dissoc rehearsal-after :duration :is-open)
+                     (dissoc rehearsal :duration :is-open)))))))))

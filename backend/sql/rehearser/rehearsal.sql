@@ -64,14 +64,12 @@ limit 1;
 -- :name rehearsal-update! :<! :1
 update rehearsal
 set
-    "start-time" = :start-time,
-    duration = :duration,
-    title = :title,
-    description = :description
+    --~ (clojure.string/join ", " (map (fn [[k _]] (str "\"" (name k) "\" = " k )) (dissoc params :id :account-id)))
 where
     "account-id" = :account-id and
     id = :id
 returning
+    id,
     "account-id",
     "start-time",
     "start-time" + (duration * interval '1 second') as "end-time",
