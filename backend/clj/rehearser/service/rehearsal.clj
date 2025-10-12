@@ -1,5 +1,7 @@
 (ns rehearser.service.rehearsal
-  (:require [rehearser.db :refer [def-db-fns]]))
+  (:require
+   [next.jdbc :as jdbc]
+   [rehearser.db :refer [def-db-fns]]))
 
 (def-db-fns "rehearser/rehearsal.sql")
 
@@ -32,3 +34,10 @@
 (defn find-entries-of-rehearsal [db {:keys [account-id]} rehearsal-id]
   (entry-select db {:account-id account-id
                     :rehearsal-id rehearsal-id}))
+
+(defn find-rehearsal [db {:keys [account-id]} rehearsal-id]
+  (jdbc/with-transaction [tx db]
+    (when-let [rehearsal (rehearsal-select-by-id tx {:account-id account-id
+                                           :rehearsal-id rehearsal-id})]
+      (assoc rehearsal :entries (entry-select-with-title tx {:account-id account-id
+                                                             :rehearsal-id rehearsal-id})))))

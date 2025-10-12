@@ -21,7 +21,7 @@
   (fn [req]
     (let [{:keys [status] :as res} (handler req)]
       (when (= 400 status)
-        (t/is (not (= 400 status))
+        (t/is (not= 400 status)
               (str "Unexpected error 400 from the handler: "
                    (-> res :body read-json-value :humanized))))
       res)))
@@ -40,7 +40,7 @@
     (let [whoami-response (app {:request-method :get
                                 :uri            "/api/whoami"
                                 :body ""})]
-      (t/is (= (:status whoami-response) 200) "Expected 200 status from whoami")
+      (t/is (= 200 (:status whoami-response)) "Expected 200 status from whoami")
       (t/is (integer? (-> whoami-response :body read-json-value :account-id))
             "No numeric account-id in whoami"))
 
@@ -77,7 +77,7 @@
       ;; list rehearsals
       (let [rehearsals (read-json-value
                          (:body (app {:request-method :get :uri "/api/rehearsal"})))
-            rehearsal-id (->>  rehearsals (filter :is-open) first :id)]
+            rehearsal-id (->> rehearsals (filter :is-open) first :id)]
 
         ;; add entry for Tune A
         (let [resp (app (post-json-request (str "/api/rehearsal/" rehearsal-id "/entry")
@@ -95,12 +95,30 @@
                                             :remarks "Still rough on B"}))]
           (t/is (= 200 (:status resp))))
 
-        ;; list entries
-        (let [entries (read-json-value
-                        (:body (app {:request-method :get
-                                     :uri (str "/api/rehearsal/" rehearsal-id "/entry")})))]
+        ;; fetch rehearsal with embedded entries Also there's several
+        ;; alternative ways to this data, so let's try poking at many
+        ;; of those
+        (let [entries-standalone (read-json-value
+                                  (:body (app {:request-method :get
+                                               :uri (str "/api/rehearsal/" rehearsal-id "/entry")})))
+              rehearsal (read-json-value
+                          (:body (app {:request-method :get
+                                       :uri (str "/api/rehearsal/" rehearsal-id)})))
+              entries (:entries rehearsal)]
+          (t/is (= 2 (count entries-standalone)))
+          (t/is (= (set (map :id entries-standalone)) (set (map :id entries))))
+
           (t/is (= 2 (count entries)))
+          ;; Names against the earlier defined names
           (t/is (= #{"Tune A" "Tune B"}
-                   (->> entries (map :exercise-id) set (map (fn [id]
-                                                             (:title (first (filter #(= (:id %) id) exercises))))) set)))
-          (t/is (integer? (-> entries first :entry-time))))))))
+                   (->> entries
+                        (map :exercise-id)
+                        (map (fn [id]
+                               (:title (first (filter #(= (:id %) id) exercises)))))
+                        set)))
+
+          ;; Names also from the response directly
+          (t/is (= #{"Tune A" "Tune B"}
+                   (->> entries
+                        (map :exercise-title)
+                        set))))))))

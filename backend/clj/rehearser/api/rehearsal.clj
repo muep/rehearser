@@ -35,6 +35,22 @@
 
 (def Entries (m/schema [:sequential Entry]))
 
+(def EntryWithTitles
+  (mu/merge
+   Entry [:map
+          {:closed true}
+          [:exercise-title string?]
+          [:variant-title string?]]))
+
+(def EntriesWithTitles
+  (m/schema [:sequential EntryWithTitles]))
+
+(def RehearsalWithEntries
+  (mu/merge
+   Rehearsal
+   [:map {:close true}
+    [:entries EntriesWithTitles]]))
+
 (defn post-rehearsal! [{{:keys [body]} :parameters
                         :keys [db whoami]}]
   {:status 200
@@ -56,6 +72,12 @@
   {:status 200
    :body (service/find-entries-of-rehearsal db whoami rehearsal-id)})
 
+
+(defn get-rehearsal [{{{:keys [rehearsal-id]} :path} :parameters
+                      :keys [db whoami]}]
+  {:status 200
+   :body (service/find-rehearsal db whoami rehearsal-id)})
+
 (defn- not-implemented! [_req]
   {:status 500
    :body "Not implemented"})
@@ -66,12 +88,14 @@
         :post {:parameters {:body RehearsalSave}
                :responses {200 {:body Rehearsal}}
                :handler post-rehearsal!}}]
-   ["/:rehearsal-id" {:get {:responses {200 {:body Rehearsal}}
-                            :handler not-implemented!}
-                      :put {:parameters {:body RehearsalSave}
-                            :responses {200 {:body Rehearsal}}
-                            :handler not-implemented!}
-                      :delete {:handler not-implemented!}}
+   ["/:rehearsal-id"
+    ["" {:get {:parameters {:path {:rehearsal-id int?}}
+               :responses {200 {:body RehearsalWithEntries}}
+               :handler get-rehearsal}
+         :put {:parameters {:body RehearsalSave}
+               :responses {200 {:body Rehearsal}}
+               :handler not-implemented!}
+         :delete {:handler not-implemented!}}]
     ["/entry" {:post {:parameters {:body EntrySave
                                    :path {:rehearsal-id int?}}
                       :responses {200 {:body Entry}}
