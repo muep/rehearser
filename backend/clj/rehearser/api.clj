@@ -2,6 +2,7 @@
   (:require [rehearser.api.account :as account]
             [rehearser.api.admin :as admin]
             [rehearser.api.exercise :as exercise]
+            [rehearser.api.rehearsal :as rehearsal]
             [rehearser.api.sysinfo :as sysinfo]
             [rehearser.api.variant :as variant]
             [rehearser.exp :as exp]))
@@ -43,6 +44,8 @@
    ["/logout" {:post account/logout}]
    ["/whoami" {:get account/whoami}]
    ["/exercise" api-metadata exercise/routes]
+   ["/rehearsal" api-metadata rehearsal/routes]
+   ["/entry" api-metadata rehearsal/entry-routes]
    ["/variant" api-metadata variant/routes]
    ["/params" {:get exp/params-get
                :post exp/params-post}]

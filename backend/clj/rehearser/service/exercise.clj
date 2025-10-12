@@ -1,6 +1,6 @@
 (ns rehearser.service.exercise
   (:require
-   [rehearser.hugsql :refer [def-db-fns]]
+   [rehearser.db :refer [def-db-fns]]
    [rehearser.misc :refer [select-or-nil-keys]]))
 
 (def-db-fns "rehearser/exercise.sql")
