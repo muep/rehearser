@@ -11,7 +11,8 @@
    [rehearser.api :as api]
    [rehearser.handler :as handler]
    [rehearser.health :as health]
-   [rehearser.reqstat :as reqstat])
+   [rehearser.reqstat :as reqstat]
+   [rehearser.ui :as ui])
   (:import
    (com.zaxxer.hikari HikariConfig HikariDataSource)))
 
@@ -70,8 +71,10 @@
                            (wrap-session session-key)
                            whoami-middleware
                            wrap-print-session]
-        routes [["/health" {:get health/get-health}]
-                ["/api" (api/routes admin-pwhash (:get-handler reqstat))]]]
+        routes (concat
+                [["/health" {:get health/get-health}]
+                 ["/api" (api/routes admin-pwhash (:get-handler reqstat))]]
+                ui/routes)]
     (handler/handler before-middlewares after-middlewares routes
                      (reitit-ring/routes
                       (if (empty? static-file-dir)
