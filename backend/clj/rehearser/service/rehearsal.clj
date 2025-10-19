@@ -20,6 +20,11 @@
                                                        :start-time
                                                        :duration]))))
 
+(defn close-rehearsal! [db whoami id end-time]
+  (rehearsal-close! db {:id id
+                        :account-id (:account-id whoami)
+                        :end-time end-time}))
+
 (defn find-all [db whoami]
   (rehearsal-select db whoami))
 

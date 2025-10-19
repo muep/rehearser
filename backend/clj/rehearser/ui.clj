@@ -26,6 +26,12 @@
                                 :variant-id int?
                                 :exercise-id int?}}
             :handler rehearsals/entry-add!}}]
+   ["/rehearsals/:id/close.html"
+    {:post {:parameters {:path {:id int?}}
+            :handler rehearsals/rehearsal-close!}}]
+   ["/rehearsals/:id/open.html"
+    {:post {:parameters {:path {:id int?}}
+            :handler rehearsals/rehearsal-open!}}]
    ["/tunes.html"
     {:get {:handler tunes/tune-listing-page}}]
    ["/tunes/:id/tune.html"

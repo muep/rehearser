@@ -48,15 +48,35 @@
            [:p "Took " duration " seconds"]
            [:p "Been going on for " (.getSeconds (Duration/between start-time (Instant/now))) " seconds"])
 
+         (if duration
+           [:form {:action (str "/rehearsals/" id "/open.html")
+                   :method "post"}
+            [:button {:type "submit"} "Reopen"]]
+           [:form {:action (str "/rehearsals/" id "/close.html")
+                   :method "post"}
+            [:button {::type "submit"} "End rehearsal"]])
+
+         [:h2 "Entries"]
          (when-not duration
            [:a {:href (str "/rehearsals/" id "/new-entry.html")} "Add entry"])
 
-         [:h2 "Entries"]
          [:ul
           (for [{:keys [exercise-title entry-time] :as entry} entries]
             [:li (entry-link entry) " at " (hiccup/h (format-time entry-time))])]])})
     {:status 404
      :body "Did not find that rehearsal"}))
+
+(defn rehearsal-close! [{{{:keys [id]} :path} :parameters
+                       :keys [db whoami]}]
+  (rehearsal-service/close-rehearsal! db whoami id (Instant/now))
+  {:status 303
+   :headers {"location" (str "/rehearsals/" id "/rehearsal.html")}})
+
+(defn rehearsal-open! [{{{:keys [id]} :path} :parameters
+                       :keys [db whoami]}]
+  (rehearsal-service/update-rehearsal! db whoami id {:duration nil})
+  {:status 303
+   :headers {"location" (str "/rehearsals/" id "/rehearsal.html")}})
 
 (defn entry-add-page [{{{:keys [rehearsal-id]} :path} :parameters
                        :keys [db whoami]}]
@@ -120,8 +140,6 @@
     {:status 404
      :body (str "No entry " id " in rehearsal " rehearsal-id)}))
 
-(-> (rehearsal-service/find-rehearsal (user/db) {:account-id 1} 5) :entries )
-
 (defn rehearsal-index-page [{:keys [db whoami]}]
   {:status 200
    :body
@@ -152,7 +170,7 @@
                     :type "text"
                     :placeholder "Title for new rehearsal"
                     :name "title"
-                    :require true
+                    :required true
                     :value ""}]]
           [:button {:type "submit"} "Start new"]])
 
