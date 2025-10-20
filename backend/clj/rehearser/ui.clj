@@ -40,4 +40,9 @@
      :post {:parameters {:path {:id int?}
                          :form {:title string?
                                 :description string?}}
-            :handler tunes/tune-details-post}}]])
+            :handler tunes/tune-details-post}}]
+   ["/tunes/new-tune.html"
+    {:get {:handler tunes/tune-add-page}
+     :post {:parameters {:form {:title string?
+                                :description string?}}
+            :handler tunes/tune-post!}}]])
