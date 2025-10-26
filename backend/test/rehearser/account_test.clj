@@ -33,7 +33,7 @@
      :body (-> body-payload .getBytes ByteArrayInputStream.)}))
 
 (t/deftest login-required-test
-  (let [app (:handler (http-service/make-app test-db (random/bytes 16) nil nil))
+  (let [app (:handler (http-service/make-app test-db (random/bytes 16) "" nil nil))
         whoami-response (app {:request-method :get
                               :uri            "/api/whoami"
                               :body ""})]
@@ -41,7 +41,7 @@
     (t/is (= (-> whoami-response :body read-json-value :account-id) nil))))
 
 (t/deftest signup-test
-  (let [app (-> (http-service/make-app test-db (random/bytes 16) nil nil)
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
                 :handler
                 handler-with-local-cookies)]
 
@@ -94,7 +94,7 @@
                                 :uri            "/api/logout"
                                 :body ""})]
       (t/is (= (:status logout-response) 303))
-      (t/is (= (-> logout-response :headers (get "Location")) "../login.html")))
+      (t/is (= (-> logout-response :headers (get "Location")) "../index.html")))
 
     ;; Now it should not have an id any more
     (let [whoami-response (app {:request-method :get

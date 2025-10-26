@@ -64,44 +64,52 @@
 
   Returns a map with :handler (the Ring handler) and any auxiliary values
   needed by the application."
-  [db session-key static-file-dir admin-pwhash]
+  [db session-key url-prefix static-file-dir admin-pwhash]
   (let [reqstat (reqstat/reqstat-middleware+handler)
-        before-middlewares [(:middleware reqstat)]
+        before-middlewares [(:middleware reqstat)
+                            (fn [handler]
+                              (fn [req]
+                                (handler (assoc req :url-prefix url-prefix))))]
         after-middlewares [(wrap-db db)
                            (wrap-session session-key)
                            whoami-middleware
                            wrap-print-session]
-        routes (concat
-                [["/health" {:get health/get-health}]
-                 ["/api" (api/routes admin-pwhash (:get-handler reqstat))]]
-                ui/routes)]
+        routes [url-prefix
+                ["/health" {:get health/get-health}]
+                ["/api" (api/routes admin-pwhash (:get-handler reqstat))]
+                ui/routes]]
     (handler/handler before-middlewares after-middlewares routes
                      (reitit-ring/routes
                       (if (empty? static-file-dir)
                         (do
                           (log/debug "Serving static content from resources")
-                          (reitit-ring/create-resource-handler {:path "/"
+                          (reitit-ring/create-resource-handler {:path (str url-prefix "/")
                                                                 :root "public"}))
                         (do
                           (log/info "Service static content from" static-file-dir)
-                          (reitit-ring/create-file-handler {:path "/"
+                          (reitit-ring/create-file-handler {:path (str url-prefix "/")
                                                             :root static-file-dir})))
                       (reitit-ring/create-default-handler)))))
 
-(defn run [{:keys [admin-pwhash session-key jdbc-url port static-file-dir]
-            :or {port 8080}}]
+(defn run [{:keys [admin-pwhash session-key jdbc-url port static-file-dir url-prefix]
+            :or {port 8080
+                 url-prefix ""}}]
   (log/info "should listen on port" port "and use database at" jdbc-url)
+
+  (when-not (empty? url-prefix)
+    (log/info (str "Prefixing URLs with " url-prefix)))
 
   (if (empty? static-file-dir)
     (log/info "Should serve static content from resources")
     (log/info "Should serve static content from" static-file-dir))
 
   (let [ds (HikariDataSource. (doto (HikariConfig.)
-                                (.setJdbcUrl jdbc-url)))
+                                (.setJdbcUrl jdbc-url)
+                                (.setInitializationFailTimeout -1)))
         db {:datasource ds}
         key (or session-key (random/bytes 16))
-        app (:handler (make-app db key static-file-dir admin-pwhash))
-        close-server (http-server/run-server app {:port port})]
+        app (:handler (make-app db key url-prefix static-file-dir admin-pwhash))
+        close-server (http-server/run-server app {:ip "0.0.0.0" :port port})]
     (fn []
       (close-server)
       (.close ds))))

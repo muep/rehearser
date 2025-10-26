@@ -13,11 +13,12 @@
 (def time-formatter (DateTimeFormatter/ofPattern "HH:mm"))
 (def zone (ZoneId/of "UTC"))
 
-(defn tune-link [{:keys [exercise-id exercise-title]}]
-  [:a {:href (str "/tunes/" exercise-id "/tune.html")} (hiccup/h exercise-title)])
+(defn tune-link [{:keys [exercise-id exercise-title]} url-prefix]
+  [:a {:href (str url-prefix "/tunes/" exercise-id "/tune.html")} (hiccup/h exercise-title)])
 
-(defn entry-link [{:keys [rehearsal-id id exercise-title]}]
-  [:a {:href (str "/rehearsals/"
+(defn entry-link [{:keys [rehearsal-id id exercise-title]} url-prefix]
+  [:a {:href (str url-prefix
+                  "/rehearsals/"
                   rehearsal-id
                   "/entry/"
                   id
@@ -29,19 +30,19 @@
 (defn format-time [instant]
   (.format time-formatter (.atZone instant zone)))
 
-(defn rehearsal-link [{:keys [id title]}]
-  [:a {:href (str "/rehearsals/" id "/rehearsal.html")} (hiccup/h title)])
+(defn rehearsal-link [{:keys [id title]} url-prefix]
+  [:a {:href (str url-prefix "/rehearsals/" id "/rehearsal.html")} (hiccup/h title)])
 
 (defn rehearsal-page [{{{:keys [id]} :path} :parameters
-                       :keys [db whoami]}]
+                       :keys [db url-prefix whoami]}]
   (if-let [rehearsal (rehearsal-service/find-rehearsal db whoami id)]
     (let [{:keys [start-time duration title entries]} rehearsal]
       {:status 200
        :body
        (common-ui/page
-        whoami title
+        url-prefix whoami title
         [:main
-         [:h1 [:a {:href "/rehearsals.html"} "Rehearsals"] " / " (hiccup/h title)]
+         [:h1 [:a {:href (str url-prefix "/rehearsals.html")} "Rehearsals"] " / " (hiccup/h title)]
 
          [:p "On " (format-instant start-time)]
          (if duration
@@ -49,48 +50,48 @@
            [:p "Been going on for " (.getSeconds (Duration/between start-time (Instant/now))) " seconds"])
 
          (if duration
-           [:form {:action (str "/rehearsals/" id "/open.html")
+           [:form {:action (str url-prefix "/rehearsals/" id "/open.html")
                    :method "post"}
             [:button {:type "submit"} "Reopen"]]
-           [:form {:action (str "/rehearsals/" id "/close.html")
+           [:form {:action (str url-prefix "/rehearsals/" id "/close.html")
                    :method "post"}
             [:button {::type "submit"} "End rehearsal"]])
 
          [:h2 "Entries"]
          (when-not duration
-           [:a {:href (str "/rehearsals/" id "/new-entry.html")} "Add entry"])
+           [:a {:href (str url-prefix "/rehearsals/" id "/new-entry.html")} "Add entry"])
 
          [:ul
           (for [{:keys [exercise-title entry-time] :as entry} entries]
-            [:li (entry-link entry) " at " (hiccup/h (format-time entry-time))])]])})
+            [:li (entry-link entry url-prefix) " at " (hiccup/h (format-time entry-time))])]])})
     {:status 404
      :body "Did not find that rehearsal"}))
 
 (defn rehearsal-close! [{{{:keys [id]} :path} :parameters
-                       :keys [db whoami]}]
+                       :keys [db url-prefix whoami]}]
   (rehearsal-service/close-rehearsal! db whoami id (Instant/now))
   {:status 303
-   :headers {"location" (str "/rehearsals/" id "/rehearsal.html")}})
+   :headers {"location" (str url-prefix "/rehearsals/" id "/rehearsal.html")}})
 
 (defn rehearsal-open! [{{{:keys [id]} :path} :parameters
-                       :keys [db whoami]}]
+                       :keys [db url-prefix whoami]}]
   (rehearsal-service/update-rehearsal! db whoami id {:duration nil})
   {:status 303
-   :headers {"location" (str "/rehearsals/" id "/rehearsal.html")}})
+   :headers {"location" (str url-prefix "/rehearsals/" id "/rehearsal.html")}})
 
 (defn entry-add-page [{{{:keys [rehearsal-id]} :path} :parameters
-                       :keys [db whoami]}]
+                       :keys [db url-prefix whoami]}]
   (let [rehearsal (rehearsal-service/find-rehearsal db whoami rehearsal-id)
         tunes (exercise-service/find-all db whoami)
         variants (variant-service/find-all db whoami)]
     {:status 200
      :body
      (common-ui/page
-      whoami (str (:title rehearsal) " / New entry")
+      url-prefix whoami (str (:title rehearsal) " / New entry")
       [:main
-       [:h1 (rehearsal-link rehearsal) " / New entry"]
+       [:h1 (rehearsal-link rehearsal url-prefix) " / New entry"]
 
-       [:form {:action (str "/rehearsals/" rehearsal-id "/new-entry.html")
+       [:form {:action (str url-prefix "/rehearsals/" rehearsal-id "/new-entry.html")
                :method "post"}
         [:div
          [:label {:for "exercise-input"} "Tune:"]
@@ -116,17 +117,17 @@
 
 (defn entry-add! [{{{:keys [rehearsal-id]} :path
                     {:keys [remarks exercise-id variant-id]} :form} :parameters
-                   :keys [db whoami] :as req}]
+                   :keys [db url-prefix whoami] :as req}]
   (rehearsal-service/insert-entry! db whoami {:rehearsal-id rehearsal-id
                                               :exercise-id exercise-id
                                               :variant-id variant-id
                                               :entry-time (Instant/now)
                                               :remarks remarks})
   {:status 303
-   :headers {"location" (str "/rehearsals/" rehearsal-id "/rehearsal.html")}})
+   :headers {"location" (str url-prefix "/rehearsals/" rehearsal-id "/rehearsal.html")}})
 
 (defn entry-page [{{{:keys [rehearsal-id id]} :path} :parameters
-                   :keys [db whoami]}]
+                   :keys [db url-prefix whoami]}]
   (if-let [[rehearsal entry]
            (let [rehearsal (rehearsal-service/find-rehearsal db whoami rehearsal-id)
                  entry (->> rehearsal :entries (some #(when (= id (:id %)) %)))]
@@ -134,13 +135,13 @@
     {:status 200
      :body
      (common-ui/page
-      whoami (str (:title rehearsal) " / " (:exercise-title entry))
+      url-prefix whoami (str (:title rehearsal) " / " (:exercise-title entry))
       [:main
-       [:h1 (rehearsal-link rehearsal) " / " (:exercise-title entry)]])}
+       [:h1 (rehearsal-link rehearsal url-prefix) " / " (:exercise-title entry)]])}
     {:status 404
      :body (str "No entry " id " in rehearsal " rehearsal-id)}))
 
-(defn rehearsal-index-page [{:keys [db whoami]}]
+(defn rehearsal-index-page [{:keys [db url-prefix whoami]}]
   {:status 200
    :body
    (let [[closed-ones open-ones] (->> (rehearsal-service/find-all db whoami)
@@ -148,7 +149,7 @@
                                       sort
                                       (map second))]
      (common-ui/page
-      whoami "Rehearsals"
+      url-prefix whoami "Rehearsals"
       [:main
        [:h1 "Rehearsals"]
 
@@ -156,7 +157,7 @@
 
        (if-let [open-rehearsal (first open-ones)]
          [:span
-          (rehearsal-link open-rehearsal)
+          (rehearsal-link open-rehearsal url-prefix)
           " started at "
           (-> open-rehearsal
               :start-time
@@ -178,7 +179,7 @@
 
        [:ul
         (for [rehearsal closed-ones]
-          [:li (rehearsal-link rehearsal)])]
+          [:li (rehearsal-link rehearsal url-prefix)])]
        ]))})
 
 (defn rehearsal-post! [{{{:keys [id]} :path

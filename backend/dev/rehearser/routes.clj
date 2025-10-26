@@ -7,8 +7,8 @@
 (def methods (set method-order))
 (def method-rank (zipmap method-order (range)))
 
-(defn routes []
-  (->> (rehearser.http-service/make-app nil nil nil nil)
+(defn routes [url-prefix]
+  (->> (rehearser.http-service/make-app nil nil url-prefix nil nil)
      :router
      reitit.core/routes 
      (mapcat (fn [[path data]]
