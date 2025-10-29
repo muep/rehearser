@@ -137,9 +137,26 @@
      (common-ui/page
       url-prefix whoami (str (:title rehearsal) " / " (:exercise-title entry))
       [:main
-       [:h1 (rehearsal-link rehearsal url-prefix) " / " (:exercise-title entry)]])}
+       [:h1 (rehearsal-link rehearsal url-prefix) " / " (:exercise-title entry)]
+       [:p "Practiced " (tune-link entry url-prefix) " at " (format-instant (:entry-time entry))]
+       [:form {:action (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")
+               :method "post"}
+        [:textarea {:id "remarks-input"
+                    :name "remarks"
+                    :placeholder "How did it go?"}
+         (hiccup/h (:remarks entry))]
+        [:input {:type "submit" :value "Save"}]]])}
     {:status 404
      :body (str "No entry " id " in rehearsal " rehearsal-id)}))
+
+(defn entry-put! [{{{:keys [rehearsal-id id]} :path
+                    {:keys [remarks exercise-id variant-id] :as entry} :form} :parameters
+                   :keys [db url-prefix whoami] :as req}]
+  (rehearsal-service/update-entry! db whoami id
+                                   (merge (select-keys entry [:remarks :exercise-id :variant-id])
+                                          {:id id}))
+  {:status 303
+   :headers {"location" (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")}})
 
 (defn rehearsal-index-page [{:keys [db url-prefix whoami]}]
   {:status 200
