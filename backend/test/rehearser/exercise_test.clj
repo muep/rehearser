@@ -18,7 +18,7 @@
 (t/use-fixtures :each fixture)
 
 (t/deftest exercise-and-variant-crud-test
-  (let [app (-> (http-service/make-app test-db (random/bytes 16) nil nil)
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
                 :handler
                 handler-with-local-cookies)]
 

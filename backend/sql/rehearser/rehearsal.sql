@@ -78,6 +78,14 @@ returning
     title,
     description;
 
+-- :name rehearsal-close! :<! :1
+update rehearsal
+set
+    duration = extract(epoch from (:end-time - "start-time"))
+where
+    "account-id" = :account-id and
+    id = :id;
+
 -- :name entry-insert! :<! :1
 insert into entry (
     "account-id",

@@ -1,6 +1,7 @@
 (ns rehearser.cmd.serve
   (:require
    [clojure.java.io :as io]
+   [clojure.string :as str]
    [clojure.tools.cli :as cli]
    [rehearser.cmd.common :refer [check-parse-result!]]
    [rehearser.hex :refer [hex->bytes]]
@@ -15,7 +16,14 @@
    [nil "--static-file-dir PATH" "serve static files from PATH"
     :validate [(fn [p] (-> (io/file p)
                            .isDirectory))
-               "Requested static file directory does not exist"]]])
+               "Requested static file directory does not exist"]]
+   [nil "--url-prefix PREFIX" "prepend PREFIX into URL paths"
+    :parse-fn (comp #(if (empty? %)
+                       %
+                       (if (str/starts-with? % "/")
+                         %
+                         (str "/" %)))
+                    #(str/replace % #"/+$" ""))]])
 
 (defn env->session-key []
   (let [k (-> "SESSION_KEY"
@@ -27,7 +35,7 @@
   (System/getenv "REHEARSER_ADMIN_PASSWORD"))
 
 (defn serve [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
-  (let [{{:keys [port static-file-dir]} :options
+  (let [{{:keys [port static-file-dir url-prefix]} :options
          :keys [arguments errors options summary]
          :as opts}
         (cli/parse-opts subcmd-args serve-options)
@@ -38,4 +46,5 @@
                :jdbc-url jdbc-url
                :port port
                :session-key session-key
-               :static-file-dir static-file-dir})))
+               :static-file-dir static-file-dir
+               :url-prefix url-prefix})))

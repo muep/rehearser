@@ -69,7 +69,7 @@
 
 (defn logout [req]
   {:status 303
-   :headers {"Location" "../login.html"}
+   :headers {"Location" "../index.html"}
    :session {}
    :body "Successfully logged out"})
 

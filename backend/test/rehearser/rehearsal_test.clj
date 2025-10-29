@@ -34,7 +34,7 @@
   response)
 
 (t/deftest rehearsal-and-entry-crud-test
-  (let [app (-> (http-service/make-app test-db (random/bytes 16) nil nil)
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
                 :handler
                 handler-with-local-cookies
                 handler-explaining-400)]
@@ -149,7 +149,7 @@
                      (dissoc rehearsal :duration :is-open)))))))))
 
 (t/deftest rehearsal-three-entries-update-close-test
-  (let [app (-> (http-service/make-app test-db (random/bytes 16) nil nil)
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
                 :handler
                 handler-with-local-cookies
                 handler-explaining-400)]
