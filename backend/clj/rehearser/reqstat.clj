@@ -7,7 +7,8 @@
        (fn [req]
          (let [template (-> req (get :reitit.core/match) :template)]
            (swap! stats (fn [s]
-                          (assoc s template (-> s (get template 0) inc)))))
+                          (update s [(:request-method req) template]
+                                  (comp inc #(or % 0))))))
          (handler req)))
      :get-handler
      (fn [req]
