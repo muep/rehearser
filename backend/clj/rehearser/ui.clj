@@ -13,17 +13,6 @@
      {:get {:handler rehearsals/rehearsal-index-page}
       :post {:parameters {:form {:title string?}}
              :handler rehearsals/rehearsal-post!}}]
-    ["/rehearsals/:rehearsal-id/entry/:id/entry.html"
-     {:get {:parameters {:path {:rehearsal-id int?
-                                :id int?}}
-            :handler rehearsals/entry-page}
-      :post {:parameters {:path {:rehearsal-id int?
-                                 :id int?}
-                          :form [:map
-                                 [:remarks {:optional true} string?]
-                                 [:variant-id {:optional true} int?]
-                                 [:exercise-id {:optional true} int?]]}
-             :handler rehearsals/entry-put!}}]
     ["/rehearsals/:rehearsal-id/new-entry.html"
      {:get {:parameters {:path {:rehearsal-id int?}}
             :handler rehearsals/entry-add-page}

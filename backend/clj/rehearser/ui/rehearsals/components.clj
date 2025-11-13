@@ -7,10 +7,6 @@
 (def time-formatter (DateTimeFormatter/ofPattern "HH:mm"))
 (def zone (ZoneId/of "UTC"))
 
-(defn rehearsal-link [{:keys [id title]} url-prefix]
-  [:a {:href (str url-prefix "/rehearsals/" id "/rehearsal.html")}
-   (hiccup/h title)])
-
 (defn entry-link [{:keys [rehearsal-id id exercise-title]} url-prefix]
   [:a {:href (str url-prefix
                  "/rehearsals/"
@@ -19,6 +15,13 @@
                  id
                  "/entry.html")}
    (hiccup/h exercise-title)])
+
+(defn rehearsal-link [{:keys [id title]} url-prefix]
+  [:a {:href (str url-prefix "/rehearsals/" id "/rehearsal.html")}
+   (hiccup/h title)])
+
+(defn tune-link [{:keys [exercise-id exercise-title]} url-prefix]
+  [:a {:href (str url-prefix "/tunes/" exercise-id "/tune.html")} (hiccup/h exercise-title)])
 
 (defn format-instant [instant]
   (.format formatter (.atZone instant zone)))
