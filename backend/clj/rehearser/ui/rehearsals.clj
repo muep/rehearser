@@ -4,10 +4,13 @@
    [rehearser.service.exercise :as exercise-service]
    [rehearser.service.rehearsal :as rehearsal-service]
    [rehearser.service.variant :as variant-service]
-   [rehearser.ui.common :as common-ui])
+   [rehearser.ui.common :as common-ui]
+   [rehearser.ui.rehearsals.detail :as detail])
   (:import
    (java.time Duration Instant ZoneId)
    (java.time.format DateTimeFormatter)))
+
+(def routes detail/routes)
 
 (def formatter (DateTimeFormatter/ofPattern "yyyy-MM-dd HH:mm"))
 (def time-formatter (DateTimeFormatter/ofPattern "HH:mm"))
@@ -32,52 +35,6 @@
 
 (defn rehearsal-link [{:keys [id title]} url-prefix]
   [:a {:href (str url-prefix "/rehearsals/" id "/rehearsal.html")} (hiccup/h title)])
-
-(defn rehearsal-page [{{{:keys [id]} :path} :parameters
-                       :keys [db url-prefix whoami]}]
-  (if-let [rehearsal (rehearsal-service/find-rehearsal db whoami id)]
-    (let [{:keys [start-time duration title entries]} rehearsal]
-      {:status 200
-       :body
-       (common-ui/page
-        url-prefix whoami title
-        [:main
-         [:h1 [:a {:href (str url-prefix "/rehearsals.html")} "Rehearsals"] " / " (hiccup/h title)]
-
-         [:p "On " (format-instant start-time)]
-         (if duration
-           [:p "Took " duration " seconds"]
-           [:p "Been going on for " (.getSeconds (Duration/between start-time (Instant/now))) " seconds"])
-
-         (if duration
-           [:form {:action (str url-prefix "/rehearsals/" id "/open.html")
-                   :method "post"}
-            [:button {:type "submit"} "Reopen"]]
-           [:form {:action (str url-prefix "/rehearsals/" id "/close.html")
-                   :method "post"}
-            [:button {::type "submit"} "End rehearsal"]])
-
-         [:h2 "Entries"]
-         (when-not duration
-           [:a {:href (str url-prefix "/rehearsals/" id "/new-entry.html")} "Add entry"])
-
-         [:ul
-          (for [{:keys [exercise-title entry-time] :as entry} entries]
-            [:li (entry-link entry url-prefix) " at " (hiccup/h (format-time entry-time))])]])})
-    {:status 404
-     :body "Did not find that rehearsal"}))
-
-(defn rehearsal-close! [{{{:keys [id]} :path} :parameters
-                       :keys [db url-prefix whoami]}]
-  (rehearsal-service/close-rehearsal! db whoami id (Instant/now))
-  {:status 303
-   :headers {"location" (str url-prefix "/rehearsals/" id "/rehearsal.html")}})
-
-(defn rehearsal-open! [{{{:keys [id]} :path} :parameters
-                       :keys [db url-prefix whoami]}]
-  (rehearsal-service/update-rehearsal! db whoami id {:duration nil})
-  {:status 303
-   :headers {"location" (str url-prefix "/rehearsals/" id "/rehearsal.html")}})
 
 (defn entry-add-page [{{{:keys [rehearsal-id]} :path} :parameters
                        :keys [db url-prefix whoami]}]
