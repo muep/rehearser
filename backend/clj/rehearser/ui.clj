@@ -9,14 +9,6 @@
    rehearsals/routes
    [["/index.html"
      {:get {:handler index/html}}]
-    ["/rehearsals/:rehearsal-id/new-entry.html"
-     {:get {:parameters {:path {:rehearsal-id int?}}
-            :handler rehearsals/entry-add-page}
-      :post {:parameters {:path {:rehearsal-id int?}
-                          :form {:remarks string?
-                                 :variant-id int?
-                                 :exercise-id int?}}
-             :handler rehearsals/entry-add!}}]
     ["/tunes.html"
      {:get {:handler tunes/tune-listing-page}}]
     ["/tunes/:id/tune.html"
