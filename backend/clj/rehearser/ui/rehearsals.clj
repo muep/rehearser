@@ -6,12 +6,13 @@
    [rehearser.service.variant :as variant-service]
    [rehearser.ui.common :as common-ui]
    [rehearser.ui.rehearsals.detail :as detail]
-   [rehearser.ui.rehearsals.entry :as entry])
+   [rehearser.ui.rehearsals.entry :as entry]
+   [rehearser.ui.rehearsals.index :as index])
   (:import
    (java.time Duration Instant ZoneId)
    (java.time.format DateTimeFormatter)))
 
-(def routes (concat detail/routes entry/routes))
+(def routes (concat detail/routes entry/routes index/routes))
 
 (def formatter (DateTimeFormatter/ofPattern "yyyy-MM-dd HH:mm"))
 (def time-formatter (DateTimeFormatter/ofPattern "HH:mm"))
@@ -73,52 +74,3 @@
   {:status 303
    :headers {"location" (str url-prefix "/rehearsals/" rehearsal-id "/rehearsal.html")}})
 
-(defn rehearsal-index-page [{:keys [db url-prefix whoami]}]
-  {:status 200
-   :body
-   (let [[closed-ones open-ones] (->> (rehearsal-service/find-all db whoami)
-                                      (group-by :is-open)
-                                      sort
-                                      (map second))]
-     (common-ui/page
-      url-prefix whoami "Rehearsals"
-      [:main
-       [:h1 "Rehearsals"]
-
-       [:h2 "Current one"]
-
-       (if-let [open-rehearsal (first open-ones)]
-         [:span
-          (rehearsal-link open-rehearsal url-prefix)
-          " started at "
-          (-> open-rehearsal
-              :start-time
-              format-instant
-              hiccup/h)]
-         [:form {:method "post"}
-          [:p "Nothing ongoing, but a new one may be started"]
-          [:div
-           [:label {:for "title-input"} "Title:"]
-           [:input {:id "title-input"
-                    :type "text"
-                    :placeholder "Title for new rehearsal"
-                    :name "title"
-                    :required true
-                    :value ""}]]
-          [:button {:type "submit"} "Start new"]])
-
-       [:h2 "Past ones"]
-
-       [:ul
-        (for [rehearsal closed-ones]
-          [:li (rehearsal-link rehearsal url-prefix)])]
-       ]))})
-
-(defn rehearsal-post! [{{{:keys [id]} :path
-                         {:keys [title]} :form} :parameters
-                        :keys [db whoami] :as req}]
-  (rehearsal-service/insert-rehearsal! db whoami {:title title
-                                                  :description ""
-                                                  :start-time (Instant/now)
-                                                  :duration nil})
-  (rehearsal-index-page req))
