@@ -9,6 +9,7 @@
   {:connection-uri state/jdbc-url})
 
 (defn run []
+  (require 'rehearser.http-service)
   (state/set-server! nil)
   (state/set-server! ((resolve 'rehearser.http-service/run)
                       {:admin-pwhash state/admin-pwhash
