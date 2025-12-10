@@ -46,14 +46,9 @@ The top level directory contains this README and packaging
 information. It is also a location where some build output and other
 generated stuff goes, though those would be better off elsewhere.
 
-There is a simple front-end in the `front` directory. See its
-[README](front/README.md) for details.
+The `backend` directory contains a Clojure application that is not
+only the backend, but also includes a server-rendered front-end.
 
-The `backend` directory contains the backend, written mainly in
-Clojure. When built, it will typically include a copy of the frontend
-that it can serve alongside the HTTP API. The frontend could be
-delivered through CDN as well.
-
-In case a second attempt at a frontend is started, it should be easy
-to add it as a new subdirectory in the project root, and change the
-load path to point there.
+There have been attempts at doing a single-page-application frontend
+as well, but currently the server-rendered one is the only one of
+interest.
