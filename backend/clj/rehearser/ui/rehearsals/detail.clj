@@ -35,7 +35,7 @@
 
          [:h2 "Entries"]
          (when-not duration
-           [:a {:href (str url-prefix "/rehearsals/" id "/new-entry.html")}
+           [:a {:href (str url-prefix "/rehearsals/" id "/entry-add-search.html")}
             "Add entry"])
 
          [:ul
