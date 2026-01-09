@@ -10,7 +10,7 @@ the MVP's simplicity goals.
 Build a **stand-alone web application** (monolithic or simple 2-tier) using:
 - A single backend (e.g., Python/Flask, Node.js, or Go)
 - A lightweight database hosted on the same VM (e.g. SQLite or PostgreSQL)
-- Static frontend files served by the backend or a CDN
+- Static frontend files - if needed - served by the backend or a CDN
 
 Deploy to a **single low-cost VM** (e.g., Hetzner Cloud, DigitalOcean
 Droplet) or a shared hosting provider with EU data residency.

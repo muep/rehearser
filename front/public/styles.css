@@ -33,3 +33,13 @@ header {
 #search {
   margin: 10px;
 }
+
+.search-no-results {
+  color: #666;
+}
+
+.exercise-meta {
+  color: #666;
+  font-size: 0.9em;
+  margin-left: 0.5em;
+}

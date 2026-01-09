@@ -25,3 +25,15 @@
 (defn delete-by-id! [db whoami id]
   (exercise-delete! db {:id id
                         :account-id (:account-id whoami)}))
+
+(defn search [db whoami query]
+  (search-exercises db (merge (select-keys whoami [:account-id])
+                             {:query (str "%" query "%")})))
+
+(defn find-recent [db whoami limit]
+  (find-recent-exercises db (merge (select-keys whoami [:account-id])
+                                   {:limit limit})))
+
+(defn find-frequent [db whoami limit]
+  (find-frequent-exercises db (merge (select-keys whoami [:account-id])
+                                     {:limit limit})))
