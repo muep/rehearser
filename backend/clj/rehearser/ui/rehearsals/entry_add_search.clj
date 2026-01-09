@@ -46,7 +46,7 @@
 
              (when (and query (empty? search-results))
                [:div
-                [:p {:style "color: #666;"} "No results found for " [:strong query]]])
+                [:p {:class "search-no-results"} "No results found for " [:strong query]]])
 
              (when (seq search-results)
                [:div
@@ -63,7 +63,7 @@
                    [:li
                     (new-entry-link url-prefix rehearsal-id exercise)
                     (when-let [latest-time (:latest-time exercise)]
-                      [:span {:style "color: #666; font-size: 0.9em; margin-left: 0.5em"}
+                      [:span {:class "exercise-meta"}
                        " (Last: " (format-time latest-time) ")"])])]])
 
              (when (seq frequent-exercises)
