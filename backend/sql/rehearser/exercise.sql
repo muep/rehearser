@@ -34,3 +34,29 @@ set
 where "account-id" = :account-id and
       id = :id
 returning id, "account-id", title, description;
+
+-- :name search-exercises :? :*
+select id, title
+from exercise
+where "account-id" = :account-id and
+      lower(title) like '%' || lower(:query) || '%'
+order by title
+limit 50;
+
+-- :name find-recent-exercises :? :*
+select e.id, e.title, max(en."entry-time") as "latest-time"
+from entry en
+join exercise e on en."exercise-id" = e.id
+where en."account-id" = :account-id
+group by e.id, e.title
+order by "latest-time" desc
+limit :limit;
+
+-- :name find-frequent-exercises :? :*
+select e.id, e.title, count(*) as frequency
+from entry en
+join exercise e on en."exercise-id" = e.id
+where en."account-id" = :account-id
+group by e.id, e.title
+order by frequency desc
+limit :limit;

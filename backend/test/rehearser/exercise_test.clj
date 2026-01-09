@@ -7,8 +7,13 @@
     [crypto.random :as random]
     [jsonista.core :as json]
     [ring.mock.request :as mock]
+    [next.jdbc :as jdbc]
 
     [rehearser.http-service :as http-service]
+    [rehearser.service.exercise :as exercise-service]
+    [rehearser.service.account :as account-service]
+    [rehearser.service.variant :as variant-service]
+    [rehearser.service.rehearsal :as rehearsal-service]
     [rehearser.test-util :refer [handler-with-local-cookies
                                  read-json-value
                                  post-form-request
@@ -88,3 +93,49 @@
       (t/is (empty? (read-json-value (:body resp)))))
     (let [resp (app {:request-method :get :uri "/api/variant"})]
       (t/is (= 1 (count (read-json-value (:body resp))))))))
+
+(t/deftest exercise-service-layer-test
+  (let [db-conn (jdbc/get-datasource {:jdbcUrl test-db})
+
+        ;; Create a test user using service layer
+        test-account (account-service/create-account! db-conn "servicetest" "testpw")
+        whoami {:account-id (:id test-account) :account-name "servicetest" :account-admin? false}
+
+        ;; Add some test exercises using service layer
+        exercise1 (exercise-service/add! db-conn whoami {:title "Service Test Jig" :description "A test jig"})
+        exercise2 (exercise-service/add! db-conn whoami {:title "Service Test Reel" :description "A test reel"})
+
+        ;; Add a variant using service layer
+        variant (variant-service/add! db-conn whoami {:title "Service Instrument" :description "Test"})
+
+        ;; Create a rehearsal using service layer
+        rehearsal (rehearsal-service/insert-rehearsal! db-conn whoami
+                                                       {:title "Service Test Session" :description "Testing"
+                                                        :start-time (java.time.Instant/ofEpochSecond 0) :duration nil})
+
+        ;; Add entries using service layer
+        _ (rehearsal-service/insert-entry! db-conn whoami
+                                           {:rehearsal-id (:id rehearsal) :exercise-id (:id exercise1) :variant-id (:id variant)
+                                            :entry-time (java.time.Instant/ofEpochSecond 1000) :remarks "First entry"})
+        _ (rehearsal-service/insert-entry! db-conn whoami
+                                           {:rehearsal-id (:id rehearsal) :exercise-id (:id exercise2) :variant-id (:id variant)
+                                            :entry-time (java.time.Instant/ofEpochSecond 2000) :remarks "Second entry"})
+        _ (rehearsal-service/insert-entry! db-conn whoami
+                                           {:rehearsal-id (:id rehearsal) :exercise-id (:id exercise1) :variant-id (:id variant)
+                                            :entry-time (java.time.Instant/ofEpochSecond 3000) :remarks "Third entry"})]
+
+    (t/testing "Service layer search"
+      (let [results (exercise-service/search db-conn whoami "Service")]
+        (t/is (= 2 (count results)) "Should find 2 service exercises")
+        (t/is (some #(= "Service Test Jig" (:title %)) results) "Should find test jig")
+        (t/is (some #(= "Service Test Reel" (:title %)) results) "Should find test reel")))
+
+    (t/testing "Service layer find-recent"
+      (let [results (exercise-service/find-recent db-conn whoami 5)]
+        (t/is (= 2 (count results)) "Should find 2 recent exercises")
+        (t/is (every? :latest-time results) "All results should have latest-time")))
+
+    (t/testing "Service layer find-frequent"
+      (let [results (exercise-service/find-frequent db-conn whoami 5)]
+        (t/is (= 2 (count results)) "Should find 2 frequent exercises")
+        (t/is (= "Service Test Jig" (:title (first results))) "First exercise should be most frequent")))))
