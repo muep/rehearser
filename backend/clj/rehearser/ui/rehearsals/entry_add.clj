@@ -9,11 +9,15 @@
   (:import
    (java.time Instant)))
 
-(defn entry-add-page [{{{:keys [rehearsal-id]} :path} :parameters
-                      :keys [db url-prefix whoami]}]
+(defn entry-add-page [{{{:keys [rehearsal-id]} :path
+                      {:keys [exercise-id]} :query} :parameters
+                     :keys [db url-prefix whoami]}]
   (let [rehearsal (rehearsal-service/find-rehearsal db whoami rehearsal-id)
         tunes (exercise-service/find-all db whoami)
-        variants (variant-service/find-all db whoami)]
+        variants (variant-service/find-all db whoami)
+        ;; Get preselected exercise if provided
+        preselected-exercise (when exercise-id
+                               (first (exercise-service/find-by-id db whoami exercise-id)))]
     {:status 200
      :body
      (common-ui/page
@@ -29,7 +33,10 @@
                    :name "exercise-id"
                    :required true}
           (for [tune tunes]
-            [:option {:value (:id tune)} (hiccup/h (:title tune))])]]
+            [:option {:value (:id tune)
+                      :selected (when preselected-exercise
+                                  (= (:id tune) (:id preselected-exercise)))}
+             (hiccup/h (:title tune))])]]
         (if (< 1 (count variants))
           [:div
            [:label {:for "variant-input"} "Instrument:"]
@@ -58,7 +65,8 @@
 
 (def routes
   [["/rehearsals/:rehearsal-id/new-entry.html"
-    {:get {:parameters {:path {:rehearsal-id int?}}
+    {:get {:parameters {:path {:rehearsal-id int?}
+                        :query {:exercise-id [:maybe int?]}}
            :handler entry-add-page}
      :post {:parameters {:path {:rehearsal-id int?}
                          :form {:remarks string?
