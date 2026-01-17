@@ -17,7 +17,9 @@
       url-prefix whoami (str (:title rehearsal) " / " (:exercise-title entry))
       [:main
        [:h1 (components/rehearsal-link rehearsal url-prefix) " / " (:exercise-title entry)]
-       [:p "Practiced " (components/tune-link entry url-prefix) " at " (components/format-instant (:entry-time entry))]
+       [:p "Practiced " (components/tune-link entry url-prefix) " at "
+        (components/format-instant (:entry-time entry))
+        " (or " [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/delete.html")} "didn't?"] ")"]
        [:form {:action (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")
                :method "post"}
         [:textarea {:id "remarks-input"
@@ -25,6 +27,28 @@
                     :placeholder "How did it go?"}
          (hiccup/h (:remarks entry))]
         [:input {:type "submit" :value "Save"}]]])}
+    {:status 404
+     :body (str "No entry " id " in rehearsal " rehearsal-id)}))
+
+(defn entry-delete-page [{{{:keys [rehearsal-id id]} :path} :parameters
+                         :keys [db url-prefix whoami] :as req}]
+  (if-let [[rehearsal entry]
+           (let [rehearsal (rehearsal-service/find-rehearsal db whoami rehearsal-id)
+                 entry (->> rehearsal :entries (some #(when (= id (:id %)) %)))]
+             (when entry [rehearsal entry]))]
+    {:status 200
+     :body
+     (common-ui/page
+      url-prefix whoami (str (:title rehearsal) " / " (:exercise-title entry) " / Delete entry")
+      [:main
+       [:h1
+        (components/rehearsal-link rehearsal url-prefix) " / "
+        (components/entry-link entry url-prefix) " / Delete entry"]
+       [:p "Are you sure you want to delete the entry for "
+        (:exercise-title entry) "?"]
+       [:form {:action (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/delete.html")
+               :method "post"}
+        [:input {:type "submit" :value "Yes, delete this entry"}]]])}
     {:status 404
      :body (str "No entry " id " in rehearsal " rehearsal-id)}))
 
@@ -37,6 +61,12 @@
   {:status 303
    :headers {"location" (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")}})
 
+(defn entry-delete! [{{{:keys [rehearsal-id id]} :path} :parameters
+                      :keys [db url-prefix whoami] :as req}]
+  (rehearsal-service/delete-entry! db whoami id)
+  {:status 303
+   :headers {"location" (str url-prefix "/rehearsals/" rehearsal-id "/rehearsal.html")}})
+
 (def routes
   [["/rehearsals/:rehearsal-id/entry/:id/entry.html"
     {:get {:parameters {:path {:rehearsal-id int?
@@ -48,4 +78,11 @@
                                 [:remarks {:optional true} string?]
                                 [:variant-id {:optional true} int?]
                                 [:exercise-id {:optional true} int?]]}
-            :handler entry-put!}}]])
+            :handler entry-put!}}]
+   ["/rehearsals/:rehearsal-id/entry/:id/delete.html"
+    {:get {:parameters {:path {:rehearsal-id int?
+                              :id int?}}
+           :handler entry-delete-page}
+     :post {:parameters {:path {:rehearsal-id int?
+                               :id int?}}
+            :handler entry-delete!}}]])
