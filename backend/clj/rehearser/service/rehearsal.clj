@@ -51,3 +51,8 @@
                                            :rehearsal-id rehearsal-id})]
       (assoc rehearsal :entries (entry-select-with-title tx {:account-id account-id
                                                              :rehearsal-id rehearsal-id})))))
+
+(defn delete-entry! [db whoami id]
+  (println (str "Going to delete entry " id))
+  (entry-delete! db {:id id
+                     :account-id (:account-id whoami)}))

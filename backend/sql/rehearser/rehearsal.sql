@@ -162,3 +162,9 @@ where
     entry."account-id" = :account-id and
     entry."rehearsal-id" = :rehearsal-id
 order by "entry-time" asc;
+
+-- :name entry-delete! :! :n
+delete from entry
+where
+    "account-id" = :account-id and
+    id = :id;
