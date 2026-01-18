@@ -2,31 +2,43 @@
   (:require
    [hiccup.core :as hiccup]
    [rehearser.service.rehearsal :as rehearsal-service]
+   [rehearser.service.exercise :as exercise-service]
    [rehearser.ui.common :as common-ui]
    [rehearser.ui.rehearsals.components :as components]))
 
 (defn entry-page [{{{:keys [rehearsal-id id]} :path} :parameters
-                  :keys [db url-prefix whoami] :as req}]
+                   :keys [db url-prefix whoami] :as req}]
   (if-let [[rehearsal entry]
            (let [rehearsal (rehearsal-service/find-rehearsal db whoami rehearsal-id)
                  entry (->> rehearsal :entries (some #(when (= id (:id %)) %)))]
              (when entry [rehearsal entry]))]
-    {:status 200
-     :body
-     (common-ui/page
-      url-prefix whoami (str (:title rehearsal) " / " (:exercise-title entry))
-      [:main
-       [:h1 (components/rehearsal-link rehearsal url-prefix) " / " (:exercise-title entry)]
-       [:p "Practiced " (components/tune-link entry url-prefix) " at "
-        (components/format-instant (:entry-time entry))
-        " (or " [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/delete.html")} "didn't?"] ")"]
-       [:form {:action (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")
-               :method "post"}
-        [:textarea {:id "remarks-input"
-                    :name "remarks"
-                    :placeholder "How did it go?"}
-         (hiccup/h (:remarks entry))]
-        [:input {:type "submit" :value "Save"}]]])}
+    (let [all-exercises (->> (exercise-service/find-all db whoami)
+                             (sort-by :title #(compare (.toLowerCase ^String %1) (.toLowerCase ^String %2))))]
+      {:status 200
+       :body
+       (common-ui/page
+        url-prefix whoami (str (:title rehearsal) " / " (:exercise-title entry))
+        [:main
+         [:h1 (components/rehearsal-link rehearsal url-prefix) " / " (:exercise-title entry)]
+         [:p "Practiced " (components/tune-link entry url-prefix) " at "
+          (components/format-instant (:entry-time entry))
+          " (or " [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/delete.html")} "didn't?"] ")"]
+         [:form {:action (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")
+                 :method "post"}
+          [:label {:for "exercise-id"} "Exercise:"]
+          [:select {:id "exercise-id"
+                    :name "exercise-id"}
+           (for [exercise all-exercises]
+             [:option {:value (:id exercise)
+                       :selected (= (:id exercise) (:exercise-id entry))}
+              (:title exercise)])]
+          [:label {:for "remarks-input" :style "display: block; margin-bottom: 5px; font-weight: bold;"}
+           "Notes:"]
+          [:textarea {:id "remarks-input"
+                      :name "remarks"
+                      :placeholder "How did it go?"}
+           (hiccup/h (:remarks entry))]
+          [:input {:type "submit" :value "Save"}]]])})
     {:status 404
      :body (str "No entry " id " in rehearsal " rehearsal-id)}))
 
