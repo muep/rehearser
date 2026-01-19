@@ -21,6 +21,15 @@ from exercise
 where "account-id" = :account-id and
       id = :id;
 
+-- :name entries-by-exercise-id :? :*
+select
+    en.*,
+    rh.title "rehearsal-title"
+from entry en
+join exercise ex on en."exercise-id" = ex.id
+join rehearsal rh on en."rehearsal-id" = rh.id
+where ex."account-id" = :account-id and ex.id = :id;
+
 -- :name exercise-delete! :! :n
 delete from exercise
 where "account-id" = :account-id and

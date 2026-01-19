@@ -1,5 +1,6 @@
 (ns rehearser.service.exercise
   (:require
+   [next.jdbc :refer [with-transaction]]
    [rehearser.db :refer [def-db-fns]]
    [rehearser.misc :refer [select-or-nil-keys]]))
 
@@ -12,6 +13,13 @@
 (defn find-by-id [db whoami id]
   (exercise-by-id db {:id id
                       :account-id (:account-id whoami)}))
+
+(defn find-with-entries-by-id [db whoami id]
+  (with-transaction [tx db]
+    (when-let [exercise (first (find-by-id tx whoami id))]
+      (assoc exercise :entries (entries-by-exercise-id
+                                tx {:id id
+                                    :account-id (:account-id whoami)})))))
 
 (defn find-all [db whoami]
   (exercise-select-all db (select-keys whoami [:account-id])))
