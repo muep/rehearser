@@ -4,10 +4,30 @@
    [rehearser.service.exercise :as exercise-service]
 
    [rehearser.ui.common :as common-ui]
-   [rehearser.ui.header :refer [header]]))
+   [rehearser.ui.header :refer [header]])
+  (:import
+   (java.time ZoneId)
+   (java.time.format DateTimeFormatter)))
+
+(def zone (ZoneId/of "UTC"))
+(def formatter (DateTimeFormatter/ofPattern "yyyy-MM-dd"))
+(defn format-instant [instant]
+  (.format formatter (.atZone instant zone)))
 
 (defn tune-link [{:keys [id title]} url-prefix]
   [:a {:href (str url-prefix "/tunes/" id "/tune.html")} (h/h title)])
+
+;; Retained here for an idea that maybe we want a rehearsal link
+;; instead of an entry link
+#_(defn rehearsal-link [{:keys [rehearsal-id rehearsal-title entry-time]}
+                      url-prefix]
+  [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/rehearsal.html")}
+   (h/h rehearsal-title)])
+
+(defn entry-link [{:keys [id rehearsal-id rehearsal-title entry-time]}
+                      url-prefix]
+  [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")}
+   (h/h rehearsal-title)])
 
 (defn tune-listing-page [{:keys [db url-prefix whoami]}]
   {:status 200
@@ -23,8 +43,8 @@
 
 (defn tune-details-page [{{{:keys [id]} :path} :parameters
                           :keys [db url-prefix whoami]}]
-  (if-let [exercise (-> (exercise-service/find-by-id db whoami id) first)]
-    (let [{:keys [title description]} exercise]
+  (if-let [exercise (exercise-service/find-with-entries-by-id db whoami id)]
+    (let [{:keys [title description entries]} exercise]
       {:status 200
        :body (common-ui/page
               url-prefix
@@ -33,6 +53,7 @@
               [:main
                [:h1 [:a {:href (str url-prefix "/tunes.html")} "Tunes"] " / " (h/h title)]
 
+               [:h2 "Details"]
                [:form {:action (str url-prefix "/tunes/" id "/tune.html")
                        :method "post"}
                 [:div
@@ -50,7 +71,11 @@
                              :placeholder "Description"
                              :name "description"
                              :required false} (h/h description)]]
-                [:button {:type "submit"} "Save"]]])})
+                [:button {:type "submit"} "Save"]]
+               [:h2 (str (count entries) " entries")]
+               [:ul
+                (for [{:as entry :keys [entry-time]} entries]
+                  [:li (format-instant entry-time) " - " (entry-link entry url-prefix)])]])})
     {:status 404}))
 
 (defn tune-details-post [{{{:keys [id]} :path
