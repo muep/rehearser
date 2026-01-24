@@ -117,3 +117,19 @@
   (exercise-service/add! db whoami {:title title :description description})
   {:status 303
    :headers {"location" (str url-prefix "/tunes.html")}})
+
+(def routes
+  [["/tunes.html"
+    {:get {:handler tune-listing-page}}]
+   ["/tunes/:id/tune.html"
+    {:get {:parameters {:path {:id int?}}
+           :handler tune-details-page}
+     :post {:parameters {:path {:id int?}
+                         :form {:title string?
+                                :description string?}}
+            :handler tune-details-post}}]
+   ["/tunes/new-tune.html"
+    {:get {:handler tune-add-page}
+     :post {:parameters {:form {:title string?
+                                :description string?}}
+            :handler tune-post!}}]])
