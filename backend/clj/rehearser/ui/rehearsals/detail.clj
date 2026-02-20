@@ -43,7 +43,10 @@
          [:ul
           (for [{:keys [exercise-title entry-time] :as entry} entries]
             [:li (components/entry-link entry url-prefix)
-             " at " (hiccup/h (components/format-time entry-time))])]])})
+             " at " (hiccup/h (components/format-time entry-time))])]
+
+         [:h2 "Other"]
+         [:a {:href (str url-prefix "/rehearsals/" id "/edit.html")} "Edit"]])})
     {:status 404
      :body "Did not find that rehearsal"}))
 

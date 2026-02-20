@@ -27,39 +27,40 @@
   (if-let [rehearsal (rehearsal-service/find-rehearsal db whoami id)]
     (let [{:keys [title description start-time duration]} rehearsal
           start-time-str (str start-time)
-          duration-str (str duration)]
+          duration-str (str duration)
+          parent-url (str url-prefix "/rehearsals/" id "/rehearsal.html")]
       {:status 200
        :body
        (common-ui/page
         url-prefix whoami (str "Edit: " title)
         [:main
          [:h1 [:a {:href (str url-prefix "/rehearsals.html")} "Rehearsals"]
-          " / " [:a {:href (str url-prefix "/rehearsals/"
-                                id "/rehearsal.html")} (hiccup/h title)]
+          " / " [:a {:href parent-url} (hiccup/h title)]
           " / Edit"]
 
          [:form {:action (str url-prefix "/rehearsals/" id "/edit.html")
                  :method "post"}
-          [:div
-           [:label {:for "title"} "Title:"]
+          [:div {:class "labeled-input"}
+           [:label {:for "title"} "Title"]
            [:input {:type "text" :name "title" :id "title" :value (hiccup/h title) :required true}]]
 
-          [:div
-           [:label {:for "description"} "Description:"]
+          [:div {:class "labeled-input"}
+           [:label {:for "description"} "Description"]
            [:textarea {:name "description" :id "description" :rows 4}
             (hiccup/h description)]]
 
-          [:div
-           [:label {:for "start-time"} "Start Time (ISO-8601 format):"]
-           [:input {:type "text" :name "start-time" :id "start-time" :value start-time-str}]]
+          [:div {:class "labeled-input"}
+           [:label {:for "start-time"} "Start Time"]
+           [:input {:type "text" :name "start-time" :id "start-time" :value start-time-str}]
+           [:small "ISO-8601 format"]]
+
+          [:div {:class "labeled-input"}
+           [:label {:for "duration"} "Duration"]
+           [:input {:type "text" :name "duration" :id "duration" :value duration-str}]
+           [:small "Seconds (leave empty for open rehearsal)"]]
 
           [:div
-           [:label {:for "duration"} "Duration (seconds, empty for open rehearsal):"]
-           [:input {:type "text" :name "duration" :id "duration" :value duration-str}]]
-
-          [:div
-           [:button {:type "submit"} "Save Changes"]
-           [:a {:href (str url-prefix "/rehearsals/" id "/rehearsal.html")} "Cancel"]]]])})
+           [:button {:type "submit"} "Save Changes"]]]])})
     {:status 404
      :body "Did not find that rehearsal"}))
 

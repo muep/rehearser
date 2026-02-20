@@ -30,6 +30,14 @@ header {
   background-color: orangered;
 }
 
+.labeled-input label {
+  display: block;
+}
+
+.labeled-input {
+  margin-bottom: 10px;
+}
+
 #search {
   margin: 10px;
 }
