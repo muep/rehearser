@@ -25,19 +25,20 @@
           " (or " [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/delete.html")} "didn't?"] ")"]
          [:form {:action (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")
                  :method "post"}
-          [:label {:for "exercise-id"} "Exercise:"]
-          [:select {:id "exercise-id"
-                    :name "exercise-id"}
-           (for [exercise all-exercises]
-             [:option {:value (:id exercise)
-                       :selected (= (:id exercise) (:exercise-id entry))}
-              (:title exercise)])]
-          [:label {:for "remarks-input" :style "display: block; margin-bottom: 5px; font-weight: bold;"}
-           "Notes:"]
-          [:textarea {:id "remarks-input"
-                      :name "remarks"
-                      :placeholder "How did it go?"}
-           (hiccup/h (:remarks entry))]
+          [:div {:class "labeled-input"}
+           [:label {:for "exercise-id"} "Exercise:"]
+           [:select {:id "exercise-id"
+                     :name "exercise-id"}
+            (for [exercise all-exercises]
+              [:option {:value (:id exercise)
+                        :selected (= (:id exercise) (:exercise-id entry))}
+               (:title exercise)])]]
+          [:div {:class "labeled-input"}
+           [:label {:for "remarks-input"} "Notes:"]
+           [:textarea {:id "remarks-input"
+                       :name "remarks"
+                       :placeholder "How did it go?"}
+            (hiccup/h (:remarks entry))]]
           [:input {:type "submit" :value "Save"}]]])})
     {:status 404
      :body (str "No entry " id " in rehearsal " rehearsal-id)}))

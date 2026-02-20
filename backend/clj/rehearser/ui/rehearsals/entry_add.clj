@@ -27,7 +27,7 @@
 
        [:form {:action (str url-prefix "/rehearsals/" rehearsal-id "/new-entry.html")
                :method "post"}
-        [:div
+        [:div {:class "labeled-input"}
          [:label {:for "exercise-input"} "Tune:"]
          [:select {:id "exercise-input"
                    :name "exercise-id"
@@ -38,14 +38,14 @@
                                   (= (:id tune) (:id preselected-exercise)))}
              (hiccup/h (:title tune))])]]
         (if (< 1 (count variants))
-          [:div
+          [:div {:class "labeled-input"}
            [:label {:for "variant-input"} "Instrument:"]
            [:select {:id "variant-input"
                      :name "variant-id"}
             (for [v variants]
               [:option {:value (:id v)} (hiccup/h (:title v))])]]
           [:input {:type "hidden" :name "variant-id" :value (:id (first variants))}])
-        [:div
+        [:div {:class "labeled-input"}
          [:label {:for "remarks-input"} "Remarks"]
          [:textarea {:id "remarks-input"
                      :name "remarks"

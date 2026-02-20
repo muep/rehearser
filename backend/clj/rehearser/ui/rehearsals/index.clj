@@ -29,7 +29,7 @@
               hiccup/h)]
          [:form {:method "post"}
           [:p "Nothing ongoing, but a new one may be started"]
-          [:div
+          [:div {:class "labeled-input"}
            [:label {:for "title-input"} "Title:"]
            [:input {:id "title-input"
                     :type "text"
