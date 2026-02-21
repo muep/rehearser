@@ -30,6 +30,27 @@ header {
   background-color: orangered;
 }
 
+.labeled-input label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.labeled-input input,
+.labeled-input textarea,
+.labeled-input select {
+  width: 100%;
+  max-width: 500px;
+}
+
+.labeled-input textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.labeled-input {
+  margin-bottom: 15px;
+}
+
 #search {
   margin: 10px;
 }

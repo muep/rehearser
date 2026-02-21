@@ -56,7 +56,7 @@
                [:h2 "Details"]
                [:form {:action (str url-prefix "/tunes/" id "/tune.html")
                        :method "post"}
-                [:div
+                [:div {:class "labeled-input"}
                  [:label {:for "title-input"} "Name:"]
                  [:input {:id "title-input"
                           :type "text"
@@ -64,7 +64,7 @@
                           :name "title"
                           :required true
                           :value title}]]
-                [:div
+                [:div {:class "labeled-input"}
                  [:label {:for "description-input"} "Description:"]
                  [:textarea {:id "description-input"
                              :type "text"
@@ -96,14 +96,14 @@
            [:h1 [:a {:href (str url-prefix "/tunes.html")} "Tunes"] " / new"]
 
            [:form {:method "post"}
-            [:div
+            [:div {:class "labeled-input"}
              [:label {:for "title-input"} "Name:"]
              [:input {:id "title-input"
                       :type "text"
                       :placeholder "Tune name"
                       :name "title"
                       :required true}]]
-            [:div
+            [:div {:class "labeled-input"}
              [:label {:for "description-input"} "Description:"]
              [:textarea {:id "description-input"
                          :type "text"

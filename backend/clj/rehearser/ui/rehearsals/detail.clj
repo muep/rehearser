@@ -9,7 +9,7 @@
 (defn rehearsal-page [{{{:keys [id]} :path} :parameters
                        :keys [db url-prefix whoami] :as req}]
   (if-let [rehearsal (rehearsal-service/find-rehearsal db whoami id)]
-    (let [{:keys [start-time duration title entries]} rehearsal
+    (let [{:keys [start-time duration title description entries]} rehearsal
           now (Instant/now)
           seconds (if duration
                     duration
@@ -23,6 +23,8 @@
           " / " (hiccup/h title)]
 
          [:p "On " (components/format-instant start-time)]
+         (when description
+           [:p "Description: " (hiccup/h description)])
          [:p "Duration: " seconds " seconds"]
 
          (if duration
@@ -41,7 +43,10 @@
          [:ul
           (for [{:keys [exercise-title entry-time] :as entry} entries]
             [:li (components/entry-link entry url-prefix)
-             " at " (hiccup/h (components/format-time entry-time))])]])})
+             " at " (hiccup/h (components/format-time entry-time))])]
+
+         [:h2 "Other"]
+         [:a {:href (str url-prefix "/rehearsals/" id "/edit.html")} "Edit"]])})
     {:status 404
      :body "Did not find that rehearsal"}))
 
