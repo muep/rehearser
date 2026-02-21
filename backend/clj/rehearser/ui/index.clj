@@ -18,3 +18,7 @@
                 (if (nil? account-name)
                   (account-ui/login-form url-prefix)
                   (header url-prefix whoami))]]))})
+
+(def routes
+  [["/index.html"
+    {:get {:handler html}}]])
