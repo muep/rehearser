@@ -1,0 +1,66 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: rehearser_e2e
+          POSTGRES_PASSWORD: rehearser_e2e
+          POSTGRES_DB: rehearser_e2e
+        options: >-
+          --health-cmd="pg_isready -U rehearser_e2e -d rehearser_e2e"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Set up Java 25 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Install Clojure CLI (deps.edn)
+        run: |
+          curl -O https://download.clojure.org/install/linux-install-1.12.4.1602.sh
+          chmod +x linux-install-1.12.4.1602.sh
+          sudo ./linux-install-1.12.4.1602.sh
+
+      - name: Install dependencies
+        working-directory: e2e-tests
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: e2e-tests
+        run: npx playwright install --with-deps
+
+      - name: Run E2E tests
+        working-directory: e2e-tests
+        run: |
+          node test-harness.js
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: e2e-tests/test-results
