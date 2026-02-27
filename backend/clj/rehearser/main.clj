@@ -99,13 +99,20 @@
                                                      summary
                                                      [(subcmd-description)])))))
 
+(defn- options-with-jdbc-url [{:keys [database] :as options}]
+  (if (< 0 (count database))
+    (-> options
+        (dissoc :database)
+        (assoc :jdbc-url database))
+    options))
+
 (defn -main [& args]
   (try
     ;; Only the top-level arguments are parsed here. Further parsing
     ;; will be done when the subcommand has been selected and its
     ;; namespace has been loaded as well.
     (let [{:keys [help status options subcmd subcmd-args subcmd-name]} (parse-args args)]
-      (subcmd {:options (merge (env->options) options)
+      (subcmd {:options (merge (env->options) (options-with-jdbc-url options))
                :subcmd-args subcmd-args}))
     (catch clojure.lang.ExceptionInfo e
           (case (-> e ex-data :type)

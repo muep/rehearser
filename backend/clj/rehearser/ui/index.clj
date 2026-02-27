@@ -19,6 +19,14 @@
                   (account-ui/login-form url-prefix)
                   (header url-prefix whoami))]]))})
 
+(defn redirect-to-index [{:keys [url-prefix]}]
+  {:status 302
+   :headers {"Location" (str url-prefix "/index.html")}})
+
 (def routes
-  [["/index.html"
+  [[""
+    {:get {:handler redirect-to-index}}]
+   ["/"
+    {:get {:handler redirect-to-index}}]
+   ["/index.html"
     {:get {:handler html}}]])

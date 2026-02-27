@@ -7,6 +7,13 @@
    [rehearser.hex :refer [hex->bytes]]
    [rehearser.http-service :as http]))
 
+(def parse-url-prefix (comp #(if (empty? %)
+                               %
+                               (if (str/starts-with? % "/")
+                                 %
+                                 (str "/" %)))
+                            #(str/replace % #"/+$" "")))
+
 (def serve-options
   [["-h" "--help" "Display help and exit"]
    [nil "--port PORT" "Select TCP port for serving HTTP"
@@ -18,12 +25,8 @@
                            .isDirectory))
                "Requested static file directory does not exist"]]
    [nil "--url-prefix PREFIX" "prepend PREFIX into URL paths"
-    :parse-fn (comp #(if (empty? %)
-                       %
-                       (if (str/starts-with? % "/")
-                         %
-                         (str "/" %)))
-                    #(str/replace % #"/+$" ""))]])
+    :parse-fn parse-url-prefix
+    :default ""]])
 
 (defn env->session-key []
   (let [k (-> "SESSION_KEY"
