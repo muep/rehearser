@@ -94,7 +94,8 @@
 (defn run [{:keys [admin-pwhash session-key jdbc-url port static-file-dir url-prefix]
             :or {port 8080
                  url-prefix ""}}]
-  (log/info "should listen on port" port "and use database at" jdbc-url)
+  (log/info "expecting database at" jdbc-url)
+  (log/info (str "serving on http://localhost:" port url-prefix "/index.html"))
 
   (when-not (empty? url-prefix)
     (log/info (str "Prefixing URLs with " url-prefix)))
