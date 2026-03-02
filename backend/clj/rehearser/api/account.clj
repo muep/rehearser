@@ -82,7 +82,7 @@
                                             (service/normalized-name username)
                                             password)]
     {:status 303
-     :headers {"Location" "../login.html"}
+     :headers {"Location" "../index.html"}
      :body "Account created"}
     {:status 303
      :headers {"Location" "../signup.html#name-conflict=true"}
