@@ -1,7 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-const BASE_URL = "http://localhost:3000";
-
 // Helper function to generate random username
 test.describe("Signup and Login Flow", () => {
   const randomSuffix = Math.floor(Math.random() * 10000);
@@ -10,7 +8,7 @@ test.describe("Signup and Login Flow", () => {
 
   test("should allow user to signup and then login", async ({ page }) => {
     // Navigate to signup page
-    await page.goto(`${BASE_URL}/signup.html`);
+    await page.goto("/signup.html");
     await expect(page).toHaveTitle(/Rehearser/);
     
     // Fill out signup form
@@ -19,7 +17,7 @@ test.describe("Signup and Login Flow", () => {
     await page.click("button[type='submit']");
     
     // Should redirect to index page after successful signup (which shows login form)
-    await expect(page).toHaveURL(`${BASE_URL}/index.html`);
+    await expect(page).toHaveURL("/index.html");
     
     // Now login with the new credentials (already on index.html with login form)
     await page.fill("input[name='username']", testUsername);
@@ -27,7 +25,7 @@ test.describe("Signup and Login Flow", () => {
     await page.click("button[type='submit']");
     
     // Should stay on index page after successful login but now show logged-in content
-    await expect(page).toHaveURL(`${BASE_URL}/index.html`);
+    await expect(page).toHaveURL("/index.html");
     
     // Verify we're logged in (check for logout button or user info)
     await expect(page.locator("body")).toContainText("Logged in");
