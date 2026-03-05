@@ -68,7 +68,9 @@ test.describe("A simple session", () => {
     await expect(page).toHaveURL("/rehearsals.html");
 
     // Verify the rehearsal appears as current
-    await expect(page.locator("body")).toContainText("Morning practice session");
+    await expect(page.locator("body")).toContainText(
+      "Morning practice session",
+    );
     await expect(page.locator("body")).toContainText("started at");
 
     // Click on the rehearsal to view details
@@ -88,7 +90,10 @@ test.describe("A simple session", () => {
     await expect(page).toHaveURL(/\/rehearsals\/\d+\/new-entry\.html/);
 
     // Fill out entry form (dropdown is already set correctly by server)
-    await page.fill("textarea[name='remarks']", "Worked on ornamentation and timing");
+    await page.fill(
+      "textarea[name='remarks']",
+      "Worked on ornamentation and timing",
+    );
     await page.click("input[type='submit']");
 
     // Should redirect back to rehearsal detail page
@@ -105,7 +110,7 @@ test.describe("A simple session", () => {
     await page.click("input[type='submit']");
 
     // Click on Cooley's reel from the recent tunes list
-    await page.click("a:has-text(\"Cooley's reel\")");
+    await page.click('a:has-text("Cooley\'s reel")');
 
     // Fill out entry form for Cooley's reel (dropdown is already set correctly)
     await page.fill("textarea[name='remarks']", "Focused on bowing patterns");
@@ -124,7 +129,9 @@ test.describe("A simple session", () => {
 
     // Verify rehearsal appears in past rehearsals
     await page.goto("/rehearsals.html");
-    await expect(page.locator("body")).toContainText("Morning practice session");
+    await expect(page.locator("body")).toContainText(
+      "Morning practice session",
+    );
     await expect(page.locator("body")).toContainText("Past ones");
   });
 });
