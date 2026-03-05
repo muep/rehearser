@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 // Helper function to add a tune
-async function addTune(page, title, description) {
+const addTune = async (page, title, description) => {
   await page.click("a:has-text('Add new')");
   await expect(page).toHaveURL("/tunes/new-tune.html");
 
@@ -11,26 +11,27 @@ async function addTune(page, title, description) {
 
   // Should redirect back to tunes listing
   await expect(page).toHaveURL("/tunes.html");
-}
+};
+
+const prepareUser = async ({ page }) => {
+  // Signup and login once, before each test
+  const testPassword = "testpassword123";
+  const randomSuffix = Math.floor(Math.random() * 10000);
+  const testUsername = `testuser${randomSuffix}`;
+
+  await page.goto("/signup.html");
+  await page.fill("input[name='username']", testUsername);
+  await page.fill("input[name='password']", testPassword);
+  await page.click("button[type='submit']");
+  await page.goto("/index.html");
+
+  await page.fill("input[name='username']", testUsername);
+  await page.fill("input[name='password']", testPassword);
+  await page.click("button[type='submit']");
+};
 
 test.describe("A simple session", () => {
-  const randomSuffix = Math.floor(Math.random() * 10000);
-  const testPassword = "testpassword123";
-
-  test.beforeEach(async ({ page }) => {
-    // Signup and login once, before each test
-    const testUsername = `testuser${randomSuffix}`;
-
-    await page.goto("/signup.html");
-    await page.fill("input[name='username']", testUsername);
-    await page.fill("input[name='password']", testPassword);
-    await page.click("button[type='submit']");
-    await page.goto("/index.html");
-
-    await page.fill("input[name='username']", testUsername);
-    await page.fill("input[name='password']", testPassword);
-    await page.click("button[type='submit']");
-  });
+  test.beforeEach(prepareUser);
 
   test("Insert some tunes and have a rehearsal", async ({ page }) => {
     await page.goto("/tunes.html");
