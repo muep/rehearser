@@ -57,7 +57,7 @@
                          "/api/signup"
                          {:username "bobb" :password "s3kret"}))]
       (t/is (= (:status response) 303))
-      (t/is (= (-> response :headers (get "Location")) "../login.html")))
+      (t/is (= (-> response :headers (get "Location")) "../index.html")))
 
     ;; Attempt logging in with a bad password
     (let [response (app (post-form-request
