@@ -16,8 +16,9 @@ const addTune = async (page, title, description) => {
 const prepareUser = async ({ page }) => {
   // Signup and login once, before each test
   const testPassword = "testpassword123";
-  const randomSuffix = Math.floor(Math.random() * 10000);
-  const testUsername = `testuser${randomSuffix}`;
+  const randomSuffix = Math.floor(Math.random() * 1000000);
+  const timestampHash = Date.now().toString().slice(-4);
+  const testUsername = `testuser${randomSuffix}${timestampHash}`;
 
   await page.goto("/signup.html");
   await page.fill("input[name='username']", testUsername);
