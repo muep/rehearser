@@ -7,7 +7,11 @@
   "author": "",
   "license": "ISC",
   "type": "module",
+  "scripts": {
+    "format": "prettier --write ."
+  },
   "devDependencies": {
-    "@playwright/test": "^1.58.2"
+    "@playwright/test": "^1.58.2",
+    "prettier": "3.8.1"
   }
 }
