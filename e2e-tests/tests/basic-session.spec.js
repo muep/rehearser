@@ -105,7 +105,7 @@ test.describe("A simple session", () => {
     await page.click("input[type='submit']");
 
     // Click on Cooley's reel from the recent tunes list
-    await page.click("a:has-text('Cooley\\'s reel')");
+    await page.click("a:has-text(\"Cooley's reel\")");
 
     // Fill out entry form for Cooley's reel (dropdown is already set correctly)
     await page.fill("textarea[name='remarks']", "Focused on bowing patterns");
