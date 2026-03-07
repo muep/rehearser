@@ -134,4 +134,81 @@ test.describe("A simple session", () => {
     );
     await expect(page.locator("body")).toContainText("Past ones");
   });
+
+  test("Create new tune from empty search result", async ({ page }) => {
+    await page.goto("/tunes.html");
+
+    // Add a few tunes using the helper function
+    await addTune(page, "Within a mile of Dublin", "A reel");
+    await addTune(page, "Did You Wash Your Father’s Shirt", "A reel");
+
+    // Verify the tunes appear in the list
+    await expect(page.locator("body")).toContainText("Within a mile of Dublin");
+    await expect(page.locator("body")).toContainText(
+      "Did You Wash Your Father’s Shirt",
+    );
+
+    // Navigate to rehearsals page
+    await page.goto("/rehearsals.html");
+
+    // Start a new rehearsal
+    await page.fill("input[name='title']", "Hasty practice session");
+    await page.click("button[type='submit']:has-text('Start new')");
+
+    // Navigate to the rehearsal page
+    await page.click("a:has-text('Hasty practice session')");
+    await expect(page).toHaveURL(/\/rehearsals\/\d+\/rehearsal\.html/);
+
+    // Navigate to the add entry page
+    await page.click("a:has-text('Add entry')");
+    await expect(page).toHaveURL(/\/rehearsals\/\d+\/entry-add-search\.html/);
+
+    // Search for a tune that hasn't been added
+    await page.fill("input[name='query']", "Coffee jig");
+    await page.click("input[type='submit']");
+
+    // Check for the "No results found for Coffee jig" text
+    await expect(page.locator(".search-no-results")).toContainText(
+      "No results found for Coffee jig",
+    );
+
+    // Check for presence of a link to add the tune
+    await expect(page.locator("body")).toContainText("Create new tune");
+    await expect(page.locator("body")).toContainText('Create "Coffee jig"');
+
+    // Follow the link to new tune page
+    await page.click('text=Create "Coffee jig"');
+    await expect(page).toHaveURL(
+      /\/tunes\/new-tune\.html\?title=Coffee\+jig(&|$)/,
+    );
+
+    // Verify the tune title is pre-filled with the search term
+    await expect(page.locator("input[name='title']")).toHaveValue("Coffee jig");
+
+    // Save the new tune
+    await page.fill("textarea[name='description']", "A lively jig");
+    await page.click("button[type='submit']:has-text('Save')");
+
+    // Verify we're redirected back to the entry search page
+    await expect(page).toHaveURL(/\/rehearsals\/\d+\/entry-add-search\.html/);
+
+    // Search for the newly created tune
+    await page.fill("input[name='query']", "Coffee jig");
+    await page.click("input[type='submit']");
+
+    // Verify the tune now appears in search results
+    await expect(page.locator("body")).toContainText("Coffee jig");
+
+    // Click the tune to add it as an entry
+    await page.click('a:has-text("Coffee jig")');
+    await expect(page).toHaveURL(/\/rehearsals\/\d+\/new-entry\.html/);
+
+    // Fill out entry details and save
+    await page.fill("textarea[name='remarks']", "Practiced the B part");
+    await page.click("input[type='submit']");
+
+    // Verify we're back at the rehearsal page with the new entry
+    await expect(page).toHaveURL(/\/rehearsals\/\d+\/rehearsal\.html/);
+    await expect(page.locator("body")).toContainText("Coffee jig");
+  });
 });

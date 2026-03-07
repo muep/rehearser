@@ -5,7 +5,9 @@
    [rehearser.service.rehearsal :as rehearsal-service]
    [rehearser.ui.common :as common-ui]
    [rehearser.ui.rehearsals.components :as components])
-  (:import (java.time.format DateTimeFormatter)))
+  (:import
+   (java.net URLEncoder)
+   (java.time.format DateTimeFormatter)))
 
 (defn format-time [inst]
   (when inst
@@ -16,6 +18,9 @@
 (defn- new-entry-link [url-prefix rehearsal-id exercise]
   [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/new-entry.html?exercise-id=" (:id exercise))}
    (:title exercise)])
+
+(defn- url-encode [t]
+  (URLEncoder/encode t "UTF-8"))
 
 (defn entry-add-search-page [{{{:keys [rehearsal-id]} :path
                              {:keys [query]} :form} :parameters
@@ -44,9 +49,16 @@
                         :placeholder "Start typing tune name..."}]
                [:input {:type "submit" :value "Search"}]]]
 
-             (when (and query (empty? search-results))
+             (when (and (seq query) (empty? search-results))
                [:div
-                [:p {:class "search-no-results"} "No results found for " [:strong query]]])
+                [:p {:class "search-no-results"} "No results found for " [:strong query]]
+                [:p "Create new tune: "
+                 [:a {:href (str url-prefix
+                                 "/tunes/new-tune.html?title="
+                                 (url-encode query)
+                                 "&redirect="
+                                 (url-encode (str url-prefix "/rehearsals/" rehearsal-id "/entry-add-search.html")))}
+                  (str "Create \"" query "\"")]]])
 
              (when (seq search-results)
                [:div
