@@ -25,8 +25,11 @@
 
 (def routes
   [[""
-    {:get {:handler redirect-to-index}}]
+    {:get {:handler redirect-to-index
+           :allow-anonymous? true}}]
    ["/"
-    {:get {:handler redirect-to-index}}]
+    {:get {:handler redirect-to-index
+           :allow-anonymous? true}}]
    ["/index.html"
-    {:get {:handler html}}]])
+    {:get {:handler html
+           :allow-anonymous? true}}]])

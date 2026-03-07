@@ -49,6 +49,22 @@
   (fn [{:keys [session] :as req}]
     (handler (assoc req :whoami (session->whoami session)))))
 
+(defn wrap-require-login-for-ui [url-prefix]
+  (fn [handler]
+    (fn [{{:keys [account-id]} :whoami
+          :keys [request-method]
+          :as req}]
+      (let [allow-anonymous? (-> req
+                                 :reitit.core/match
+                                 :data
+                                 request-method
+                                 :allow-anonymous?
+                                 boolean)]
+        (if (or allow-anonymous? account-id)
+          (handler req)
+          {:status 303
+           :headers {"location" (str url-prefix "/index.html")}})))))
+
 (defn make-app
   "Constructs the backend Ring application with routes and middleware.
 
@@ -73,6 +89,7 @@
         after-middlewares [(wrap-db db)
                            (wrap-session session-key)
                            whoami-middleware
+                           (wrap-require-login-for-ui url-prefix)
                            wrap-print-session]
         routes [url-prefix
                 ["/health" {:get health/get-health}]
