@@ -1,5 +1,7 @@
 (ns rehearser.ui.tunes
   (:require
+   [clojure.string :as str]
+   [clojure.tools.logging :as log]
    [hiccup.core :as h]
    [rehearser.service.exercise :as exercise-service]
 
@@ -85,7 +87,7 @@
   {:status 303
    :headers {"location" (str url-prefix "/tunes/" id "/tune.html")}})
 
-(defn tune-add-page [{{{:keys [id]} :path} :parameters
+(defn tune-add-page [{{{:keys [title]} :query} :parameters
                       :keys [db url-prefix whoami]}]
   {:status 200
    :body (common-ui/page
@@ -102,7 +104,8 @@
                       :type "text"
                       :placeholder "Tune name"
                       :name "title"
-                      :required true}]]
+                      :required true
+                      :value (or title "")}]]
             [:div {:class "labeled-input"}
              [:label {:for "description-input"} "Description:"]
              [:textarea {:id "description-input"
@@ -112,11 +115,28 @@
                          :required false}]]
             [:button {:type "submit"} "Save"]]])})
 
-(defn tune-post! [{{{:keys [title description]} :form} :parameters
+(defn- redirect-location [url-prefix redirect default-location]
+  (if redirect
+    (cond
+      (not (str/starts-with? redirect (str url-prefix "/")))
+      (do
+        (log/warn "redirect target" redirect "outside prefix" url-prefix)
+        default-location)
+      (some (fn [dangerous-sequence]
+              (str/includes? redirect dangerous-sequence))
+            ["//" "\n" "\r" "\\"])
+      (do
+        (log/warn "redirect target" redirect "contains a problematic sequence")
+        default-location)
+      :else redirect)
+    default-location))
+
+(defn tune-post! [{{{:keys [title description]} :form
+                    {:keys [redirect]} :query} :parameters
                    :keys [db url-prefix whoami] :as req}]
   (exercise-service/add! db whoami {:title title :description description})
   {:status 303
-   :headers {"location" (str url-prefix "/tunes.html")}})
+   :headers {"location" (redirect-location url-prefix redirect (str url-prefix "/tunes.html"))}})
 
 (def routes
   [["/tunes.html"
@@ -129,7 +149,12 @@
                                 :description string?}}
             :handler tune-details-post}}]
    ["/tunes/new-tune.html"
-    {:get {:handler tune-add-page}
-     :post {:parameters {:form {:title string?
+    {:get {:parameters {:query [:map
+                                [:title {:optional true} string?]
+                                [:redirect {:optional true} string?]]}
+           :handler tune-add-page}
+     :post {:parameters {:query [:map
+                                 [:redirect {:optional true} string?]]
+                         :form {:title string?
                                 :description string?}}
             :handler tune-post!}}]])
