@@ -62,8 +62,12 @@
                                  boolean)]
         (if (or allow-anonymous? account-id)
           (handler req)
-          {:status 303
-           :headers {"location" (str url-prefix "/index.html")}})))))
+          (case (-> req :reitit.core/match :data :anonymous-reject-via)
+            :redirect-to-index
+            {:status 303
+             :headers {"location" (str url-prefix "/index.html")}}
+            :http-401
+            {:status 401}))))))
 
 (defn make-app
   "Constructs the backend Ring application with routes and middleware.
@@ -92,9 +96,11 @@
                            (wrap-require-login-for-ui url-prefix)
                            wrap-print-session]
         routes [url-prefix
+                {:anonymous-reject-via :redirect-to-index}
                 ["/health" {:get {:handler health/get-health
                                   :allow-anonymous? true}}]
-                ["/api" (api/routes admin-pwhash (:get-handler reqstat))]
+                (concat ["/api" {:anonymous-reject-via :http-401}]
+                        (api/routes admin-pwhash (:get-handler reqstat)))
                 ui/routes]]
     (handler/handler before-middlewares after-middlewares routes
                      (reitit-ring/routes
