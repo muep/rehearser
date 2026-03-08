@@ -5,7 +5,6 @@
     [rehearser.test-db :refer [test-db]]
 
     [crypto.random :as random]
-    [ring.mock.request :as mock]
 
     [rehearser.http-service :as http-service]
     [rehearser.test-util :refer [handler-with-local-cookies
@@ -13,15 +12,6 @@
   (:import (java.io ByteArrayInputStream)))
 
 (t/use-fixtures :each fixture)
-
-
-(defn post-json-text-request [uri body-text]
-  {:request-method :post
-   :uri uri
-   :headers {"accept" "application/json"
-             "content-type" "application/json"
-             "content-length" (-> body-text .length str)}
-   :body (-> body-text .getBytes ByteArrayInputStream.)})
 
 (defn post-form-request [uri params]
   (let [body-payload (ring.util.codec/form-encode params)]
