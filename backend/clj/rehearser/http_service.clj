@@ -92,7 +92,8 @@
                            (wrap-require-login-for-ui url-prefix)
                            wrap-print-session]
         routes [url-prefix
-                ["/health" {:get health/get-health}]
+                ["/health" {:get {:handler health/get-health
+                                  :allow-anonymous? true}}]
                 ["/api" (api/routes admin-pwhash (:get-handler reqstat))]
                 ui/routes]]
     (handler/handler before-middlewares after-middlewares routes
