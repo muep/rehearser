@@ -28,4 +28,5 @@
 
 (def routes
   [["/signup.html"
-    {:get {:handler html}}]])
+    {:get {:handler html
+           :allow-anonymous? true}}]])

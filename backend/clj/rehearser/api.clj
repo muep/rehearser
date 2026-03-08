@@ -35,14 +35,18 @@
 (def api-metadata {:middleware [[wrap-require-account]]})
 
 (defn routes [admin-pwhash get-reqstat]
-  [["/login" {:post account/login}]
-   ["/admin-login" {:post (account/admin-login admin-pwhash)}]
+  [["/login" {:post {:handler account/login
+                     :allow-anonymous? true}}]
+   ["/admin-login" {:post {:handler (account/admin-login admin-pwhash)
+                           :allow-anonymous? true}}]
    ["/admin"
     {:middleware [[(wrap-require-admin admin-pwhash)]]}
     admin/routes]
-   ["/signup" {:post account/signup}]
+   ["/signup" {:post {:handler account/signup
+                      :allow-anonymous? true}}]
    ["/logout" {:post account/logout}]
-   ["/whoami" {:get account/whoami}]
+   ["/whoami" {:get {:handler account/whoami
+                     :allow-anonymous? true}}]
    ["/exercise" api-metadata exercise/routes]
    ["/rehearsal" api-metadata rehearsal/routes]
    ["/entry" api-metadata rehearsal/entry-routes]
