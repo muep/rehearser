@@ -5,6 +5,7 @@
             [rehearser.api.rehearsal :as rehearsal]
             [rehearser.api.sysinfo :as sysinfo]
             [rehearser.api.variant :as variant]
+            [rehearser.api.export :as export]
             [rehearser.exp :as exp]))
 
 (defn wrap-require-account [handler]
@@ -51,6 +52,7 @@
    ["/rehearsal" api-metadata rehearsal/routes]
    ["/entry" api-metadata rehearsal/entry-routes]
    ["/variant" api-metadata variant/routes]
+   ["/export" api-metadata export/routes]
    ["/params" {:get exp/params-get
                :post exp/params-post}]
    ["/fail" {:get exp/fail
