@@ -10,17 +10,21 @@ Via docker:
     docker run -e POSTGRES_PASSWORD=postgres \
         -d \
         --name rehearser-db \
+        --tmpfs /var/lib/postgresql:size=1g \
         -p 5432:5432 postgres
 
 ## Run tests
 
-Run this:
+Run all tests:
 
     clojure -M:test
 
-Or to limit what tests are to be run, additionally pass in a filter string
+Or run tests matching a specific pattern by passing it as an argument:
 
-    clojure -M:test db-url
+    clojure -M:test db
+
+This will run any test whose fully qualified name contains "db", such as
+`rehearser.db-test` and `rehearser.db-url-test`.
 
 ## Build self-container JAR archive
 
