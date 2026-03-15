@@ -5,7 +5,7 @@
    [rehearser.test-util :refer [test-time-reporter]]))
 
 (defn- test-pattern [kw]
-  (re-pattern (str "rehearser\\..*" kw ".*-test")))
+  (re-pattern (str "rehearser\\..*" kw ".*")))
 
 (defn- matches-some-pattern [v patterns]
   (let [m (meta v)
