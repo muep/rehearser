@@ -50,7 +50,7 @@
                 :uri "/api/export"}
         response (app request)
         body (:body response)
-        parsed (try (read-json-value body) (catch Exception _ {}))]
+        parsed (read-json-value body)]
 
     (t/is (= 200 (:status response)) "Response should be successful")
     (t/is (map? parsed) "Parsed JSON should be a map")

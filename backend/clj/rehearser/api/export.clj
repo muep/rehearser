@@ -33,8 +33,8 @@
              [:id int?]
              [:title string?]
              [:description string?]
-             [:start-time int?]
-             [:duration int?]]))
+             [:start-time integer?]
+             [:duration [:maybe integer?]]]))
 
 (def EntryExport
   (m/schema [:map {:closed true}
@@ -42,13 +42,13 @@
              [:rehearsal-id int?]
              [:exercise-id int?]
              [:variant-id int?]
-             [:entry-time int?]
+             [:entry-time integer?]
              [:remarks [:maybe string?]]]))
 
 (def ExportResponse
   (m/schema [:map {:closed true}
              [:version int?]
-             [:exported-at int?]
+             [:exported-at integer?]
              [:account AccountExport]
              [:exercises [:sequential ExerciseExport]]
              [:variants [:sequential VariantExport]]

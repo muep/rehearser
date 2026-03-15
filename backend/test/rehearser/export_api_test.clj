@@ -81,9 +81,9 @@
 
       ;; Parse the JSON response to check timestamp format
       (let [body (:body response)
-            parsed (when body (try (read-json-value body)
-                                  (catch Exception e
-                                    {})))
+            _ (t/is body "Expected a non-nil body")
+            parsed (read-json-value body)
+            _ (t/is (map? parsed) "Expected parsing to give a map")
             exported-at (get parsed :exported-at)
             rehearsals (get parsed :rehearsals)
             entries (get parsed :entries)]
@@ -98,7 +98,7 @@
         ;; Check rehearsal timestamps if any exist
         (when (seq rehearsals)
           (let [first-rehearsal (first rehearsals)
-                start-time (get first-rehearsal "start-time")]
+                start-time (get first-rehearsal :start-time)]
             (when start-time
               (t/is (number? start-time) "rehearsal start-time should be a number")
               (t/is (integer? start-time) "rehearsal start-time should be an integer"))))
@@ -106,7 +106,7 @@
         ;; Check entry timestamps if any exist
         (when (seq entries)
           (let [first-entry (first entries)
-                entry-time (get first-entry "entry-time")]
+                entry-time (get first-entry :entry-time)]
             (when entry-time
               (t/is (number? entry-time) "entry entry-time should be a number")
               (t/is (integer? entry-time) "entry entry-time should be an integer"))))))))

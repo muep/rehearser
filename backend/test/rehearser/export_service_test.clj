@@ -80,7 +80,7 @@
     ;; Verify relationships are preserved
     ;; Note: variant IDs are offset by 1 due to default variant (ID 1)
     ;; variant1 will have ID 2, variant2 will have ID 3
-    (let [entries (:entries export-data)
+    (let [entries (sort-by :id (:entries export-data))
           entry1-exported (first entries)
           entry2-exported (second entries)]
 
