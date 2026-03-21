@@ -14,6 +14,10 @@
   (exercise-by-id db {:id id
                       :account-id (:account-id whoami)}))
 
+(defn find-by-title [db whoami title]
+  (exercise-by-title db {:title title
+                         :account-id (:account-id whoami)}))
+
 (defn find-with-entries-by-id [db whoami id]
   (with-transaction [tx db]
     (when-let [exercise (first (find-by-id tx whoami id))]

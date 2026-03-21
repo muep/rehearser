@@ -28,6 +28,11 @@
   (fn [req]
     (try
       (handler req)
+      (catch clojure.lang.ExceptionInfo e
+        (when-not (contains? #{:reitit.coercion/request-coercion}
+                             (-> e ex-data :type))
+          (log/error e))
+        (throw e))
       (catch java.lang.Exception e
         (log/error e "Unhandled exception")
         (throw e)))))

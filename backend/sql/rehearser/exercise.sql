@@ -21,6 +21,12 @@ from exercise
 where "account-id" = :account-id and
       id = :id;
 
+-- :name exercise-by-title :? :1
+select id, "account-id", title, description
+from exercise
+where "account-id" = :account-id and
+      title = :title;
+
 -- :name entries-by-exercise-id :? :*
 select
     en.*,
