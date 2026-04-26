@@ -6,6 +6,7 @@
    [reitit.ring.middleware.parameters :refer [parameters-middleware]]
    [reitit.ring.coercion :refer [coerce-request-middleware
                                  coerce-response-middleware]]
+   [reitit.ring.middleware.multipart :as multipart]
 
    [reitit.coercion :refer [compile-request-coercers]]
    [reitit.coercion.malli :as malli-coercion]
@@ -27,9 +28,26 @@
   (fn [req]
     (try
       (handler req)
+      (catch clojure.lang.ExceptionInfo e
+        (when-not (contains? #{:reitit.coercion/request-coercion}
+                             (-> e ex-data :type))
+          (log/error e))
+        (throw e))
       (catch java.lang.Exception e
         (log/error e "Unhandled exception")
         (throw e)))))
+
+(defn- with-sequential-values [m]
+  (into {}
+        (for [[k v] m]
+          [k (if (sequential? v) v [v])])))
+
+(defn- fix-multipart-params [handler]
+  (fn [{{:keys [multipart]} :parameters
+        :as req}]
+    (handler (if multipart
+               (update-in req [:parameters :multipart] with-sequential-values)
+               req))))
 
 (def api-adapter-middlewares
   [wrap-disable-cache
@@ -40,6 +58,8 @@
    wrap-format-request
    parameters-middleware
    coerce-request-middleware
+   multipart/multipart-middleware
+   fix-multipart-params
    coerce-response-middleware])
 
 (defn handler [before-middlewares after-middlewares routes default-handler]

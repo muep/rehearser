@@ -33,7 +33,7 @@
              [:id int?]
              [:title string?]
              [:description string?]
-             [:start-time integer?]
+             [:start-time Timestamp]
              [:duration [:maybe integer?]]]))
 
 (def EntryExport
@@ -42,39 +42,22 @@
              [:rehearsal-id int?]
              [:exercise-id int?]
              [:variant-id int?]
-             [:entry-time integer?]
+             [:entry-time Timestamp]
              [:remarks [:maybe string?]]]))
 
-(def ExportResponse
+(def ExportStructure
   (m/schema [:map {:closed true}
              [:version int?]
-             [:exported-at integer?]
+             [:exported-at Timestamp]
              [:account AccountExport]
              [:exercises [:sequential ExerciseExport]]
              [:variants [:sequential VariantExport]]
              [:rehearsals [:sequential RehearsalExport]]
              [:entries [:sequential EntryExport]]]))
 
-(defn- convert-timestamps [data]
-  (cond
-    (instance? Instant data)
-    (instant->unix-seconds data)
-
-    (map? data)
-    (into {} (map (fn [[k v]] [k (convert-timestamps v)]) data))
-
-    (sequential? data)
-    (mapv convert-timestamps data)
-
-    :else
-    data))
-
 (defn export-handler [{:keys [db whoami]}]
   (let [account-id (:account-id whoami)
-        export-data (export-service/export-account db account-id)
-
-        ;; Convert Instant objects to Unix epoch seconds
-        json-data (convert-timestamps export-data)
+        json-data (export-service/export-account db account-id)
 
         ;; Generate filename with ISO-8601 timestamp
         timestamp-str (.format (java.time.format.DateTimeFormatter/ISO_INSTANT) (Instant/now))
@@ -85,5 +68,5 @@
      :headers {"Content-Disposition" (str "attachment; filename=\"" filename "\"")}}))
 
 (def routes
-  [["" {:get {:handler export-handler
-              :responses {200 {:body ExportResponse}}}}]])
+  [["/export" {:get {:handler export-handler
+                     :responses {200 {:body ExportStructure}}}}]])

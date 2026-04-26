@@ -21,6 +21,12 @@ from variant
 where "account-id" = :account-id and
       id = :id;
 
+-- :name variant-by-title :? :1
+select id, "account-id", title, description
+from variant
+where "account-id" = :account-id and
+      title = :title;
+
 -- :name variant-delete! :! :n
 delete from variant
 where "account-id" = :account-id and

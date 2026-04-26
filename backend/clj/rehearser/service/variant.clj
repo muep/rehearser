@@ -11,7 +11,11 @@
 
 (defn find-by-id [db whoami id]
   (variant-by-id db {:id id
-                      :account-id (:account-id whoami)}))
+                     :account-id (:account-id whoami)}))
+
+(defn find-by-title [db whoami title]
+  (variant-by-title db {:title title
+                        :account-id (:account-id whoami)}))
 
 (defn find-all [db whoami]
   (variant-select-all db (select-keys whoami [:account-id])))
