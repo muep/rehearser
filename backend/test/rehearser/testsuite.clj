@@ -31,6 +31,6 @@
             :multithread? true
             :report reporter}))
 
-        (println "\nTest durations:")
-        (doseq [[v ms] (sort-by second @timings)]
-          (println (format "%-60s %8.2f ms" (clojure.string/replace v #"^rehearser" "r") ms)))))))
+        (println "\nTests with long duration:")
+        (doseq [[v ms] (->> @timings (filter #(< 1000 (second %))) (sort-by second))]
+          (println (format "%-60s %8.0f ms" (clojure.string/replace v #"^rehearser" "r") ms)))))))
