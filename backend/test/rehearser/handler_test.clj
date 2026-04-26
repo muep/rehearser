@@ -1,9 +1,10 @@
 (ns rehearser.handler-test
   (:require
    [clojure.test :as t]
-   [rehearser.handler])
+   [rehearser.handler]
+   [rehearser.test-util :refer [read-json-value]])
   (:import
-   (java.io ByteArrayInputStream)
+   (java.io ByteArrayInputStream InputStream)
    (java.time Instant)))
 
 (def basic-body
@@ -41,7 +42,15 @@
         request (:request response)]
     (t/is (= 200 (:status response)))
     (t/is (= {:id 1 :name "hello" :timestamp (Instant/ofEpochSecond 1681134173)}
-             (get-in request [:parameters :body])))))
+             (get-in request [:parameters :body]))
+          "The request must be coerced to the expected shape")
+    (t/is (instance? InputStream (:body response))
+          "The response must be coerced and delivered out as InputStream")
+    (t/is (= {:name "hello"
+              :id 1
+              :timestamp "2023-04-10T13:42:53Z"}
+             (read-json-value (slurp (:body response))))
+          "The response is of expected shape, when parsed")))
 
 (t/deftest bad-json->bad-request
   (let [response (app (post-json-text-request

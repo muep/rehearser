@@ -16,6 +16,8 @@
         metosin/reitit-malli {:mvn/version "0.6.0"}
         metosin/muuntaja {:mvn/version "0.6.8"}
         crypto-random/crypto-random {:mvn/version "1.2.1"}
+        ;; Servlet API required by Ring middleware
+        javax.servlet/javax.servlet-api {:mvn/version "4.0.1"}
 
         ;; HTML
         hiccup/hiccup {:mvn/version "2.0.0"}
