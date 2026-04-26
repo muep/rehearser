@@ -36,7 +36,8 @@
                                                                                   :entry-time entry-time
                                                                                   :exercise-id (get exercise-ids exercise-id)
                                                                                   :rehearsal-id (get rehearsal-ids rehearsal-id)
-                                                                                  :variant-id (get variant-ids variant-id)}))]))
+                                                                                  :variant-id (get variant-ids variant-id)}))]
+                              (assoc ids id new-id)))
                           {}
                           entries)]
     {:variant-ids variant-ids
