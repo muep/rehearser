@@ -94,13 +94,13 @@
       ;; Import the exported data into target account using multipart endpoint
       (let [json-content (json/write-value-as-string exported-data)
             boundary "----WebKitFormBoundary7MA4YWxkTrZu0gW"
-            body-text (str "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\n"
+            body-text (str "--" boundary "\r\n"
                           "Content-Disposition: form-data; name=\"file\"; filename=\"export.json\"\r\n"
                           "Content-Type: application/json\r\n\r\n"
                           json-content "\r\n"
-                          "------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n")
+                          "--" boundary "--\r\n")
             import-request (-> (mock/request :post "/import.html")
-                              (mock/content-type "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW")
+                              (mock/content-type (str "multipart/form-data; boundary=" boundary))
                               (mock/body body-text))
             import-response (app import-request)]
         (t/is (= 303 (:status import-response)) "Import should redirect after success"))
