@@ -24,7 +24,7 @@
   (let [file-content (-> multipart :file :tempfile slurp)
         parsed-data (json/read-value file-content object-mapper)
         validated-data (malli/decode-and-explain ExportStructure parsed-data)
-        result (import-service/import-data db whoami validated-data)]
+        _result (import-service/import-data db whoami validated-data)]
     {:status 303
      :headers {"location" (str url-prefix "/index.html")}}))
 
