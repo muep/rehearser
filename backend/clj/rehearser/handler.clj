@@ -29,12 +29,14 @@
     (try
       (handler req)
       (catch clojure.lang.ExceptionInfo e
+        ;; Request coercion exceptions are expected client errors (bad input)
+        ;; and are handled properly by exception-middleware, no need to log
         (when-not (contains? #{:reitit.coercion/request-coercion}
                              (-> e ex-data :type))
-          (log/error e))
+          (log/error e "Unhandled ExceptionInfo"))
         (throw e))
       (catch java.lang.Exception e
-        (log/error e "Unhandled exception")
+        (log/error e "Unhandled Exception")
         (throw e)))))
 
 (def api-adapter-middlewares
