@@ -55,11 +55,11 @@
         response (-> request app)
         {{{:keys [files text-field num-field]} :multipart} :parameters :as req} (-> response :request)]
     (is-status 200 response)
-    (t/is (= [67] num-field))
-    (t/is (= ["Hello World"] text-field))
-    (t/is (map? (first files)))
-    (t/is (= #{:filename :content-type :tempfile :size} (-> files first keys set)))
-    (t/is (= "Test file content" (-> files first :tempfile slurp)))))
+    (t/is (= 67 num-field))
+    (t/is (= "Hello World" text-field))
+    (t/is (map? files))
+    (t/is (= #{:filename :content-type :tempfile :size} (-> files keys set)))
+    (t/is (= "Test file content" (-> files :tempfile slurp)))))
 
 (t/deftest multipart-multiple-files-test
   (let [request (-> (mock/request :post "/api/multipart-test")
@@ -87,8 +87,8 @@
         response (-> request app)
         {{{:keys [files text-field num-field]} :multipart} :parameters :as req} (-> response :request)]
     (is-status 200 response)
-    (t/is (= [67] num-field))
-    (t/is (= ["Hello World"] text-field))
+    (t/is (= 67 num-field))
+    (t/is (= "Hello World" text-field))
 
     (t/is (vector? files))
 

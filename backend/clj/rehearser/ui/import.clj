@@ -21,7 +21,7 @@
 
 (defn import-handler [{:keys [db whoami url-prefix]
                        {:keys [multipart]} :parameters}]
-  (let [file-content (-> multipart :file first :tempfile slurp)
+  (let [file-content (-> multipart :file :tempfile slurp)
         parsed-data (json/read-value file-content object-mapper)
         validated-data (malli/decode-and-explain ExportStructure parsed-data)
         result (import-service/import-data db whoami validated-data)]
