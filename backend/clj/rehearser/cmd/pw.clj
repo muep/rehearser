@@ -8,7 +8,7 @@
        (BCrypt/checkpw (first subcmd-args))
        println))
 
-(defn hashpw [opts]
+(defn hashpw [_]
    (-> (System/console)
        (.readPassword "Password: " nil)
        String.

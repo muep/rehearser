@@ -1,10 +1,7 @@
 (ns rehearser.api.export
   (:require
    [rehearser.service.export :as export-service]
-   [rehearser.malli :refer [Timestamp]]
-   [malli.core :as m]
-   [malli.util :as mu]
-   [ring.util.response :as ring-resp])
+   [malli.core :as m])
   (:import (java.time Instant)))
 
 (defn- instant->unix-seconds [instant]
@@ -77,7 +74,7 @@
         json-data (convert-timestamps export-data)
 
         ;; Generate filename with ISO-8601 timestamp
-        timestamp-str (.format (java.time.format.DateTimeFormatter/ISO_INSTANT) (Instant/now))
+        timestamp-str (.format java.time.format.DateTimeFormatter/ISO_INSTANT (Instant/now))
         filename (str "rehearser-export-" timestamp-str ".json")]
 
     {:status 200

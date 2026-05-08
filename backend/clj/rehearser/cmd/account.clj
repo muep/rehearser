@@ -8,6 +8,8 @@
 
 (def-db-fns "rehearser/account.sql")
 
+(declare select-accounts account-force-passwd!)
+
 (defn add [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
   (when-not (= 2 (count subcmd-args))
     (usage-error! "Expected exactly two arguments"
@@ -21,7 +23,7 @@
       (println "Account" username "created with id:" account-id)
       (println "Account named" username "already existed, nothing was changed"))))
 
-(defn -list [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
+(defn -list [{{:keys [jdbc-url]} :options}]
   (let [db {:connection-uri jdbc-url}]
     (doseq [{:keys [id name]} (select-accounts db)]
       (println id name))))

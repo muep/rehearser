@@ -11,7 +11,7 @@
                                   (comp inc #(or % 0))))))
          (handler req)))
      :get-handler
-     (fn [req]
+     (fn [_]
        (let [s @stats]
          {:status 200
           :body s}))}))

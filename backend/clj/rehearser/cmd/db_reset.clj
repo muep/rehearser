@@ -1,6 +1,5 @@
 (ns rehearser.cmd.db-reset
-  (:require [clojure.java.io :as io]
-            [rehearser.db :as db]))
+  (:require [rehearser.db :as db]))
 
-(defn run [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
+(defn run [{{:keys [jdbc-url]} :options}]
   (db/reset {:connection-uri jdbc-url}))

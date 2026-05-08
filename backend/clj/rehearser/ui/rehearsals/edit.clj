@@ -1,29 +1,26 @@
 (ns rehearser.ui.rehearsals.edit
   (:require
    [hiccup.core :as hiccup]
-   [hiccup.form :as form]
    [rehearser.service.rehearsal :as rehearsal-service]
-   [rehearser.ui.common :as common-ui]
-   [rehearser.ui.rehearsals.components :as components]
-   [clojure.string :as str])
+   [rehearser.ui.common :as common-ui])
   (:import
-   (java.time Instant Duration)))
+   (java.time Instant)))
 
 (defn parse-instant [s]
   (try
     (Instant/parse s)
-    (catch Exception e
+    (catch Exception _
       nil)))
 
 (defn parse-duration [s]
   (try
     (when (seq s)
       (Long/parseLong s))
-    (catch Exception e
+    (catch Exception _
       nil)))
 
 (defn edit-page [{{{:keys [id]} :path} :parameters
-                  :keys [db url-prefix whoami] :as req}]
+                  :keys [db url-prefix whoami]}]
   (if-let [rehearsal (rehearsal-service/find-rehearsal db whoami id)]
     (let [{:keys [title description start-time duration]} rehearsal
           start-time-str (str start-time)
@@ -66,8 +63,8 @@
 
 (defn edit-save! [{{{:keys [id]} :path
                     {:keys [title description start-time duration]} :form} :parameters
-                   :keys [db url-prefix whoami] :as req}]
-  (if-let [rehearsal (rehearsal-service/find-rehearsal db whoami id)]
+                   :keys [db url-prefix whoami]}]
+  (if (rehearsal-service/find-rehearsal db whoami id)
     (let [parsed-start-time (parse-instant start-time)
           parsed-duration (parse-duration duration)
           update-data (cond-> {:title title}

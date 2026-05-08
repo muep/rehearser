@@ -6,6 +6,10 @@
 
 (def-db-fns "rehearser/exercise.sql")
 
+(declare exercise-insert! exercise-by-id entries-by-exercise-id
+         exercise-select-all exercise-update! exercise-delete!
+         search-exercises find-recent-exercises find-frequent-exercises)
+
 (defn add! [db whoami exercise]
   (exercise-insert! db (merge (select-keys whoami [:account-id])
                               (select-keys exercise [:title :description]))))

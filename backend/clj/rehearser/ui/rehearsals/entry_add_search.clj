@@ -1,6 +1,5 @@
 (ns rehearser.ui.rehearsals.entry-add-search
   (:require
-   [hiccup.core :as hiccup]
    [rehearser.service.exercise :as exercise-service]
    [rehearser.service.rehearsal :as rehearsal-service]
    [rehearser.ui.common :as common-ui]

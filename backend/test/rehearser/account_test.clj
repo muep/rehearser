@@ -5,7 +5,7 @@
     [rehearser.test-db :refer [test-db]]
 
     [crypto.random :as random]
-    [ring.mock.request :as mock]
+    [ring.util.codec :as codec]
 
     [rehearser.http-service :as http-service]
     [rehearser.test-util :refer [handler-with-local-cookies

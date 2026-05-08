@@ -5,8 +5,6 @@
    [rehearser.test-db :refer [test-db]]
 
    [crypto.random :as random]
-   [jsonista.core :as json]
-   [ring.mock.request :as mock]
 
    [rehearser.http-service :as http-service]
    [rehearser.test-util :refer [handler-with-local-cookies

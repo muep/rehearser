@@ -2,7 +2,6 @@
   (:require
    [clojure.test :as t]
    [next.jdbc :as jdbc]
-   [rehearser.db :as db]
    [rehearser.test-db :refer [test-db]]
    [rehearser.fixture :refer [fixture]])
   (:import

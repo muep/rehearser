@@ -23,8 +23,8 @@
     ;; than password hash. This check is for an extra safety
     ;; mechanism, where the normal middleware is replaced with an
     ;; always-rejecting one.
-    (fn [handler]
-      (fn [req]
+    (fn [_]
+      (fn [_]
         {:status 403}))
     (fn [handler]
       (fn [{{:keys [account-admin?]} :whoami

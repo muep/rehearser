@@ -2,7 +2,6 @@
   (:require
    [clojure.tools.namespace.repl :refer [refresh]]
    [rehearser.db :as db]
-   [sysinfo :refer [sys-summary sys-stat]]
    [user.state :as state]))
 
 (defn db []

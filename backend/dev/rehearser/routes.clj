@@ -4,7 +4,7 @@
    [rehearser.http-service]))
 
 (def method-order [:post :get :put :delete])
-(def methods (set method-order))
+(def http-methods (set method-order))
 (def method-rank (zipmap method-order (range)))
 
 (defn routes [url-prefix]
@@ -13,6 +13,6 @@
      reitit.core/routes 
      (mapcat (fn [[path data]]
                (for [m (keys data)
-                     :when (contains? methods m)]
+                     :when (contains? http-methods m)]
                  [m path])))
      (sort-by (fn [[m p]] [p (method-rank m)]))))

@@ -7,7 +7,7 @@
    [rehearser.ui.rehearsals.components :as components]))
 
 (defn entry-page [{{{:keys [rehearsal-id id]} :path} :parameters
-                   :keys [db url-prefix whoami] :as req}]
+                   :keys [db url-prefix whoami]}]
   (if-let [[rehearsal entry]
            (let [rehearsal (rehearsal-service/find-rehearsal db whoami rehearsal-id)
                  entry (->> rehearsal :entries (some #(when (= id (:id %)) %)))]
@@ -44,7 +44,7 @@
      :body (str "No entry " id " in rehearsal " rehearsal-id)}))
 
 (defn entry-delete-page [{{{:keys [rehearsal-id id]} :path} :parameters
-                         :keys [db url-prefix whoami] :as req}]
+                         :keys [db url-prefix whoami]}]
   (if-let [[rehearsal entry]
            (let [rehearsal (rehearsal-service/find-rehearsal db whoami rehearsal-id)
                  entry (->> rehearsal :entries (some #(when (= id (:id %)) %)))]
@@ -66,8 +66,8 @@
      :body (str "No entry " id " in rehearsal " rehearsal-id)}))
 
 (defn entry-put! [{{{:keys [rehearsal-id id]} :path
-                    {:keys [remarks exercise-id variant-id] :as entry} :form} :parameters
-                   :keys [db url-prefix whoami] :as req}]
+                    {:as entry} :form} :parameters
+                   :keys [db url-prefix whoami]}]
   (rehearsal-service/update-entry! db whoami id
                                    (merge (select-keys entry [:remarks :exercise-id :variant-id])
                                           {:id id}))
@@ -75,7 +75,7 @@
    :headers {"location" (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")}})
 
 (defn entry-delete! [{{{:keys [rehearsal-id id]} :path} :parameters
-                      :keys [db url-prefix whoami] :as req}]
+                      :keys [db url-prefix whoami]}]
   (rehearsal-service/delete-entry! db whoami id)
   {:status 303
    :headers {"location" (str url-prefix "/rehearsals/" rehearsal-id "/rehearsal.html")}})

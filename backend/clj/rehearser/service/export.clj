@@ -5,6 +5,9 @@
 
 (def-db-fns "rehearser/export.sql")
 
+(declare account-for-export exercises-for-export variants-for-export
+         rehearsals-for-export entries-for-export)
+
 (defn export-account [db-conn account-id]
   ;; Validate account exists
   (let [account (account-for-export db-conn {:account-id account-id})]
