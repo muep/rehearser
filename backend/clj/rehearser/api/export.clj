@@ -1,11 +1,9 @@
 (ns rehearser.api.export
   (:require
+   [rehearser.malli :refer [Timestamp]]
    [rehearser.service.export :as export-service]
    [malli.core :as m])
   (:import (java.time Instant)))
-
-(defn- instant->unix-seconds [instant]
-  (.getEpochSecond ^Instant instant))
 
 ;; Malli schemas for export data structure
 (def AccountExport

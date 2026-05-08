@@ -5,7 +5,6 @@
     [rehearser.test-db :refer [test-db]]
     [rehearser.test-util :refer [handler-with-local-cookies
                                  post-form-request
-                                 post-json-request
                                  read-json-value]]
     [rehearser.http-service :as http-service]
     [crypto.random :as random]
@@ -14,13 +13,12 @@
     [rehearser.service.account :as account-service]
     [rehearser.service.exercise :as exercise-service]
     [rehearser.service.rehearsal :as rehearsal-service]
-    [rehearser.service.variant :as variant-service])
-  (:import (java.io ByteArrayInputStream)))
+    [rehearser.service.variant :as variant-service]))
 
 (t/use-fixtures :each fixture)
 
+;; Test the complete export-import workflow with realistic data
 (t/deftest test-export-import-roundtrip
-  "Test the complete export-import workflow with realistic data"
   (let
       [exported-data
        (let [;; Create source account and login
@@ -44,14 +42,14 @@
                                                               :duration 3600})
 
              ;; Create entries using the default variant
-             entry1 (rehearsal-service/insert-entry! test-db whoami
+             _entry1 (rehearsal-service/insert-entry! test-db whoami
                                                      {:rehearsal-id (:id rehearsal1)
                                                       :exercise-id (:id exercise1)
                                                       :variant-id (:id default-variant)
                                                       :entry-time (java.time.Instant/ofEpochSecond 1100)
                                                       :remarks "First test entry"})
 
-             entry2 (rehearsal-service/insert-entry! test-db whoami
+             _entry2 (rehearsal-service/insert-entry! test-db whoami
                                                      {:rehearsal-id (:id rehearsal1)
                                                       :exercise-id (:id exercise2)
                                                       :variant-id (:id default-variant)

@@ -2,8 +2,7 @@
   (:require
    [clojure.test :as t]
    [rehearser.handler :as handler]
-   [ring.mock.request :as mock]
-   [clojure.java.io :as io]))
+   [ring.mock.request :as mock]))
 
 (defn- dummy-handler [request]
   {:status 200
@@ -53,7 +52,7 @@
                                     "Test file content\r\n"
                                     "------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n")))
         response (-> request app)
-        {{{:keys [files text-field num-field]} :multipart} :parameters :as req} (-> response :request)]
+        {{{:keys [files text-field num-field]} :multipart} :parameters} (-> response :request)]
     (is-status 200 response)
     (t/is (= 67 num-field))
     (t/is (= "Hello World" text-field))
@@ -85,7 +84,7 @@
                                     "------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n")))
 
         response (-> request app)
-        {{{:keys [files text-field num-field]} :multipart} :parameters :as req} (-> response :request)]
+        {{{:keys [files text-field num-field]} :multipart} :parameters} (-> response :request)]
     (is-status 200 response)
     (t/is (= 67 num-field))
     (t/is (= "Hello World" text-field))

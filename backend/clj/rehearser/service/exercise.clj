@@ -6,7 +6,7 @@
 
 (def-db-fns "rehearser/exercise.sql")
 
-(declare exercise-insert! exercise-by-id entries-by-exercise-id
+(declare exercise-insert! exercise-by-id exercise-by-title entries-by-exercise-id
          exercise-select-all exercise-update! exercise-delete!
          search-exercises find-recent-exercises find-frequent-exercises)
 

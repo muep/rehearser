@@ -2,9 +2,7 @@
   (:require
    [rehearser.service.exercise :as exercise]
    [rehearser.service.variant :as variant]
-   [rehearser.service.rehearsal :as rehearsal])
-  (:import
-   (org.postgresql.util PSQLException)))
+   [rehearser.service.rehearsal :as rehearsal]))
 
 (defn import-data [db whoami {:keys [exercises variants rehearsals entries]}]
   (let [variant-ids (reduce (fn [ids {:keys [id title description]}]

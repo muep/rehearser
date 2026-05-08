@@ -28,9 +28,8 @@
     {:status 303
      :headers {"location" (str url-prefix "/index.html")}}))
 
-(defn html [{{:keys [account-name] :as whoami} :whoami
-             :keys [url-prefix]
-             :as req}]
+(defn html [{{:keys [account-name]} :whoami
+             :keys [url-prefix]}]
   {:status 200
    :body (str
           "<!DOCTYPE html>"

@@ -1,6 +1,6 @@
 (ns rehearser.testsuite
   (:require
-   [clojure.string :as str]
+   [clojure.string]
    [eftest.runner :as eftest]
    [eftest.report.pretty]
    [eftest.report.progress]
