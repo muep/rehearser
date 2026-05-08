@@ -15,6 +15,8 @@
         name (str (ns-name (:ns m)) "/" (:name m))]
     (some #(re-find % name) patterns)))
 
+(def rather-many-ms-for-test 1000)
+
 (defn -main [& args]
   (test-db/wrap-prepared-template-db!
     (fn []
@@ -35,5 +37,8 @@
             :report reporter}))
 
         (println "\nTests with long duration:")
-        (doseq [[v ms] (->> @timings (filter #(< 1000 (second %))) (sort-by second))]
+        (doseq [[v ms] (->> @timings
+                            (filter (fn [[_name duration]]
+                                      (< rather-many-ms-for-test duration)))
+                            (sort-by second))]
           (println (format "%-60s %8.0f ms" (clojure.string/replace v #"^rehearser" "r") ms)))))))
