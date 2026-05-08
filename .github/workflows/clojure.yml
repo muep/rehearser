@@ -24,7 +24,7 @@ jobs:
           --health-retries 5
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
 
     - name: Check if dependencies have changed
       run: ./check-deps.sh
