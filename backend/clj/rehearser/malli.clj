@@ -1,11 +1,15 @@
 (ns rehearser.malli
   (:require [malli.core :as m]
+            [malli.error :as me]
             [malli.util :as mu]
-            [malli.registry :as mr])
+            [malli.registry :as mr]
+            [malli.transform :as mt])
   (:import (java.time Instant)))
 
 (defn number->instant [num]
-  (-> num Instant/ofEpochSecond))
+  (if (number? num)
+    (-> num Instant/ofEpochSecond)
+    ::m/invalid))
 
 (defn instant->number [^Instant i]
   (-> i .getEpochSecond))
@@ -32,3 +36,16 @@
     [:fn
      {:error/fn (constantly "At least one update is required")}
      (fn [m] (not (empty? m)))]]))
+
+(defn decode-and-explain [schema value]
+  (let [decoded (m/decode schema value mt/json-transformer)
+        valid (m/validate schema decoded)]
+    (if valid
+      decoded
+      (let [explanation (m/explain schema decoded)
+            humanized (me/humanize explanation)]
+        (throw (ex-info "Data did not match schema"
+                        {:type :coercion-error
+                         :explanation explanation
+                         :humanized humanized}))))))
+

@@ -6,6 +6,7 @@
    [reitit.ring.middleware.parameters :refer [parameters-middleware]]
    [reitit.ring.coercion :refer [coerce-request-middleware
                                  coerce-response-middleware]]
+   [reitit.ring.middleware.multipart :as multipart]
 
    [reitit.coercion :refer [compile-request-coercers]]
    [reitit.coercion.malli :as malli-coercion]
@@ -27,8 +28,15 @@
   (fn [req]
     (try
       (handler req)
+      (catch clojure.lang.ExceptionInfo e
+        ;; Request coercion exceptions are expected client errors (bad input)
+        ;; and are handled properly by exception-middleware, no need to log
+        (when-not (contains? #{:reitit.coercion/request-coercion}
+                             (-> e ex-data :type))
+          (log/error e "Unhandled ExceptionInfo"))
+        (throw e))
       (catch java.lang.Exception e
-        (log/error e "Unhandled exception")
+        (log/error e "Unhandled Exception")
         (throw e)))))
 
 (def api-adapter-middlewares
@@ -40,6 +48,7 @@
    wrap-format-request
    parameters-middleware
    coerce-request-middleware
+   multipart/multipart-middleware
    coerce-response-middleware])
 
 (defn handler [before-middlewares after-middlewares routes default-handler]

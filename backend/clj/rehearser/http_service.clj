@@ -134,7 +134,9 @@
         db {:datasource ds}
         key (or session-key (random/bytes 16))
         app (:handler (make-app db key url-prefix static-file-dir admin-pwhash))
-        close-server (http-server/run-server app {:ip "0.0.0.0" :port port})]
+        close-server (http-server/run-server app {:ip "0.0.0.0"
+                                                  :max-body (* 1024 1024)
+                                                  :port port})]
     (fn []
       (close-server)
       (.close ds))))

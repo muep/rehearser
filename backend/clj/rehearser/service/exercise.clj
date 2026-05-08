@@ -6,7 +6,7 @@
 
 (def-db-fns "rehearser/exercise.sql")
 
-(declare exercise-insert! exercise-by-id entries-by-exercise-id
+(declare exercise-insert! exercise-by-id exercise-by-title entries-by-exercise-id
          exercise-select-all exercise-update! exercise-delete!
          search-exercises find-recent-exercises find-frequent-exercises)
 
@@ -17,6 +17,10 @@
 (defn find-by-id [db whoami id]
   (exercise-by-id db {:id id
                       :account-id (:account-id whoami)}))
+
+(defn find-by-title [db whoami title]
+  (exercise-by-title db {:title title
+                         :account-id (:account-id whoami)}))
 
 (defn find-with-entries-by-id [db whoami id]
   (with-transaction [tx db]

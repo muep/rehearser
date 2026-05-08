@@ -5,7 +5,7 @@
 
 (def-db-fns "rehearser/variant.sql")
 
-(declare variant-insert! variant-by-id variant-select-all
+(declare variant-insert! variant-by-id variant-by-title variant-select-all
          variant-update! variant-delete!)
 
 (defn add! [db whoami variant]
@@ -14,7 +14,11 @@
 
 (defn find-by-id [db whoami id]
   (variant-by-id db {:id id
-                      :account-id (:account-id whoami)}))
+                     :account-id (:account-id whoami)}))
+
+(defn find-by-title [db whoami title]
+  (variant-by-title db {:title title
+                        :account-id (:account-id whoami)}))
 
 (defn find-all [db whoami]
   (variant-select-all db (select-keys whoami [:account-id])))

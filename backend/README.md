@@ -17,10 +17,12 @@ Via docker:
 
 Run all tests:
 
+    # (in project root)
     clojure -M:test
 
 Or run tests matching a specific pattern by passing it as an argument:
 
+    # (in project root)
     clojure -M:test db
 
 This will run any test whose fully qualified name contains "db", such as
@@ -28,4 +30,5 @@ This will run any test whose fully qualified name contains "db", such as
 
 ## Build self-container JAR archive
 
+    # (in project root)
     ./package.sh
