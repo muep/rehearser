@@ -7,7 +7,7 @@
    [rehearser.fixture :as fixture]
    [crypto.random :as random]))
 
-(t/use-fixtures :each rehearser.fixture/fixture)
+(t/use-fixtures :each fixture/fixture)
 
 (t/deftest redirect-to-index-test
   (let [app (:handler (http-service/make-app test-db (random/bytes 16) "" nil nil))

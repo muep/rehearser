@@ -24,7 +24,7 @@
    :body (-> body-text .getBytes ByteArrayInputStream.)})
 
 (defn post-form-request [uri params]
-  (let [body-payload (ring.util.codec/form-encode params)]
+  (let [body-payload (codec/form-encode params)]
     {:request-method :post
      :uri            uri
      :headers        {"accept"       "application/json"
