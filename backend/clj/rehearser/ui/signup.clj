@@ -10,9 +10,8 @@
    [:button {:type "submit"} "Sign up"]
    [:p "Already have an account? " [:a {:href (str url-prefix "/index.html")} "Log in"]]]) 
 
-(defn html [{{:keys [account-name] :as whoami} :whoami
-             :keys [url-prefix]
-             :as req}]
+(defn html [{{:keys [account-name]} :whoami
+             :keys [url-prefix]}]
   {:status 200
    :body (str
           "<!DOCTYPE html>"

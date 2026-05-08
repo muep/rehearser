@@ -1,7 +1,8 @@
 classes
 target
 .calva
-.clj-kondo
+.clj-kondo/.cache
+.clj-kondo/metosin
 .cpcache
 .dir-locals.el
 .lsp

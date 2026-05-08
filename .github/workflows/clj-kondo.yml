@@ -1,0 +1,19 @@
+name: clj-kondo
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    container:
+      image: clojure:temurin-21-tools-deps-trixie-slim
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Run clj-kondo
+      run: clojure -M:clj-kondo --lint backend

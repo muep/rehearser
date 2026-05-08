@@ -4,9 +4,7 @@
    [clojure.tools.logging :as log]
    [hiccup.core :as h]
    [rehearser.service.exercise :as exercise-service]
-
-   [rehearser.ui.common :as common-ui]
-   [rehearser.ui.header :refer [header]])
+   [rehearser.ui.common :as common-ui])
   (:import
    (java.time ZoneId)
    (java.time.format DateTimeFormatter)))
@@ -26,7 +24,7 @@
   [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/rehearsal.html")}
    (h/h rehearsal-title)])
 
-(defn entry-link [{:keys [id rehearsal-id rehearsal-title entry-time]}
+(defn entry-link [{:keys [id rehearsal-id rehearsal-title]}
                       url-prefix]
   [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")}
    (h/h rehearsal-title)])
@@ -76,19 +74,19 @@
                 [:button {:type "submit"} "Save"]]
                [:h2 (str (count entries) " entries")]
                [:ul
-                (for [{:as entry :keys [entry-time]} entries]
-                  [:li (format-instant entry-time) " - " (entry-link entry url-prefix)])]])})
+                (for [{:as entry} entries]
+                  [:li (format-instant (:entry-time entry)) " - " (entry-link entry url-prefix)])]])})
     {:status 404}))
 
 (defn tune-details-post [{{{:keys [id]} :path
                            {:keys [title description]} :form} :parameters
-                          :keys [db url-prefix whoami] :as req}]
+                          :keys [db url-prefix whoami]}]
   (exercise-service/update-by-id! db whoami id {:title title :description description})
   {:status 303
    :headers {"location" (str url-prefix "/tunes/" id "/tune.html")}})
 
 (defn tune-add-page [{{{:keys [title]} :query} :parameters
-                      :keys [db url-prefix whoami]}]
+                      :keys [url-prefix whoami]}]
   {:status 200
    :body (common-ui/page
           url-prefix
@@ -133,7 +131,7 @@
 
 (defn tune-post! [{{{:keys [title description]} :form
                     {:keys [redirect]} :query} :parameters
-                   :keys [db url-prefix whoami] :as req}]
+                   :keys [db url-prefix whoami]}]
   (exercise-service/add! db whoami {:title title :description description})
   {:status 303
    :headers {"location" (redirect-location url-prefix redirect (str url-prefix "/tunes.html"))}})

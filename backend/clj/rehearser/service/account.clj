@@ -2,11 +2,11 @@
   (:require
    [rehearser.db :refer [def-db-fns]])
   (:import
-   (org.springframework.security.crypto.bcrypt BCrypt)
-   (java.sql SQLException)
-   (org.postgresql.util PSQLException)))
+   (org.springframework.security.crypto.bcrypt BCrypt)))
 
 (def-db-fns "rehearser/account.sql")
+
+(declare account-create! account-default-variant!)
 
 (def account-regex #"[a-zA-Z][a-zA-Z0-9]{3,29}")
 

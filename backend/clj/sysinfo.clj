@@ -58,7 +58,7 @@
     (.substring txt 0 (- (.length txt) (.length suffix)))))
 
 (defn meminfo-str->int [num-and-unit]
-  (if-let [kib-text (strip-suffix num-and-unit " kB")]
+  (when-let [kib-text (strip-suffix num-and-unit " kB")]
     (-> kib-text Long/parseLong (* 1024M))))
 
 (def pool-names

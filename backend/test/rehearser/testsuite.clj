@@ -1,6 +1,9 @@
 (ns rehearser.testsuite
   (:require
+   [clojure.string :as str]
    [eftest.runner :as eftest]
+   [eftest.report.pretty]
+   [eftest.report.progress]
    [rehearser.test-db :as test-db]
    [rehearser.test-util :refer [test-time-reporter]]))
 
@@ -33,4 +36,4 @@
 
         (println "\nTest durations:")
         (doseq [[v ms] (sort-by second @timings)]
-          (println (format "%-60s %8.2f ms" (clojure.string/replace v #"^rehearser" "r") ms)))))))
+          (println (format "%-60s %8.2f ms" (str/replace v #"^rehearser" "r") ms)))))))

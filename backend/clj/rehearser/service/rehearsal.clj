@@ -5,6 +5,10 @@
 
 (def-db-fns "rehearser/rehearsal.sql")
 
+(declare rehearsal-insert! rehearsal-update! rehearsal-close!
+         rehearsal-select entry-insert! entry-update! entry-select
+         rehearsal-select-by-id entry-select-with-title entry-delete!)
+
 (defn insert-rehearsal! [db whoami rehearsal]
   (rehearsal-insert! db (merge (select-keys whoami [:account-id])
                                (select-keys rehearsal [:title

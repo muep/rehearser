@@ -1,10 +1,10 @@
 (ns rehearser.api.sysinfo
   (:require [sysinfo]))
 
-(defn sys-stat [req]
+(defn sys-stat [_]
   {:status 200
    :body (sysinfo/sys-stat)})
 
-(defn sys-summary [req]
+(defn sys-summary [_]
   {:status 200
    :body (sysinfo/sys-summary)})

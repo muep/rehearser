@@ -39,7 +39,6 @@
 
 (defn serve [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
   (let [{{:keys [port static-file-dir url-prefix]} :options
-         :keys [arguments errors options summary]
          :as opts}
         (cli/parse-opts subcmd-args serve-options)
         session-key (env->session-key)

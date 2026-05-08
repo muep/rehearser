@@ -7,6 +7,8 @@
 
 (def-db-fns "rehearser/account.sql")
 
+(declare select-account-by-name)
+
 (def account-exceptions
   {:account-name-format {:status 400
                          :body "Invalid format for user name"}})
@@ -57,7 +59,7 @@
       {:status 403})
     ;; Actual implementation, installed only if it seems that a
     ;; useful password hash is available.
-    (fn [{:keys [db session]
+    (fn [{:keys [session]
           {:strs [password]} :params}]
       (if (BCrypt/checkpw password admin-pwhash)
         {:status 200
@@ -67,7 +69,7 @@
                          :account-admin? true)}
         {:status 403}))))
 
-(defn logout [req]
+(defn logout [_]
   {:status 303
    :headers {"Location" "../index.html"}
    :session {}
@@ -76,11 +78,11 @@
 (def passwd login)
 
 
-(defn- signup- [{:keys [db session]
+(defn- signup- [{:keys [db]
                  {:strs [username password]} :params}]
-  (if-let [account (service/create-account! db
-                                            (service/normalized-name username)
-                                            password)]
+  (if (service/create-account! db
+                              (service/normalized-name username)
+                              password)
     {:status 303
      :headers {"Location" "../index.html"}
      :body "Account created"}

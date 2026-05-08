@@ -54,7 +54,7 @@
 
 (defn entry-add! [{{{:keys [rehearsal-id]} :path
                    {:keys [remarks exercise-id variant-id]} :form} :parameters
-                  :keys [db url-prefix whoami] :as req}]
+                  :keys [db url-prefix whoami]}]
   (rehearsal-service/insert-entry! db whoami {:rehearsal-id rehearsal-id
                                              :exercise-id exercise-id
                                              :variant-id variant-id

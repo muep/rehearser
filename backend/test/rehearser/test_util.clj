@@ -1,7 +1,9 @@
 (ns rehearser.test-util
   (:require
+   [clojure.string :as str]
    [jsonista.core :as json]
-   [ring.mock.request :as mock])
+   [ring.mock.request :as mock]
+   [ring.util.codec :as codec])
   (:import (java.io ByteArrayInputStream)))
 
 (def object-mapper (json/object-mapper {:decode-key-fn true}))
@@ -18,12 +20,12 @@
                                      @cookies)
             response (handler req-with-cookies)]
         (when-let [set-cookie (first (get-in response [:headers "Set-Cookie"]))]
-          (let [[cookie-name cookie-val] (clojure.string/split set-cookie #"=" 2)]
-            (swap! cookies assoc cookie-name (first (clojure.string/split cookie-val #";")))))
+          (let [[cookie-name cookie-val] (str/split set-cookie #"=" 2)]
+            (swap! cookies assoc cookie-name (first (str/split cookie-val #";")))))
         response))))
 
 (defn post-form-request [uri params]
-  (let [body-payload (ring.util.codec/form-encode params)]
+  (let [body-payload (codec/form-encode params)]
     {:request-method :post
      :uri            uri
      :headers        {"accept"       "application/json"

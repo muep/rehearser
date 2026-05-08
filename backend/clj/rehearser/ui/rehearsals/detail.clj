@@ -4,10 +4,10 @@
    [rehearser.service.rehearsal :as rehearsal-service]
    [rehearser.ui.common :as common-ui]
    [rehearser.ui.rehearsals.components :as components])
-  (:import (java.time Duration Instant ZoneId)))
+  (:import (java.time Duration Instant)))
 
 (defn rehearsal-page [{{{:keys [id]} :path} :parameters
-                       :keys [db url-prefix whoami] :as req}]
+                       :keys [db url-prefix whoami]}]
   (if-let [rehearsal (rehearsal-service/find-rehearsal db whoami id)]
     (let [{:keys [start-time duration title description entries]} rehearsal
           now (Instant/now)
@@ -41,7 +41,7 @@
             "Add entry"])
 
          [:ul
-          (for [{:keys [exercise-title entry-time] :as entry} entries]
+          (for [{:keys [entry-time] :as entry} entries]
             [:li (components/entry-link entry url-prefix)
              " at " (hiccup/h (components/format-time entry-time))])]
 
@@ -51,13 +51,13 @@
      :body "Did not find that rehearsal"}))
 
 (defn rehearsal-close! [{{{:keys [id]} :path} :parameters
-                          :keys [db url-prefix whoami] :as req}]
+                          :keys [db url-prefix whoami]}]
   (rehearsal-service/close-rehearsal! db whoami id (Instant/now))
   {:status 303
    :headers {"location" (str url-prefix "/rehearsals/" id "/rehearsal.html")}})
 
 (defn rehearsal-open! [{{{:keys [id]} :path} :parameters
-                        :keys [db url-prefix whoami] :as req}]
+                        :keys [db url-prefix whoami]}]
   (rehearsal-service/update-rehearsal! db whoami id {:duration nil})
   {:status 303
    :headers {"location" (str url-prefix "/rehearsals/" id "/rehearsal.html")}})
@@ -72,3 +72,5 @@
    ["/rehearsals/:id/open.html"
     {:post {:parameters {:path {:id int?}}
             :handler rehearsal-open!}}]])
+
+

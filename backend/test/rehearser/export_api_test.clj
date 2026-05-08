@@ -1,5 +1,6 @@
 (ns rehearser.export-api-test
   (:require
+    [clojure.string :as str]
     [clojure.test :as t]
     [rehearser.fixture :refer [fixture]]
     [rehearser.test-db :refer [test-db]]
@@ -26,7 +27,7 @@
   (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
                 :handler
                 handler-with-local-cookies)
-        test-account (account-service/create-account! test-db "testuser" "testpass")
+        _ (account-service/create-account! test-db "testuser" "testpass")
         _ (app (post-form-request "/api/login" {:username "testuser" :password "testpass"}))]
 
     (let [get-response (app {:request-method :get
@@ -37,21 +38,21 @@
   (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
                 :handler
                 handler-with-local-cookies)
-        test-account (account-service/create-account! test-db "testuser2" "testpass")
+        _ (account-service/create-account! test-db "testuser2" "testpass")
         _ (app (post-form-request "/api/login" {:username "testuser2" :password "testpass"}))]
 
     ;; Test that the endpoint returns correct content type
     (let [response (app {:request-method :get
                         :uri "/api/export"})]
       (t/is (= 200 (:status response)) "Response should be successful")
-      (t/is (clojure.string/starts-with? (get-in response [:headers "Content-Type"]) "application/json") "Content-Type should start with application/json")
+      (t/is (str/starts-with? (get-in response [:headers "Content-Type"]) "application/json") "Content-Type should start with application/json")
       (t/is (contains? (:headers response) "Content-Disposition") "Response should have Content-Disposition header"))))
 
 (t/deftest test-export-response-has-download-header
   (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
                 :handler
                 handler-with-local-cookies)
-        test-account (account-service/create-account! test-db "testuser3" "testpass")
+        _ (account-service/create-account! test-db "testuser3" "testpass")
         _ (app (post-form-request "/api/login" {:username "testuser3" :password "testpass"}))]
 
     ;; Test that the endpoint returns proper download headers
@@ -71,7 +72,7 @@
   (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
                 :handler
                 handler-with-local-cookies)
-        test-account (account-service/create-account! test-db "testuser4" "testpass")
+        _ (account-service/create-account! test-db "testuser4" "testpass")
         _ (app (post-form-request "/api/login" {:username "testuser4" :password "testpass"}))]
 
     ;; Test that timestamps are properly converted to Unix seconds
@@ -136,7 +137,7 @@
       ;; Parse the JSON response
       (let [body (:body response)
             parsed (when body (try (read-json-value body)
-                                  (catch Exception e
+                                  (catch Exception _
                                     {})))]
 
         ;; Verify top-level structure

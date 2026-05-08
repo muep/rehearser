@@ -5,6 +5,9 @@
 
 (def-db-fns "rehearser/variant.sql")
 
+(declare variant-insert! variant-by-id variant-select-all
+         variant-update! variant-delete!)
+
 (defn add! [db whoami variant]
   (variant-insert! db (merge (select-keys whoami [:account-id])
                              (select-keys variant [:title :description]))))

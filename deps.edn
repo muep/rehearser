@@ -33,6 +33,9 @@
  :aliases {:uberdeps {:replace-deps {uberdeps/uberdeps {:mvn/version "1.1.2"}}
                       :replace-paths []
                       :main-opts ["-m" "uberdeps.uberjar"]}
+           :clj-kondo
+           {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2026.04.15"}}
+            :main-opts ["-m" "clj-kondo.main"]}
            :dev {:extra-paths ["backend/test" "backend/dev"]
                  :extra-deps {org.clojure/tools.namespace {:mvn/version "1.4.4"}
                               eftest/eftest  {:mvn/version "0.6.0"}

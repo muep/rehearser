@@ -45,7 +45,7 @@
           [:li (components/rehearsal-link rehearsal url-prefix)])]]))})
 
 (defn rehearsal-post! [{{{:keys [title]} :form} :parameters
-                        :keys [db url-prefix whoami] :as req}]
+                        :keys [db url-prefix whoami]}]
   (rehearsal-service/insert-rehearsal! db whoami {:title title
                                                   :description ""
                                                   :start-time (Instant/now)

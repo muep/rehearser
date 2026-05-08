@@ -6,8 +6,7 @@
    [rehearser.ui.header :refer [header]]))
 
 (defn html [{{:keys [account-name] :as whoami} :whoami
-             :keys [url-prefix]
-             :as req}]
+             :keys [url-prefix]}]
   {:status 200
    :body (str
           "<!DOCTYPE html>"

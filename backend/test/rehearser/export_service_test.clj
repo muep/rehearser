@@ -8,8 +8,7 @@
     [rehearser.service.exercise :as exercise-service]
     [rehearser.service.variant :as variant-service]
     [rehearser.service.rehearsal :as rehearsal-service]
-    [rehearser.service.export :as export-service])
-  (:import (java.time Instant)))
+    [rehearser.service.export :as export-service]))
 
 (t/use-fixtures :each fixture)
 
@@ -34,19 +33,19 @@
                                                         :duration 3600})
 
         ;; Create some entries using the exercises and variants
-        entry1 (rehearsal-service/insert-entry! db-conn whoami
-                                               {:rehearsal-id (:id rehearsal1)
-                                                :exercise-id (:id exercise1)
-                                                :variant-id (:id variant1)
-                                                :entry-time (java.time.Instant/ofEpochSecond 1100)
-                                                :remarks "Good progress"})
+        _ (rehearsal-service/insert-entry! db-conn whoami
+                                              {:rehearsal-id (:id rehearsal1)
+                                               :exercise-id (:id exercise1)
+                                               :variant-id (:id variant1)
+                                               :entry-time (java.time.Instant/ofEpochSecond 1100)
+                                               :remarks "Good progress"})
 
-        entry2 (rehearsal-service/insert-entry! db-conn whoami
-                                               {:rehearsal-id (:id rehearsal1)
-                                                :exercise-id (:id exercise2)
-                                                :variant-id (:id variant2)
-                                                :entry-time (java.time.Instant/ofEpochSecond 1200)
-                                                :remarks "Needs more work"})
+        _ (rehearsal-service/insert-entry! db-conn whoami
+                                              {:rehearsal-id (:id rehearsal1)
+                                               :exercise-id (:id exercise2)
+                                               :variant-id (:id variant2)
+                                               :entry-time (java.time.Instant/ofEpochSecond 1200)
+                                               :remarks "Needs more work"})
 
         export-data (export-service/export-account db-conn (:id test-account))]
 
@@ -130,12 +129,12 @@
         whoami {:account-id (:id test-account) :account-name "testuser5"}
 
         ;; Add some realistic data to make the test more comprehensive
-        exercise1 (exercise-service/add! db-conn whoami {:title "Test Exercise" :description "Test"})
-        rehearsal1 (rehearsal-service/insert-rehearsal! db-conn whoami
-                                                       {:title "Test Rehearsal"
-                                                        :description "Test"
-                                                        :start-time (java.time.Instant/ofEpochSecond 500)
-                                                        :duration 1800})
+        _ (exercise-service/add! db-conn whoami {:title "Test Exercise" :description "Test"})
+        _ (rehearsal-service/insert-rehearsal! db-conn whoami
+                                              {:title "Test Rehearsal"
+                                               :description "Test"
+                                               :start-time (java.time.Instant/ofEpochSecond 500)
+                                               :duration 1800})
         export-data (export-service/export-account db-conn (:id test-account))]
 
     (t/is (contains? export-data :account) "Export should contain account")
@@ -155,7 +154,7 @@
         whoami {:account-id (:id test-account) :account-name "testuser7"}
 
         ;; Add realistic data
-        variant1 (variant-service/add! db-conn whoami {:title "Test Variant" :description "Test"})
+        _ (variant-service/add! db-conn whoami {:title "Test Variant" :description "Test"})
         export-data (export-service/export-account db-conn (:id test-account))]
 
     (t/is (contains? export-data :version) "Export should have version field")
@@ -177,12 +176,12 @@
                                                         :start-time (java.time.Instant/ofEpochSecond 1000)
                                                         :duration 1800})
         variant1 (variant-service/add! db-conn whoami {:title "Test Variant" :description "Test"})
-        entry1 (rehearsal-service/insert-entry! db-conn whoami
-                                               {:rehearsal-id (:id rehearsal1)
-                                                :exercise-id (:id exercise1)
-                                                :variant-id (:id variant1)
-                                                :entry-time (java.time.Instant/ofEpochSecond 2000)
-                                                :remarks "Test entry"})
+        _ (rehearsal-service/insert-entry! db-conn whoami
+                                              {:rehearsal-id (:id rehearsal1)
+                                               :exercise-id (:id exercise1)
+                                               :variant-id (:id variant1)
+                                               :entry-time (java.time.Instant/ofEpochSecond 2000)
+                                               :remarks "Test entry"})
         export-data (export-service/export-account db-conn (:id test-account))]
 
     (t/is (contains? export-data :exported-at) "Export should have exported-at field")
@@ -210,12 +209,12 @@
                                                         :duration nil})
 
         ;; Add an entry to make it more realistic
-        entry1 (rehearsal-service/insert-entry! db-conn whoami
-                                               {:rehearsal-id (:id rehearsal1)
-                                                :exercise-id (:id exercise1)
-                                                :variant-id (:id variant1)
-                                                :entry-time (java.time.Instant/ofEpochSecond 100)
-                                                :remarks "Test entry"})
+        _ (rehearsal-service/insert-entry! db-conn whoami
+                                              {:rehearsal-id (:id rehearsal1)
+                                               :exercise-id (:id exercise1)
+                                               :variant-id (:id variant1)
+                                               :entry-time (java.time.Instant/ofEpochSecond 100)
+                                               :remarks "Test entry"})
 
         export-data (export-service/export-account db-conn (:id test-account))]
 

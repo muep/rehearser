@@ -1,0 +1,2 @@
+{:linters {:redundant-let {:level :off}
+           :unused-alias {:level :warning}}}

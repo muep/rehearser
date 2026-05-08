@@ -8,5 +8,5 @@
 
 (def params-post params-get)
 
-(defn fail [req]
+(defn fail [_]
   (throw (ex-info "Intentional failure in request processing" {})))

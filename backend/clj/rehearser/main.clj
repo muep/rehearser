@@ -77,7 +77,7 @@
 (def env->options env->jdbc-url)
 
 (defn parse-args [args]
-  (let [{:keys [arguments errors options summary] :as opts}
+  (let [{:keys [arguments options summary] :as opts}
         (cli/parse-opts args toplevel-options :in-order true)
         [subcmd-name & subcmd-args] arguments]
     (common-cmd/check-parse-result! ["rehearser"] opts
@@ -111,7 +111,7 @@
     ;; Only the top-level arguments are parsed here. Further parsing
     ;; will be done when the subcommand has been selected and its
     ;; namespace has been loaded as well.
-    (let [{:keys [help status options subcmd subcmd-args subcmd-name]} (parse-args args)]
+    (let [{:keys [options subcmd subcmd-args]} (parse-args args)]
       (subcmd {:options (merge (env->options) (options-with-jdbc-url options))
                :subcmd-args subcmd-args}))
     (catch clojure.lang.ExceptionInfo e

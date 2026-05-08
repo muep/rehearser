@@ -14,7 +14,7 @@ jobs:
       image: clojure:temurin-21-tools-deps-trixie-slim
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Build release archive
       run: ./package.sh

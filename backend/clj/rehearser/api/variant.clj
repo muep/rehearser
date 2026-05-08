@@ -3,8 +3,7 @@
             [rehearser.response :as response]
             [rehearser.malli :refer [Metadata save->update]]
             [malli.core :as m]
-            [malli.util :as mu]
-            [malli.error :as me]))
+            [malli.util :as mu]))
 
 (def VariantSave
   (m/schema [:map {:closed true}
@@ -28,7 +27,7 @@
    :status 200})
 
 (defn get-variant [{{{:keys [id]} :path} :parameters
-                     :keys [db whoami parameters]}]
+                     :keys [db whoami]}]
   (response/get-one (service/find-by-id db whoami id)))
 
 (defn delete-variant! [{{{:keys [id]} :path} :parameters

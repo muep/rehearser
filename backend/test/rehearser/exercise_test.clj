@@ -5,8 +5,6 @@
     [rehearser.test-db :refer [test-db]]
 
     [crypto.random :as random]
-    [jsonista.core :as json]
-    [ring.mock.request :as mock]
     [next.jdbc :as jdbc]
 
     [rehearser.http-service :as http-service]
