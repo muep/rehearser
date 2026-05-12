@@ -74,7 +74,13 @@
       :else
       {:jdbc-url "jdbc:postgresql://localhost:5432/rehearser?user=rehearser&password=rehearser"})))
 
-(def env->options env->jdbc-url)
+(defn env->mistral-api-key []
+  (let [mistral-api-key (System/getenv "MISTRAL_API_KEY")]
+    {:mistral-api-key mistral-api-key}))
+
+(defn env->options []
+  (merge (env->jdbc-url)
+         (env->mistral-api-key)))
 
 (defn parse-args [args]
   (let [{:keys [arguments options summary] :as opts}

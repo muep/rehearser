@@ -16,10 +16,10 @@
   (:import
    (com.zaxxer.hikari HikariConfig HikariDataSource)))
 
-(defn wrap-db [db]
+(defn wrap-resources [resources]
   (fn [handler]
     (fn [req]
-      (handler (assoc req :db db)))))
+      (handler (merge req resources)))))
 
 (defn wrap-session [key]
   (fn [handler]
@@ -84,13 +84,14 @@
 
   Returns a map with :handler (the Ring handler) and any auxiliary values
   needed by the application."
-  [db session-key url-prefix static-file-dir admin-pwhash]
+  [db session-key url-prefix static-file-dir admin-pwhash mistral-api-key]
   (let [reqstat (reqstat/reqstat-middleware+handler)
         before-middlewares [(:middleware reqstat)
                             (fn [handler]
                               (fn [req]
                                 (handler (assoc req :url-prefix url-prefix))))]
-        after-middlewares [(wrap-db db)
+        after-middlewares [(wrap-resources {:db db
+                                            :mistral-api-key mistral-api-key})
                            (wrap-session session-key)
                            whoami-middleware
                            (wrap-require-login-for-ui url-prefix)
@@ -115,7 +116,7 @@
                                                             :root static-file-dir})))
                       (reitit-ring/create-default-handler)))))
 
-(defn run [{:keys [admin-pwhash session-key jdbc-url port static-file-dir url-prefix]
+(defn run [{:keys [admin-pwhash session-key jdbc-url mistral-api-key port static-file-dir url-prefix]
             :or {port 8080
                  url-prefix ""}}]
   (log/info "expecting database at" jdbc-url)
@@ -123,6 +124,9 @@
 
   (when-not (empty? url-prefix)
     (log/info (str "Prefixing URLs with " url-prefix)))
+
+  (when-not (empty? mistral-api-key)
+    (log/info "Mistral API available"))
 
   (if (empty? static-file-dir)
     (log/info "Should serve static content from resources")
@@ -133,7 +137,7 @@
                                 (.setInitializationFailTimeout -1)))
         db {:datasource ds}
         key (or session-key (random/bytes 16))
-        app (:handler (make-app db key url-prefix static-file-dir admin-pwhash))
+        app (:handler (make-app db key url-prefix static-file-dir admin-pwhash mistral-api-key))
         close-server (http-server/run-server app {:ip "0.0.0.0"
                                                   :max-body (* 1024 1024)
                                                   :port port})]

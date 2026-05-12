@@ -10,6 +10,7 @@
 (defonce jdbc-url "jdbc:postgresql://localhost:5432/rehearser?user=rehearser&password=rehearser")
 (defonce port 8080)
 (defonce session-key (random/bytes 16))
+(defonce mistral-api-key nil)
 
 (defn set-server! [new-server]
   (swap! server (fn [old-server]

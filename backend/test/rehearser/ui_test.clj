@@ -10,13 +10,13 @@
 (t/use-fixtures :each fixture/fixture)
 
 (t/deftest redirect-to-index-test
-  (let [app (:handler (http-service/make-app test-db (random/bytes 16) "" nil nil))
+  (let [app (:handler (http-service/make-app test-db (random/bytes 16) "" nil nil nil))
         response (app (mock/request :get "/"))]
     (t/is (= (:status response) 302))
     (t/is (= (get-in response [:headers "Location"]) "/index.html"))))
 
 (t/deftest redirect-to-index-test-with-url-prefix
-  (let [app (:handler (http-service/make-app test-db (random/bytes 16) "/reh" nil nil))]
+  (let [app (:handler (http-service/make-app test-db (random/bytes 16) "/reh" nil nil nil))]
     (let [response (app (mock/request :get "/reh"))]
       (t/is (= (:status response) 302))
       (t/is (= (get-in response [:headers "Location"]) "/reh/index.html")))

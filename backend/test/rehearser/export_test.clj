@@ -56,7 +56,7 @@
                                                       :entry-time (java.time.Instant/ofEpochSecond 1200)
                                                       :remarks "Second test entry"})
 
-             app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
+             app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil nil)
                      :handler
                      handler-with-local-cookies)
              login-response (app (post-form-request "/api/login" {:username source-username :password source-password}))
@@ -83,7 +83,7 @@
           password "targetpwd"
           target-account (account-service/create-account! test-db username password)
           target-whoami {:account-id (:id target-account) :account-name username}
-          app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
+          app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil nil)
                   :handler
                   handler-with-local-cookies)]
 

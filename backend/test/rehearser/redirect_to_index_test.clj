@@ -24,7 +24,7 @@
      :body (-> body-payload .getBytes ByteArrayInputStream.)}))
 
 (t/deftest redirect-anonymous-user-to-index
-  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil nil)
                 :handler
                 handler-with-local-cookies)]
 

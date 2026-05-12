@@ -37,7 +37,8 @@
 (defn env->admin-pwhash []
   (System/getenv "REHEARSER_ADMIN_PASSWORD"))
 
-(defn serve [{{:keys [jdbc-url]} :options :keys [subcmd-args]}]
+(defn serve [{{:keys [jdbc-url mistral-api-key]} :options
+              :keys [subcmd-args]}]
   (let [{{:keys [port static-file-dir url-prefix]} :options
          :as opts}
         (cli/parse-opts subcmd-args serve-options)
@@ -46,6 +47,7 @@
     (check-parse-result! ["rehearser" "serve"] opts nil)
     (http/run {:admin-pwhash admin-pwhash
                :jdbc-url jdbc-url
+               :mistral-api-key mistral-api-key
                :port port
                :session-key session-key
                :static-file-dir static-file-dir

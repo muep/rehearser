@@ -13,6 +13,7 @@
   (state/set-server! ((resolve 'rehearser.http-service/run)
                       {:admin-pwhash state/admin-pwhash
                        :jdbc-url state/jdbc-url
+                       :mistral-api-key state/mistral-api-key
                        :port state/port
                        :session-key state/session-key
                        :static-file-dir "front/public"})))

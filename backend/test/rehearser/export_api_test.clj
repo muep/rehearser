@@ -15,7 +15,7 @@
 (t/use-fixtures :each fixture)
 
 (t/deftest test-export-endpoint-requires-authentication
-  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil nil)
                 :handler)
         response (app {:request-method :get
                       :uri "/api/export"})]
@@ -24,7 +24,7 @@
     (t/is (contains? #{401 403} (:status response)) "Unauthenticated export request should be rejected")))
 
 (t/deftest test-export-endpoint-accepts-get-only
-  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil nil)
                 :handler
                 handler-with-local-cookies)
         _ (account-service/create-account! test-db "testuser" "testpass")
@@ -35,7 +35,7 @@
       (t/is (= (:status get-response) 200) "GET method should be supported"))))
 
 (t/deftest test-export-endpoint-returns-correct-content-type
-  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil nil)
                 :handler
                 handler-with-local-cookies)
         _ (account-service/create-account! test-db "testuser2" "testpass")
@@ -49,7 +49,7 @@
       (t/is (contains? (:headers response) "Content-Disposition") "Response should have Content-Disposition header"))))
 
 (t/deftest test-export-response-has-download-header
-  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil nil)
                 :handler
                 handler-with-local-cookies)
         _ (account-service/create-account! test-db "testuser3" "testpass")
@@ -69,7 +69,7 @@
           (t/is (.endsWith content-disp ".json\"") "Filename should end with .json extension"))))))
 
 (t/deftest test-export-response-converts-timestamps
-  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil nil)
                 :handler
                 handler-with-local-cookies)
         _ (account-service/create-account! test-db "testuser4" "testpass")
@@ -113,7 +113,7 @@
               (t/is (integer? entry-time) "entry entry-time should be an integer"))))))))
 
 (t/deftest test-export-response-matches-json-schema
-  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil nil)
                 :handler
                 handler-with-local-cookies)
         test-account (account-service/create-account! test-db "testuser6" "testpass")

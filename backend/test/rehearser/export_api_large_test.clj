@@ -13,7 +13,7 @@
 (t/use-fixtures :each fixture)
 
 (t/deftest test-export-with-large-dataset
-  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil)
+  (let [app (-> (http-service/make-app test-db (random/bytes 16) "" nil nil nil)
                 :handler
                 handler-with-local-cookies)
         test-account (account-service/create-account! test-db "testuser7" "testpass")
