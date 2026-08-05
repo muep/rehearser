@@ -7,7 +7,8 @@
 
 (declare rehearsal-insert! rehearsal-update! rehearsal-close!
          rehearsal-select entry-insert! entry-update! entry-select
-         rehearsal-select-by-id entry-select-with-title entry-delete!)
+         rehearsal-select-by-id entry-select-with-title entry-delete!
+         entry-select-by-id entry-select-by-id-with-title)
 
 (defn insert-rehearsal! [db whoami rehearsal]
   (rehearsal-insert! db (merge (select-keys whoami [:account-id])
@@ -56,7 +57,26 @@
       (assoc rehearsal :entries (entry-select-with-title tx {:account-id account-id
                                                              :rehearsal-id rehearsal-id})))))
 
+(defn find-entry-by-id [db whoami entry-id]
+  (entry-select-by-id db {:account-id (:account-id whoami)
+                          :id entry-id}))
+
+(defn find-entry-by-id-with-title [db whoami entry-id]
+  (entry-select-by-id-with-title db {:account-id (:account-id whoami)
+                                     :id entry-id}))
+
 (defn delete-entry! [db whoami id]
   (println (str "Going to delete entry " id))
   (entry-delete! db {:id id
                      :account-id (:account-id whoami)}))
+
+(defn duplicate-entry! [db whoami entry-id]
+  (jdbc/with-transaction [tx db]
+    (when-let [original-entry (entry-select-by-id tx {:account-id (:account-id whoami)
+                                                      :id entry-id})]
+      (entry-insert! tx (merge (select-keys whoami [:account-id])
+                               (select-keys original-entry [:rehearsal-id
+                                                            :exercise-id
+                                                            :variant-id
+                                                            :entry-time
+                                                            :remarks]))))))

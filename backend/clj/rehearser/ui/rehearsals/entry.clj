@@ -22,7 +22,8 @@
          [:h1 (components/rehearsal-link rehearsal url-prefix) " / " (:exercise-title entry)]
          [:p "Practiced " (components/tune-link entry url-prefix) " at "
           (components/format-instant (:entry-time entry))
-          " (or " [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/delete.html")} "didn't?"] ")"]
+          " (or " [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/delete.html")} "didn't?"]
+          " or " [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/duplicate.html")} "duplicate"] ")"]
          [:form {:action (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")
                  :method "post"}
           [:div {:class "labeled-input"}
@@ -80,6 +81,38 @@
   {:status 303
    :headers {"location" (str url-prefix "/rehearsals/" rehearsal-id "/rehearsal.html")}})
 
+(defn entry-duplicate-page [{{{:keys [rehearsal-id id]} :path} :parameters
+                             :keys [db url-prefix whoami]}]
+  (if-let [entry (rehearsal-service/find-entry-by-id-with-title db whoami id)]
+    (let [rehearsal (rehearsal-service/find-rehearsal db whoami (:rehearsal-id entry))]
+      {:status 200
+       :body
+       (common-ui/page
+        url-prefix whoami (str (:title rehearsal) " / " (:exercise-title entry) " / Duplicate entry")
+        [:main
+         [:h1
+          (components/rehearsal-link rehearsal url-prefix) " / "
+          (components/entry-link entry url-prefix) " / Duplicate entry"]
+         [:p "Duplicate entry for " (hiccup/h (:exercise-title entry)) "?"]
+         [:p "Exercise: " (hiccup/h (:exercise-title entry))]
+         [:p "Variant: " (hiccup/h (:variant-title entry))]
+         [:p "Remarks: " (hiccup/h (:remarks entry))]
+         [:p "Entry time: " (components/format-instant (:entry-time entry))]
+         [:form {:action (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/duplicate.html")
+                 :method "post"}
+          [:input {:type "submit" :value "Duplicate entry"}]
+          [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")} "Cancel"]]])})
+    {:status 404
+     :body (str "No entry " id " found")}))
+
+(defn entry-duplicate! [{{{:keys [rehearsal-id id]} :path} :parameters
+                        :keys [db url-prefix whoami]}]
+  (if-let [new-entry (rehearsal-service/duplicate-entry! db whoami id)]
+    {:status 303
+     :headers {"location" (str url-prefix "/rehearsals/" rehearsal-id "/entry/" (:id new-entry) "/entry.html")}}
+    {:status 404
+     :body (str "No entry " id " found")}))
+
 (def routes
   [["/rehearsals/:rehearsal-id/entry/:id/entry.html"
     {:get {:parameters {:path {:rehearsal-id int?
@@ -98,4 +131,11 @@
            :handler entry-delete-page}
      :post {:parameters {:path {:rehearsal-id int?
                                :id int?}}
-            :handler entry-delete!}}]])
+            :handler entry-delete!}}]
+   ["/rehearsals/:rehearsal-id/entry/:id/duplicate.html"
+    {:get {:parameters {:path {:rehearsal-id int?
+                               :id int?}}
+           :handler entry-duplicate-page}
+     :post {:parameters {:path {:rehearsal-id int?
+                                :id int?}}
+            :handler entry-duplicate!}}]])
