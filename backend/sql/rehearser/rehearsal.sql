@@ -141,7 +141,7 @@ from
 where
     "account-id" = :account-id and
     "rehearsal-id" = :rehearsal-id
-order by "entry-time" asc;
+order by "entry-time" asc, id asc;
 
 -- :name entry-select-with-title :? :*
 select
@@ -161,7 +161,7 @@ from
 where
     entry."account-id" = :account-id and
     entry."rehearsal-id" = :rehearsal-id
-order by "entry-time" asc;
+order by "entry-time" asc, entry.id asc;
 
 -- :name entry-delete! :! :n
 delete from entry
