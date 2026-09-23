@@ -26,12 +26,13 @@ def fail(message):
     sys.exit(1)
 
 
-def run(cmd, *, check=True, capture=False):
+def run(cmd, *, check=True, capture=False, cwd=None):
     print(f"+ {' '.join(cmd)}")
     result = subprocess.run(
         cmd,
         stdout=subprocess.PIPE if capture else None,
         stderr=subprocess.PIPE if capture else None,
+        cwd=cwd,
     )
     if result.returncode != 0:
         if check and os.geteuid() != 0:
@@ -83,20 +84,27 @@ def ensure_jdk():
 
 def ensure_clojure_cli():
     """Debian's "clojure" package is NOT the CLI tools we need."""
-    if have("clojure") and run(
-        ["clojure", "-M", "-e", "(clojure-version)"],
-        check=False,
-        capture=True,
-    ).returncode == 0:
-        return
-    with tempfile.NamedTemporaryFile(suffix=".sh", delete=False) as f:
-        urllib.request.urlretrieve(CLOJURE_INSTALL_URL, f.name)
-        installer = f.name
-    try:
-        run(["bash", installer])
-    finally:
-        os.unlink(installer)
-    run(["clojure", "-M", "-e", '(println "clojure" (clojure-version))'])
+    # Run clojure in a scratch directory, so that a root run does not leave
+    # a root-owned .cpcache in the project directory.
+    with tempfile.TemporaryDirectory() as scratch:
+        if have("clojure") and run(
+            ["clojure", "-M", "-e", "(clojure-version)"],
+            check=False,
+            capture=True,
+            cwd=scratch,
+        ).returncode == 0:
+            return
+        with tempfile.NamedTemporaryFile(suffix=".sh", delete=False) as f:
+            urllib.request.urlretrieve(CLOJURE_INSTALL_URL, f.name)
+            installer = f.name
+        try:
+            run(["bash", installer])
+        finally:
+            os.unlink(installer)
+        run(
+            ["clojure", "-M", "-e", '(println "clojure" (clojure-version))'],
+            cwd=scratch,
+        )
 
 
 def ensure_postgres():
