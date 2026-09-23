@@ -18,4 +18,4 @@ if [ ! -f "$DEPS_FILE" ]; then
     exit 1
 fi
 
-exec clojure -M:dev -m outdated-deps.core "$DEPS_FILE"
+exec clojure -M:dev -m outdated-deps "$DEPS_FILE"

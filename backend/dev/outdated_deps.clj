@@ -1,4 +1,4 @@
-(ns outdated-deps.core
+(ns outdated-deps
   "Print dependencies in a deps.edn file that have a newer release.
 
   Each dependency listed with :mvn/version in the file's :deps and
