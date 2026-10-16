@@ -6,14 +6,19 @@
    [rehearser.ui.common :as common-ui]
    [rehearser.ui.rehearsals.components :as components]))
 
-(defn entry-page [{{{:keys [rehearsal-id id]} :path} :parameters
-                   :keys [db url-prefix whoami]}]
+(defn entry-page [{{{:keys [rehearsal-id id]} :path
+                   {:keys [exercise-id]} :query} :parameters
+                  :keys [db url-prefix whoami]}]
   (if-let [[rehearsal entry]
            (let [rehearsal (rehearsal-service/find-rehearsal db whoami rehearsal-id)
                  entry (->> rehearsal :entries (some #(when (= id (:id %)) %)))]
              (when entry [rehearsal entry]))]
-    (let [all-exercises (->> (exercise-service/find-all db whoami)
-                             (sort-by :title #(compare (.toLowerCase ^String %1) (.toLowerCase ^String %2))))]
+    (let [selected-exercise (when exercise-id
+                              (first (exercise-service/find-by-id db whoami exercise-id)))
+          selected-exercise-id (or (:id selected-exercise)
+                                   (:exercise-id entry))
+          selected-title (or (:title selected-exercise)
+                            (:exercise-title entry))]
       {:status 200
        :body
        (common-ui/page
@@ -26,14 +31,18 @@
           " or " [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/duplicate.html")} "duplicate"] ")"]
          [:form {:action (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry.html")
                  :method "post"}
+          [:input {:type "hidden" :name "exercise-id" :value selected-exercise-id}]
           [:div {:class "labeled-input"}
-           [:label {:for "exercise-id"} "Exercise:"]
-           [:select {:id "exercise-id"
-                     :name "exercise-id"}
-            (for [exercise all-exercises]
-              [:option {:value (:id exercise)
-                        :selected (= (:id exercise) (:exercise-id entry))}
-               (:title exercise)])]]
+           [:label {:for "exercise-display"} "Tune:"]
+           [:span {:id "exercise-display"}
+            (hiccup/h selected-title)
+            (when (and selected-exercise
+                       (not= (:id selected-exercise) (:exercise-id entry)))
+              [:span " (changing from " (hiccup/h (:exercise-title entry)) ")"])]
+           " ("
+           [:a {:href (str url-prefix "/rehearsals/" rehearsal-id "/entry/" id "/entry-edit-search.html")}
+            "change tune"]
+           ")"]
           [:div {:class "labeled-input"}
            [:label {:for "remarks-input"} "Notes:"]
            [:textarea {:id "remarks-input"
@@ -116,7 +125,9 @@
 (def routes
   [["/rehearsals/:rehearsal-id/entry/:id/entry.html"
     {:get {:parameters {:path {:rehearsal-id int?
-                               :id int?}}
+                               :id int?}
+                        :query [:map
+                                [:exercise-id {:optional true} int?]]}
            :handler entry-page}
      :post {:parameters {:path {:rehearsal-id int?
                                 :id int?}

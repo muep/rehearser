@@ -5,6 +5,7 @@
    [rehearser.ui.rehearsals.entry :as entry]
    [rehearser.ui.rehearsals.entry-add :as entry-add]
    [rehearser.ui.rehearsals.entry-add-search :as entry-add-search]
+   [rehearser.ui.rehearsals.entry-edit-search :as entry-edit-search]
    [rehearser.ui.rehearsals.index :as index]))
 
 (def routes (concat detail/routes
@@ -12,4 +13,5 @@
                     entry/routes
                     entry-add/routes
                     entry-add-search/routes
+                    entry-edit-search/routes
                     index/routes))

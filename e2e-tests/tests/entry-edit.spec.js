@@ -72,18 +72,29 @@ test.describe("Editing rehearsal entries", () => {
     await page.click("a:has-text('Kesh jig')");
     await expect(page).toHaveURL(/\/rehearsals\/\d+\/entry\/\d+\/entry\.html/);
 
-    // The edit form is pre-filled with the entry's tune and remarks
-    await expect(page.locator("#exercise-id")).toHaveValue(
-      await page
-        .locator("#exercise-id option", { hasText: "Kesh jig" })
-        .getAttribute("value"),
-    );
+    // The edit form shows the entry's current tune and remarks
+    await expect(page.locator("#exercise-display")).toHaveText("Kesh jig");
     await expect(page.locator("textarea[name='remarks']")).toHaveValue(
       "Worked on ornamentation",
     );
 
-    // Change the entry's tune from Kesh jig to Cooley's reel and update notes
-    await page.selectOption("#exercise-id", { label: "Cooley's reel" });
+    // Change the entry's tune from Kesh jig to Cooley's reel via the
+    // search flow, mirroring the add-entry flow
+    await page.click("a:has-text('change tune')");
+    await expect(page).toHaveURL(
+      /\/rehearsals\/\d+\/entry\/\d+\/entry-edit-search\.html/,
+    );
+    await page.fill("input[name='query']", "Cooley");
+    await page.click("input[type='submit']");
+    await page.locator("a", { hasText: "Cooley's reel" }).first().click();
+    await expect(page).toHaveURL(/\/rehearsals\/\d+\/entry\/\d+\/entry\.html/);
+
+    // The edit form now shows the newly selected tune
+    await expect(page.locator("#exercise-display")).toHaveText(
+      "Cooley's reel (changing from Kesh jig)",
+    );
+
+    // Update notes and save
     await page.fill(
       "textarea[name='remarks']",
       "Switched this slot to work on bowing",
@@ -94,11 +105,7 @@ test.describe("Editing rehearsal entries", () => {
     await expect(page).toHaveURL(/\/rehearsals\/\d+\/entry\/\d+\/entry\.html/);
 
     // The edited entry now points at the other tune
-    await expect(page.locator("#exercise-id")).toHaveValue(
-      await page
-        .locator("#exercise-id option", { hasText: "Cooley's reel" })
-        .getAttribute("value"),
-    );
+    await expect(page.locator("#exercise-display")).toHaveText("Cooley's reel");
     await expect(page.locator("body")).toContainText("Practiced");
 
     // On the rehearsal page, the entry now appears under its new tune
