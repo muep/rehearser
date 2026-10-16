@@ -1,20 +1,20 @@
 {:paths ["classes" "backend/clj" "backend/resources" "backend/sql" "front"]
  :deps {;; General org.clojure bits
-        org.clojure/clojure {:mvn/version "1.12.3"}
-        org.clojure/tools.cli {:mvn/version "1.1.230"}
+        org.clojure/clojure {:mvn/version "1.12.6"}
+        org.clojure/tools.cli {:mvn/version "1.4.256"}
 
         ;; Logging
-        org.clojure/tools.logging {:mvn/version "1.3.0"}
-        org.slf4j/slf4j-api {:mvn/version "2.0.17"}
-        org.slf4j/slf4j-simple {:mvn/version "2.0.17"}
+        org.clojure/tools.logging {:mvn/version "1.3.1"}
+        org.slf4j/slf4j-api {:mvn/version "2.0.20"}
+        org.slf4j/slf4j-simple {:mvn/version "2.0.20"}
 
         ;; HTTP
-        http-kit/http-kit {:mvn/version "2.6.0"}
-        metosin/reitit-core {:mvn/version "0.6.0"}
-        metosin/reitit-ring {:mvn/version "0.6.0"}
-        metosin/reitit-middleware {:mvn/version "0.6.0"}
-        metosin/reitit-malli {:mvn/version "0.6.0"}
-        metosin/muuntaja {:mvn/version "0.6.8"}
+        http-kit/http-kit {:mvn/version "2.8.1"}
+        metosin/reitit-core {:mvn/version "0.11.0"}
+        metosin/reitit-ring {:mvn/version "0.11.0"}
+        metosin/reitit-middleware {:mvn/version "0.11.0"}
+        metosin/reitit-malli {:mvn/version "0.11.0"}
+        metosin/muuntaja {:mvn/version "0.6.12"}
         crypto-random/crypto-random {:mvn/version "1.2.1"}
         ;; Servlet API required by Ring middleware
         javax.servlet/javax.servlet-api {:mvn/version "4.0.1"}
@@ -23,23 +23,23 @@
         hiccup/hiccup {:mvn/version "2.0.0"}
 
         ;; Database
-        org.postgresql/postgresql {:mvn/version "42.7.8"}
-        com.zaxxer/HikariCP {:mvn/version "7.0.2"}
-        com.github.seancorfield/next.jdbc {:mvn/version "1.3.1070"}
+        org.postgresql/postgresql {:mvn/version "42.7.13"}
+        com.zaxxer/HikariCP {:mvn/version "7.1.0"}
+        com.github.seancorfield/next.jdbc {:mvn/version "1.3.1118"}
         com.layerware/hugsql {:mvn/version "0.5.3"
                               :exclusions [com.layerware/hugsql-adapter-clojure-java-jdbc]}
         com.layerware/hugsql-adapter-next-jdbc {:mvn/version "0.5.3"}
 
         ;; Misc
-        org.springframework.security/spring-security-crypto {:mvn/version "5.8.2"}}
- :aliases {:uberdeps {:replace-deps {uberdeps/uberdeps {:mvn/version "1.1.2"}}
+        org.springframework.security/spring-security-crypto {:mvn/version "7.1.1"}}
+ :aliases {:uberdeps {:replace-deps {uberdeps/uberdeps {:mvn/version "1.4.0"}}
                       :replace-paths []
                       :main-opts ["-m" "uberdeps.uberjar"]}
            :clj-kondo
-           {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2026.04.15"}}
+           {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2026.08.04"}}
             :main-opts ["-m" "clj-kondo.main"]}
            :dev {:extra-paths ["backend/test" "backend/dev"]
-                 :extra-deps {org.clojure/tools.namespace {:mvn/version "1.4.4"}
+                 :extra-deps {org.clojure/tools.namespace {:mvn/version "1.5.1"}
                               eftest/eftest  {:mvn/version "0.6.0"}
                               ring/ring-mock {:mvn/version "0.6.2"}}}
            :test {:extra-paths ["backend/test"]
