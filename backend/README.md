@@ -15,6 +15,14 @@ Via docker:
 
 ## Run tests
 
+In a fresh environment, prepare the dependencies first; no root
+privileges are needed. This installs JDK 21, the Clojure CLI and a
+loopback-only PostgreSQL into a user-writable directory and prints
+the environment to use:
+
+    # (in project root)
+    ./prepare-test-deps.py
+
 Run all tests:
 
     # (in project root)
